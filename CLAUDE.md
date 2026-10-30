@@ -14,6 +14,7 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 - Para ficheros de `public/` usar `import.meta.env.BASE_URL` como prefijo.
 - Sitio estático sin servidor: si se añade router, usar `HashRouter` (Pages no hace fallback a `index.html`).
 - Comandos: `npm run dev`, `npm run build` (debe pasar sin errores antes de cada push), `npm run lint`.
+- Versiones de referencia (revisadas el 2026-10-30): Node 24 LTS (`.nvmrc`, usado por CI y despliegue; mínimo `>=22.12` por Vite 8), Vite 8, React 19, TypeScript 7, `@types/node` alineado con la major de Node (24).
 - Sin dependencias nuevas salvo necesidad clara.
 
 ## Idioma
