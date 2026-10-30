@@ -14,7 +14,7 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 - Para ficheros de `public/` usar `import.meta.env.BASE_URL` como prefijo (en `index.html` y `manifest.webmanifest`, rutas relativas).
 - App instalable (PWA): `public/manifest.webmanifest`, `public/sw.js` (red primero, copia sin conexión) y iconos de Repi (`icon.svg` es la fuente de los PNG). Si se cambian los ficheros de `public/` que el service worker guarda, subir `CACHE` en `sw.js`.
 - Sitio estático sin servidor: si se añade router, usar `HashRouter` (Pages no hace fallback a `index.html`).
-- Comandos: `npm run dev`, `npm run build` (debe pasar sin errores antes de cada push), `npm run lint`.
+- Comandos: `npm run dev`, `npm test` (tests), `npm run build` (debe pasar sin errores antes de cada push), `npm run lint`.
 - Versiones de referencia (revisadas el 2026-10-30): Node 24 LTS (`.nvmrc`, usado por CI y despliegue; mínimo `>=22.12` por Vite 8), Vite 8, React 19, TypeScript 7, `@types/node` alineado con la major de Node (24).
 - Sin dependencias nuevas salvo necesidad clara.
 
@@ -48,12 +48,16 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 
 - Se trabaja con TDD: primero se escribe un test que falla, luego el código mínimo para que pase y después se refactoriza. Vale para lógica, componentes y datos de ejercicios.
 - Cada cambio de comportamiento lleva su test en la misma PR; un fallo corregido se empieza con un test que lo reproduzca.
-- Los tests deben pasar (`npm test`, además de `npm run lint` y `npm run build`) antes de cada push.
-- Framework de tests (Vitest): pendiente de configurar en la issue #23. Hasta entonces, no se añade lógica nueva sin esa base; esta nota se actualiza al terminarla.
+- Los tests deben pasar (`npm test`, además de `npm run lint` y `npm run build`) antes de cada push; el CI también los ejecuta.
+- Herramientas: Vitest con jsdom y Testing Library (`@testing-library/react`, `user-event`, `jest-dom`). `npm test` ejecuta todo una vez y `npm run test:watch` queda vigilando cambios.
+- Los tests van junto al código (`Algo.test.ts` o `Algo.test.tsx`); la configuración común está en `src/test/setup.ts`. Se importan `describe`, `it` y `expect` de `vitest` (sin globales).
+- Los tests de componentes se escriben como los usaría una persona: buscar por rol y nombre accesible (`getByRole`), no por clases CSS.
+- Los datos de ejercicios tienen sus propios tests (respuesta entre las opciones, operaciones correctas); al añadir contenido nuevo se añaden o amplían.
+- Al empezar con un test que ya pasa porque el código existía, comprobar que puede fallar estropeando el código a propósito.
 
 ## Flujo de trabajo (issues y PR)
 
 - Todo trabajo pendiente (tareas, pasos, mejoras) se anota como issue en GitHub con la plantilla "Tarea / mejora". Incluir una imagen aclaratoria siempre que el cambio sea visual o necesite explicarse; sin fotos de menores ni datos personales.
 - Al empezar una issue: rama `issue-<n>-<slug>` desde `main` y PR en borrador con `Closes #<n>`. No se hace push directo a `main`.
-- El CI (`.github/workflows/ci.yml`) ejecuta `npm run lint` y `npm run build` (y los tests cuando estén configurados) en cada PR y deja `dist` como artefacto para revisar.
+- El CI (`.github/workflows/ci.yml`) ejecuta `npm run lint`, `npm test` y `npm run build` en cada PR y deja `dist` como artefacto para revisar.
 - Se hace merge solo tras revisión del usuario; al entrar en `main`, `deploy.yml` publica en GitHub Pages (CD).
