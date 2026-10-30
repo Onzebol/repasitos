@@ -1,6 +1,6 @@
 # Diseño de la aplicación
 
-Estado: **en definición** (issue #8). Falta elegir el estilo visual entre los tres bocetos.
+Estado: **estilo C elegido** (issue #8). Puede revisarse más adelante; los estilos A y B quedan como alternativa en los bocetos.
 
 ## Decisiones tomadas
 
@@ -28,3 +28,11 @@ Los bocetos son orientativos: iconos (emojis), colores y tipografías del sistem
 - Componentes comunes: botón grande, tarjeta de materia, pantalla de ejercicio, feedback de acierto y de error.
 - Audio: cuándo se usa y cómo se activa (sin reproducción automática molesta).
 - Router: `HashRouter` (Pages no hace fallback a `index.html`).
+
+## Implementado
+
+- Tema del estilo C en `src/assets/theme.css` (variables de color, tarjetas redondeadas, foco visible, `prefers-reduced-motion`).
+- Componentes compartidos en `src/components/`: `Mascot` (Repi) y `Hills` (colinas del fondo).
+- Pantalla de inicio con la elección de perfil (`docs/diseno/inicio-implementado.png`, y versión móvil).
+- Tipografía provisional: Trebuchet MS con respaldo del sistema. Pendiente elegir una fuente legible para primeros lectores y alojarla en el repo.
+- Pendiente: pantallas de materias, ejercicios y feedback (dependen de confirmar las materias, issue #2).

@@ -1,19 +1,28 @@
+import type { CSSProperties } from 'react'
+import { Hills } from './components/Hills'
+import { Mascot } from './components/Mascot'
+
 function App() {
   return (
-    <>
-      <h1>Repasitos</h1>
-      <p>¿Quién va a repasar hoy?</p>
+    <main className="home">
+      <Hills />
+      <header className="greeting">
+        <Mascot size={150} />
+        <p className="bubble">¡Hola! ¿Quién repasa hoy?</p>
+      </header>
       <div className="profiles">
-        <button className="profile infantil">
-          Infantil
+        <button className="profile" style={{ '--tint': '#ffd1dc' } as CSSProperties}>
+          <span className="profile-icon" aria-hidden="true">🧩</span>
+          <span className="profile-name">Infantil</span>
           <small>3º de Infantil</small>
         </button>
-        <button className="profile primaria">
-          Primaria
+        <button className="profile" style={{ '--tint': '#bfe3ff' } as CSSProperties}>
+          <span className="profile-icon" aria-hidden="true">📚</span>
+          <span className="profile-name">Primaria</span>
           <small>2º de Primaria</small>
         </button>
       </div>
-    </>
+    </main>
   )
 }
 
