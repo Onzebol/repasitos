@@ -60,3 +60,12 @@ Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el 
 6. Figuras y cuerpos geométricos; simetría.
 7. Tablas de multiplicar, doble y mitad; repartos.
 8. Problemas sencillos y gráficos de barras.
+
+## Estado en la web
+
+| Unidad | Estado | Temas |
+|---|---|---|
+| 1 | Hecha (56 ejercicios) | Números hasta el 99 · Decenas y unidades · Los signos > y < · Sumas y restas sin llevar · La decena más cercana · Cálculo mental |
+| 2 a 9 | Muy pronto | |
+
+Los ejercicios están en `src/primaria/matematicas/` y se escriben desde cero. En la web las unidades se muestran como "Unidad 1", "Unidad 2"... con un resumen del contenido, sin usar los títulos del libro.
