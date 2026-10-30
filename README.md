@@ -1,6 +1,6 @@
 # Repasitos
 
-Web para que mis hijas repasen las materias del curso jugando.
+Web para repasar jugando las materias de 3º de Infantil y 2º de Primaria.
 
 ## Perfiles
 
@@ -12,7 +12,7 @@ Web para que mis hijas repasen las materias del curso jugando.
 ## Objetivos
 
 - Repasar las materias del curso con ejercicios cortos y atractivos.
-- Que cada niña tenga su espacio con contenido adaptado a su nivel.
+- Que cada perfil tenga su espacio con contenido adaptado a su nivel.
 - Que funcione en tablet y ordenador, sin instalar nada (publicado en GitHub Pages).
 
 ## Tecnologías

@@ -1,4 +1,4 @@
-# Temario de los cursos (Arnedo, La Rioja)
+# Temario de los cursos
 
 Estado: **borrador pendiente de confirmar** (ver "Pendiente"). Investigación hecha el 2026-10-30.
 
@@ -26,7 +26,7 @@ Fuente: Decreto 36/2022, anexo V (horas semanales de 5 años) y saberes básicos
 | Descubrimiento y exploración del entorno | 4 | Exploración de objetos y materiales; experimentación y pensamiento científico; medio físico y natural (agua, tierra, aire; seres vivos) |
 | Comunicación y representación de la realidad | 12,5 | Aproximación a la lectura y la escritura; iniciación a habilidades numéricas básicas; tecnologías digitales; lenguaje musical y plástico |
 | Lengua extranjera (inglés) | 1 | Vocabulario: saludos, tiempo, días, meses, transporte, cuerpo, familia, colegio, colores, números, sentimientos, animales, casa, ropa, comida; rimas y canciones |
-| Religión / Educación emocional y para la creatividad | 1 | Alternativa según la familia |
+| Religión / Educación emocional y para la creatividad | 1 | Alternativa a Religión |
 
 Nota: el decreto desarrolla el bloque de lengua (conciencia fonológica, conciencia fonémica, comunicación oral) con ejemplos en inglés, porque el centro puede ser bilingüe. Las partes de lectoescritura en castellano hay que concretarlas con lo que trabajan en el colegio.
 
@@ -47,17 +47,27 @@ Fuente: circular 2022-23, anexo 1.3 (la tabla de horas salió desordenada al ext
 
 La circular también cita Dramatización y Teatro, Tutoría y Proyectos de libre disposición del centro; dependen de cada colegio y no se incluyen.
 
+### Asignaturas reales de 2º de Primaria (2026-10-30)
+
+Matemáticas, Conocimiento del Medio, Inglés, Lengua, Música, Teatro, Educación Física, Educación Emocional y Religión.
+
+Diferencias con la circular: aparece **Teatro** (la circular lo llama Dramatización y Teatro) y no se mencionan Plástica ni Valores cívicos. Plástica queda pendiente de confirmar.
+
+### Libros de 2º de Primaria
+
+Editorial **Santillana**, proyecto **Construyendo Mundos** (LOMLOE), (dato aportado para el proyecto). Las unidades se organizan en torno a situaciones de aprendizaje. Los ISBN de listas de otros colegios (la edición puede variar; comprobar con los libros reales): Matemáticas 978-84-144-0763-9 (confirmado), Lengua 978-84-144-0762-2 (confirmado), Religión 978-84-144-0796-7. Conocimiento del Medio (1.er trimestre, dato aportado): 978-84-144-4812-0. No se ha encontrado el índice de unidades: sacarlo del libro o de la web de Santillana.
+
 ## Propuesta de materias para la web
 
 Se descartan Educación Física y Religión (no encajan en un repaso en pantalla).
 
 - **Infantil:** Crecimiento en armonía (emociones, cuerpo, hábitos) · Descubrimiento del entorno (animales, plantas, estaciones) · Lectoescritura (letras y sonidos) · Números (conteo y formas) · Inglés (vocabulario) · Música y plástica.
-- **Primaria:** Lengua · Matemáticas · Conocimiento del Medio · Inglés · Plástica y Música (opcional) · Valores (opcional).
+- **Primaria:** Lengua · Matemáticas · Conocimiento del Medio · Inglés · Música · Teatro (a valorar) · Educación emocional (a valorar). Quedan fuera Educación Física y Religión.
 
 ## Pendiente
 
-- [ ] Confirmar con el usuario qué materias quedan (regla de `CLAUDE.md`: confirmar el temario antes de añadir una materia).
-- [ ] Averiguar qué editorial o método usa el colegio de cada niña; el temario real sale de ahí.
+- [ ] Confirmar qué materias quedan (regla de `CLAUDE.md`: confirmar el temario antes de añadir una materia).
+- [ ] Editorial de 2º de Primaria: Santillana, Construyendo Mundos (hecho). Falta la de 3º de Infantil y el índice de unidades de los libros de 2º.
 - [ ] Conseguir el texto del Decreto 41/2022 (Primaria) para detallar los contenidos de cada área de 2º.
 - [ ] Concretar los contenidos de lectoescritura y números de 3º de Infantil.
 - [ ] Después, crear el índice como datos tipados en `src/infantil/` y `src/primaria/` y buscar contenido materia por materia.

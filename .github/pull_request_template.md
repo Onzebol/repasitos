@@ -4,7 +4,7 @@ Closes #
 
 
 ## Imagen del cambio
-<!-- Captura antes/después. Obligatoria si cambia algo visual. Sin fotos de las niñas. -->
+<!-- Captura antes/después. Obligatoria si cambia algo visual. Sin fotos de menores ni datos personales. -->
 
 ## Revisión
 - [ ] `npm run lint` y `npm run build` pasan (lo comprueba el CI)

@@ -1,10 +1,10 @@
 # Repasitos
 
-Web educativa para que dos niñas repasen las materias del curso: una de 3º de Infantil y otra de 2º de Primaria. Ver `README.md` para el contexto general.
+Web educativa para repasar las materias de dos cursos: 3º de Infantil y 2º de Primaria. Ver `README.md` para el contexto general.
 
 ## Público
 
-Usuarios finales: niñas de 5-6 y 7-8 años. Los padres son quienes mantienen el proyecto. Todo debe poder usarse sin ayuda.
+Usuarios finales: niños y niñas de 5-6 y 7-8 años. Los adultos mantienen el proyecto. Todo debe poder usarse sin ayuda.
 
 ## Stack
 
@@ -28,14 +28,14 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 - Infantil: casi sin texto, apoyo en imágenes, iconos y audio; colores vivos; sin tiempos límite ni penalizaciones.
 - Primaria: frases cortas, vocabulario de 2º, feedback inmediato y positivo ante errores ("¡Casi! Inténtalo otra vez").
 - Accesibilidad: contraste alto, fuentes grandes y legibles.
-- No incluir publicidad, rastreo ni recogida de datos personales de las menores.
+- No incluir publicidad, rastreo ni recogida de datos personales de menores.
 
 ## Organización del contenido
 
 - Cada perfil (`infantil`, `primaria`) tiene su carpeta en `src/` con una pantalla por materia.
 - Los ejercicios se definen como datos (arrays tipados en TS) separados de la lógica, para añadir contenido sin tocar los componentes.
 - Componentes y estilos compartidos en `src/components/` y `src/assets/`.
-- Repositorio público: no subir datos personales ni fotos de las niñas.
+- Repositorio público: no subir datos personales ni fotos de menores.
 
 ## Notas de trabajo
 
@@ -44,7 +44,7 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 
 ## Flujo de trabajo (issues y PR)
 
-- Todo trabajo pendiente (tareas, pasos, mejoras) se anota como issue en GitHub con la plantilla "Tarea / mejora". Incluir una imagen aclaratoria siempre que el cambio sea visual o necesite explicarse; nunca fotos de las niñas.
+- Todo trabajo pendiente (tareas, pasos, mejoras) se anota como issue en GitHub con la plantilla "Tarea / mejora". Incluir una imagen aclaratoria siempre que el cambio sea visual o necesite explicarse; sin fotos de menores ni datos personales.
 - Al empezar una issue: rama `issue-<n>-<slug>` desde `main` y PR en borrador con `Closes #<n>`. No se hace push directo a `main`.
 - El CI (`.github/workflows/ci.yml`) ejecuta `npm run lint` y `npm run build` en cada PR y deja `dist` como artefacto para revisar.
 - Se hace merge solo tras revisión del usuario; al entrar en `main`, `deploy.yml` publica en GitHub Pages (CD).
