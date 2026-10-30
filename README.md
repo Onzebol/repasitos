@@ -2,6 +2,10 @@
 
 Web para repasar jugando las materias de 3º de Infantil y 2º de Primaria.
 
+**Web publicada:** <https://onzebol.github.io/repasitos/>
+
+![Pantalla de inicio](docs/diseno/inicio-implementado.png)
+
 ## Perfiles
 
 | Perfil | Curso | Notas |
@@ -53,7 +57,7 @@ npm run lint
 
 ## Publicación
 
-Repositorio público en GitHub. En *Settings → Pages* hay que elegir **Source: GitHub Actions**; después cada push a `main` publica la web en `https://<usuario>.github.io/repasitos/`.
+Repositorio público en GitHub. En *Settings → Pages* hay que elegir **Source: GitHub Actions**; después cada push a `main` publica la web en <https://onzebol.github.io/repasitos/>.
 
 ## Flujo de trabajo
 
@@ -67,4 +71,4 @@ Las tareas se anotan como issues (con imagen aclaratoria cuando haga falta). Cad
 
 ## Estado
 
-Hecho: pantalla de inicio con el estilo elegido (mundo de cuento) y la mascota Repi, CI y despliegue, temario de 2º de Primaria. Pendiente: confirmar las materias, pantallas de materias, ejercicios y feedback, y el temario de 3º de Infantil.
+Hecho: pantalla de inicio con el estilo elegido (mundo de cuento) y la mascota Repi, CI y despliegue, temario de 2º de Primaria y materias de la web confirmadas. Pendiente: pantallas de materias, ejercicios y feedback, y el temario de 3º de Infantil.
