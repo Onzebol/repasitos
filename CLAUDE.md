@@ -24,6 +24,7 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 
 ## Convenciones de diseño
 
+- Estilo visual: "mundo de cuento" (cielo, colinas, tarjetas redondeadas) con la mascota Repi, un zorro común a los dos perfiles. Decisiones y bocetos en `docs/diseno.md`; tema en `src/assets/theme.css`.
 - Interfaz pensada para tablet y táctil: botones grandes, zonas de toque amplias.
 - Infantil: casi sin texto, apoyo en imágenes, iconos y audio; colores vivos; sin tiempos límite ni penalizaciones.
 - Primaria: frases cortas, vocabulario de 2º, feedback inmediato y positivo ante errores ("¡Casi! Inténtalo otra vez").
@@ -32,14 +33,14 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 
 ## Organización del contenido
 
-- Cada perfil (`infantil`, `primaria`) tiene su carpeta en `src/` con una pantalla por materia.
+- Cada perfil (`infantil`, `primaria`) tiene su carpeta en `src/` con sus materias como datos (`materias.ts`) y, más adelante, una pantalla por materia. La navegación es por estado en `App.tsx` (sin router por ahora); la lectura en voz alta usa la síntesis de voz del navegador (`src/speak.ts`).
 - Los ejercicios se definen como datos (arrays tipados en TS) separados de la lógica, para añadir contenido sin tocar los componentes.
 - Componentes y estilos compartidos en `src/components/` y `src/assets/`.
 - Repositorio público: no subir datos personales ni fotos de menores.
 
 ## Notas de trabajo
 
-- Antes de añadir una materia nueva, confirmar con el usuario el temario del curso. Investigación y estado actual del temario en `docs/temario.md`.
+- Antes de añadir una materia nueva, confirmar con el usuario el temario del curso. Investigación y estado actual del temario en `docs/temario.md` e índices de unidades de 2º de Primaria en `docs/`. Mantener `README.md` y `CLAUDE.md` al día en la misma PR que cambie algo que los deje desfasados.
 - Mantener los cambios pequeños y verificarlos con `npm run dev` en el navegador.
 
 ## Flujo de trabajo (issues y PR)
