@@ -11,7 +11,8 @@ Usuarios finales: niños y niñas de 5-6 y 7-8 años. Los adultos mantienen el p
 Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio público; el despliegue lo hace `.github/workflows/deploy.yml` en cada push a `main`.
 
 - `vite.config.ts` usa `base: '/repasitos/'`: mantenerlo si se renombra el repositorio.
-- Para ficheros de `public/` usar `import.meta.env.BASE_URL` como prefijo.
+- Para ficheros de `public/` usar `import.meta.env.BASE_URL` como prefijo (en `index.html` y `manifest.webmanifest`, rutas relativas).
+- App instalable (PWA): `public/manifest.webmanifest`, `public/sw.js` (red primero, copia sin conexión) y iconos de Repi (`icon.svg` es la fuente de los PNG). Si se cambian los ficheros de `public/` que el service worker guarda, subir `CACHE` en `sw.js`.
 - Sitio estático sin servidor: si se añade router, usar `HashRouter` (Pages no hace fallback a `index.html`).
 - Comandos: `npm run dev`, `npm run build` (debe pasar sin errores antes de cada push), `npm run lint`.
 - Versiones de referencia (revisadas el 2026-10-30): Node 24 LTS (`.nvmrc`, usado por CI y despliegue; mínimo `>=22.12` por Vite 8), Vite 8, React 19, TypeScript 7, `@types/node` alineado con la major de Node (24).

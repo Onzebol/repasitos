@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a7dcff" />
+      <stop offset="1" stop-color="#e8f7ff" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#sky)" />
+  <path d="M0 380 Q130 320 260 360 T512 340 V512 H0Z" fill="#8fd27f" />
+  <path d="M0 440 Q150 400 300 430 T512 420 V512 H0Z" fill="#5fb85a" />
+  <g transform="translate(94 76) scale(2.7)">
+    <polygon points="14,10 48,34 20,62" fill="#f28c28" stroke="#4a2a0c" stroke-width="4" stroke-linejoin="round" />
+    <polygon points="106,10 72,34 100,62" fill="#f28c28" stroke="#4a2a0c" stroke-width="4" stroke-linejoin="round" />
+    <polygon points="20,18 38,32 24,46" fill="#ffd6a8" />
+    <polygon points="100,18 82,32 96,46" fill="#ffd6a8" />
+    <path d="M12 62 Q12 30 60 30 Q108 30 108 62 Q108 108 60 112 Q12 108 12 62Z" fill="#f28c28" stroke="#4a2a0c" stroke-width="4" />
+    <path d="M14 76 Q40 70 60 92 Q80 70 106 76 Q96 108 60 112 Q24 108 14 76Z" fill="#fff6e6" />
+    <circle cx="42" cy="62" r="7" fill="#3a2410" />
+    <circle cx="78" cy="62" r="7" fill="#3a2410" />
+    <circle cx="44" cy="60" r="2.4" fill="#fff" />
+    <circle cx="80" cy="60" r="2.4" fill="#fff" />
+    <ellipse cx="60" cy="82" rx="8" ry="6" fill="#3a2410" />
+    <path d="M48 92 Q60 102 72 92" fill="none" stroke="#3a2410" stroke-width="4" stroke-linecap="round" />
+  </g>
+</svg>
