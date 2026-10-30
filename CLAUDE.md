@@ -44,9 +44,16 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 - Antes de añadir una materia nueva, confirmar con el usuario el temario del curso. Investigación y estado actual del temario en `docs/temario.md` e índices de unidades de 2º de Primaria en `docs/`. Mantener `README.md` y `CLAUDE.md` al día en la misma PR que cambie algo que los deje desfasados.
 - Mantener los cambios pequeños y verificarlos con `npm run dev` en el navegador.
 
+## Desarrollo guiado por tests (TDD)
+
+- Se trabaja con TDD: primero se escribe un test que falla, luego el código mínimo para que pase y después se refactoriza. Vale para lógica, componentes y datos de ejercicios.
+- Cada cambio de comportamiento lleva su test en la misma PR; un fallo corregido se empieza con un test que lo reproduzca.
+- Los tests deben pasar (`npm test`, además de `npm run lint` y `npm run build`) antes de cada push.
+- Framework de tests (Vitest): pendiente de configurar en la issue #23. Hasta entonces, no se añade lógica nueva sin esa base; esta nota se actualiza al terminarla.
+
 ## Flujo de trabajo (issues y PR)
 
 - Todo trabajo pendiente (tareas, pasos, mejoras) se anota como issue en GitHub con la plantilla "Tarea / mejora". Incluir una imagen aclaratoria siempre que el cambio sea visual o necesite explicarse; sin fotos de menores ni datos personales.
 - Al empezar una issue: rama `issue-<n>-<slug>` desde `main` y PR en borrador con `Closes #<n>`. No se hace push directo a `main`.
-- El CI (`.github/workflows/ci.yml`) ejecuta `npm run lint` y `npm run build` en cada PR y deja `dist` como artefacto para revisar.
+- El CI (`.github/workflows/ci.yml`) ejecuta `npm run lint` y `npm run build` (y los tests cuando estén configurados) en cada PR y deja `dist` como artefacto para revisar.
 - Se hace merge solo tras revisión del usuario; al entrar en `main`, `deploy.yml` publica en GitHub Pages (CD).
