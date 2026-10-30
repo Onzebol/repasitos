@@ -57,16 +57,17 @@ Diferencias con la circular: aparece **Teatro** (la circular lo llama Dramatizac
 
 Editorial **Santillana**, proyecto **Construyendo Mundos** (LOMLOE), (dato aportado para el proyecto). Las unidades se organizan en torno a situaciones de aprendizaje. Los ISBN de listas de otros colegios (la edición puede variar; comprobar con los libros reales): Matemáticas 978-84-144-0763-9 (confirmado), Lengua 978-84-144-0762-2 (confirmado), Religión 978-84-144-0796-7. Conocimiento del Medio (1.er trimestre, dato aportado): 978-84-144-4812-0. No se ha encontrado el índice de unidades: sacarlo del libro o de la web de Santillana.
 
-## Propuesta de materias para la web
+## Materias de la web (confirmadas)
 
-Se descartan Educación Física y Religión (no encajan en un repaso en pantalla).
+En la web solo entran las materias que tienen sentido como repaso en pantalla.
 
-- **Infantil:** Crecimiento en armonía (emociones, cuerpo, hábitos) · Descubrimiento del entorno (animales, plantas, estaciones) · Lectoescritura (letras y sonidos) · Números (conteo y formas) · Inglés (vocabulario) · Música y plástica.
-- **Primaria:** Lengua · Matemáticas · Conocimiento del Medio · Inglés · Música · Teatro (a valorar) · Educación emocional (a valorar). Quedan fuera Educación Física y Religión.
+- **Infantil (confirmadas):** Crecimiento en armonía (emociones, cuerpo, hábitos) · Descubrimiento del entorno (animales, plantas, estaciones) · Lectoescritura (letras y sonidos) · Números (conteo y formas) · Inglés (vocabulario) · Música y plástica.
+- **Primaria:** Lengua · Matemáticas · Conocimiento del Medio · Inglés · Música.
+- **Fuera de la web:** Educación Física, Religión, Teatro y Educación emocional (en Primaria no tienen sentido como ejercicios en pantalla). Se pueden revisar más adelante.
 
 ## Pendiente
 
-- [ ] Confirmar qué materias quedan (regla de `CLAUDE.md`: confirmar el temario antes de añadir una materia).
+- [x] Confirmar qué materias quedan (hecho, ver "Materias de la web").
 - [ ] Editorial de 2º de Primaria: Santillana, Construyendo Mundos (hecho). Índices de unidades de Matemáticas, Lengua y Conocimiento del Medio en `docs/` (hecho). Falta la editorial de 3º de Infantil y los libros de Inglés, Música, Teatro y Educación emocional.
 - [ ] Conseguir el texto del Decreto 41/2022 (Primaria) para detallar los contenidos de cada área de 2º.
 - [ ] Concretar los contenidos de lectoescritura y números de 3º de Infantil.
