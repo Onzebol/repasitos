@@ -37,9 +37,10 @@ repasitos/
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    # Pantalla de inicio: elegir perfil
-│   ├── components/                # Mascot (Repi), Hills, TopBar, SubjectsScreen...
+│   ├── components/                # Mascot (Repi), Hills, TopBar, ListScreen, Practice, Keypad...
 │   ├── infantil/materias.ts       # Materias de 3º de Infantil (datos)
 │   ├── primaria/materias.ts       # Materias de 2º de Primaria (datos)
+│   ├── primaria/matematicas/      # Unidades y ejercicios de Matemáticas (datos)
 │   ├── types.ts, speak.ts         # Tipos compartidos y lectura en voz alta
 │   └── assets/theme.css           # Tema visual (estilo "mundo de cuento")
 ├── index.html
@@ -81,4 +82,4 @@ Las tareas se anotan como issues (con imagen aclaratoria cuando haga falta). Cad
 
 ## Estado
 
-Hecho: icono de la app (Repi) y web instalable en el móvil; pantalla de inicio y pantallas de materias de cada perfil con el estilo elegido (mundo de cuento) y la mascota Repi, CI y despliegue, materias confirmadas y temario de 2º de Primaria. Cada materia abre de momento una pantalla "¡Muy pronto!". Pendiente: ejercicios y feedback, y el temario de 3º de Infantil.
+Hecho: icono de la app (Repi) y web instalable en el móvil; pantalla de inicio y pantallas de materias con el estilo elegido (mundo de cuento); materias confirmadas y temario de 2º de Primaria; Matemáticas de 2º, unidad 1 (56 ejercicios en 6 temas). Las demás materias abren "¡Muy pronto!". Pendiente: resto de unidades y materias, y el temario de 3º de Infantil.
