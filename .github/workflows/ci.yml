@@ -23,6 +23,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
+      - run: npm test
       - run: npm run build
       # Para revisar la PR sin publicar: descargar el artefacto y abrirlo con `npx vite preview`
       - uses: actions/upload-artifact@v7

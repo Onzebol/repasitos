@@ -21,7 +21,7 @@ Web para repasar jugando las materias de 3º de Infantil y 2º de Primaria.
 
 ## Tecnologías
 
-Vite + React + TypeScript. Despliegue automático en GitHub Pages con GitHub Actions.
+Vite + React + TypeScript. Tests con Vitest y Testing Library (desarrollo guiado por tests). Despliegue automático en GitHub Pages con GitHub Actions.
 
 ## Estructura
 
@@ -42,6 +42,7 @@ repasitos/
 │   ├── primaria/materias.ts       # Materias de 2º de Primaria (datos)
 │   ├── primaria/matematicas/      # Unidades y ejercicios de Matemáticas (datos)
 │   ├── types.ts, speak.ts         # Tipos compartidos y lectura en voz alta
+│   ├── test/setup.ts              # Configuración común de los tests (*.test.ts junto al código)
 │   └── assets/theme.css           # Tema visual (estilo "mundo de cuento")
 ├── index.html
 ├── .nvmrc                         # Node 24 LTS
@@ -64,6 +65,8 @@ npm install
 npm run dev       # servidor local
 npm run build     # compila a dist/
 npm run lint
+npm test          # tests (una vez)
+npm run test:watch  # tests vigilando cambios
 ```
 
 ## Publicación
