@@ -38,5 +38,12 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 
 ## Notas de trabajo
 
-- Antes de añadir una materia nueva, confirmar con el usuario el temario del curso.
+- Antes de añadir una materia nueva, confirmar con el usuario el temario del curso. Investigación y estado actual del temario en `docs/temario.md`.
 - Mantener los cambios pequeños y verificarlos con `npm run dev` en el navegador.
+
+## Flujo de trabajo (issues y PR)
+
+- Todo trabajo pendiente (tareas, pasos, mejoras) se anota como issue en GitHub con la plantilla "Tarea / mejora". Incluir una imagen aclaratoria siempre que el cambio sea visual o necesite explicarse; nunca fotos de las niñas.
+- Al empezar una issue: rama `issue-<n>-<slug>` desde `main` y PR en borrador con `Closes #<n>`. No se hace push directo a `main`.
+- El CI (`.github/workflows/ci.yml`) ejecuta `npm run lint` y `npm run build` en cada PR y deja `dist` como artefacto para revisar.
+- Se hace merge solo tras revisión del usuario; al entrar en `main`, `deploy.yml` publica en GitHub Pages (CD).
