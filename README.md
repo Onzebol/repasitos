@@ -49,6 +49,13 @@ repasitos/
 └── CLAUDE.md
 ```
 
+## Instalar en el móvil o la tablet
+
+La web es instalable (PWA) y funciona sin conexión una vez abierta:
+
+- **Android (Chrome):** menú ⋮ → *Instalar aplicación* (o *Añadir a la pantalla de inicio*).
+- **iPhone y iPad (Safari):** botón Compartir → *Añadir a pantalla de inicio*.
+
 ## Desarrollo
 
 ```bash
