@@ -25,7 +25,7 @@ body:
     id: imagen
     attributes:
       label: Imagen aclaratoria
-      description: Captura o boceto del cambio (arrástrala aquí). Obligatoria si cambia algo visual. Nunca fotos de las niñas.
+      description: Captura o boceto del cambio (arrástrala aquí). Obligatoria si cambia algo visual. Sin fotos de menores ni datos personales.
   - type: textarea
     id: fuentes
     attributes:
