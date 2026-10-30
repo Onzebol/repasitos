@@ -33,7 +33,7 @@ repasitos/
 │   ├── ISSUE_TEMPLATE/            # Plantilla de tarea
 │   └── pull_request_template.md
 ├── docs/                          # Temario, índices de unidades y diseño
-├── public/                        # Estáticos (favicon)
+├── public/                        # Iconos, manifest y service worker (app instalable)
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    # Pantalla de inicio: elegir perfil
@@ -48,6 +48,13 @@ repasitos/
 ├── README.md
 └── CLAUDE.md
 ```
+
+## Instalar en el móvil o la tablet
+
+La web es instalable (PWA) y funciona sin conexión una vez abierta:
+
+- **Android (Chrome):** menú ⋮ → *Instalar aplicación* (o *Añadir a la pantalla de inicio*).
+- **iPhone y iPad (Safari):** botón Compartir → *Añadir a pantalla de inicio*.
 
 ## Desarrollo
 
@@ -74,4 +81,4 @@ Las tareas se anotan como issues (con imagen aclaratoria cuando haga falta). Cad
 
 ## Estado
 
-Hecho: pantalla de inicio y pantallas de materias de cada perfil con el estilo elegido (mundo de cuento) y la mascota Repi, CI y despliegue, materias confirmadas y temario de 2º de Primaria. Cada materia abre de momento una pantalla "¡Muy pronto!". Pendiente: ejercicios y feedback, y el temario de 3º de Infantil.
+Hecho: icono de la app (Repi) y web instalable en el móvil; pantalla de inicio y pantallas de materias de cada perfil con el estilo elegido (mundo de cuento) y la mascota Repi, CI y despliegue, materias confirmadas y temario de 2º de Primaria. Cada materia abre de momento una pantalla "¡Muy pronto!". Pendiente: ejercicios y feedback, y el temario de 3º de Infantil.
