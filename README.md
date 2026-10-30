@@ -23,13 +23,20 @@ Vite + React + TypeScript. Despliegue automático en GitHub Pages con GitHub Act
 
 ```
 repasitos/
-├── .github/workflows/deploy.yml   # Build y despliegue a Pages al hacer push a main
+├── .github/
+│   ├── workflows/ci.yml           # Lint y build en cada PR
+│   ├── workflows/deploy.yml       # Build y despliegue a Pages al hacer push a main
+│   ├── ISSUE_TEMPLATE/            # Plantilla de tarea
+│   └── pull_request_template.md
+├── docs/                          # Temario, índices de unidades y diseño
 ├── public/                        # Estáticos (favicon)
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    # Pantalla de inicio: elegir perfil
-│   └── index.css
+│   ├── components/                # Mascot (Repi), Hills...
+│   └── assets/theme.css           # Tema visual (estilo "mundo de cuento")
 ├── index.html
+├── .nvmrc                         # Node 24 LTS
 ├── vite.config.ts                 # base: '/repasitos/' para GitHub Pages
 ├── README.md
 └── CLAUDE.md
@@ -48,6 +55,16 @@ npm run lint
 
 Repositorio público en GitHub. En *Settings → Pages* hay que elegir **Source: GitHub Actions**; después cada push a `main` publica la web en `https://<usuario>.github.io/repasitos/`.
 
+## Flujo de trabajo
+
+Las tareas se anotan como issues (con imagen aclaratoria cuando haga falta). Cada issue se trabaja en una rama y una PR en borrador; el CI (lint y build) debe pasar y, tras la revisión, el merge a `main` publica la web. Detalle en `CLAUDE.md`.
+
+## Documentación
+
+- `docs/temario.md`: temario de los dos cursos, fuentes y tareas pendientes.
+- `docs/matematicas-2-primaria.md`, `docs/lengua-2-primaria.md`, `docs/conocimiento-del-medio-2-primaria.md`: índices de unidades de 2º de Primaria.
+- `docs/diseno.md`: decisiones de diseño y bocetos (`docs/diseno/`).
+
 ## Estado
 
-Proyecto recién creado con la pantalla de inicio. Pendiente de definir las materias y los primeros ejercicios.
+Hecho: pantalla de inicio con el estilo elegido (mundo de cuento) y la mascota Repi, CI y despliegue, temario de 2º de Primaria. Pendiente: confirmar las materias, pantallas de materias, ejercicios y feedback, y el temario de 3º de Infantil.
