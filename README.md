@@ -37,7 +37,10 @@ repasitos/
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                    # Pantalla de inicio: elegir perfil
-│   ├── components/                # Mascot (Repi), Hills...
+│   ├── components/                # Mascot (Repi), Hills, TopBar, SubjectsScreen...
+│   ├── infantil/materias.ts       # Materias de 3º de Infantil (datos)
+│   ├── primaria/materias.ts       # Materias de 2º de Primaria (datos)
+│   ├── types.ts, speak.ts         # Tipos compartidos y lectura en voz alta
 │   └── assets/theme.css           # Tema visual (estilo "mundo de cuento")
 ├── index.html
 ├── .nvmrc                         # Node 24 LTS
@@ -71,4 +74,4 @@ Las tareas se anotan como issues (con imagen aclaratoria cuando haga falta). Cad
 
 ## Estado
 
-Hecho: pantalla de inicio con el estilo elegido (mundo de cuento) y la mascota Repi, CI y despliegue, temario de 2º de Primaria y materias de la web confirmadas. Pendiente: pantallas de materias, ejercicios y feedback, y el temario de 3º de Infantil.
+Hecho: pantalla de inicio y pantallas de materias de cada perfil con el estilo elegido (mundo de cuento) y la mascota Repi, CI y despliegue, materias confirmadas y temario de 2º de Primaria. Cada materia abre de momento una pantalla "¡Muy pronto!". Pendiente: ejercicios y feedback, y el temario de 3º de Infantil.
