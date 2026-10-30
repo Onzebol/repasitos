@@ -1,0 +1,33 @@
+name: Tarea / mejora
+description: Algo que hacer en la web (contenido, funcionalidad, diseño, mejora)
+labels: ["tarea"]
+body:
+  - type: dropdown
+    id: perfil
+    attributes:
+      label: Perfil
+      options: [Infantil, Primaria, Ambos, Proyecto (técnico / documentación)]
+    validations:
+      required: true
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Qué hay que hacer y por qué
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos
+      value: |
+        - [ ] 
+  - type: textarea
+    id: imagen
+    attributes:
+      label: Imagen aclaratoria
+      description: Captura o boceto del cambio (arrástrala aquí). Obligatoria si cambia algo visual. Nunca fotos de las niñas.
+  - type: textarea
+    id: fuentes
+    attributes:
+      label: Fuentes / referencias
+      description: Decreto, libro, enlaces... (ver docs/temario.md)
