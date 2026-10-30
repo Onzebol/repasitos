@@ -8,18 +8,18 @@ Estado: **en definición** (issue #8). Falta elegir el estilo visual entre los t
 - **Misma base, distinto tono:** los dos perfiles comparten componentes y navegación.
   - Infantil: iconos muy grandes, casi sin texto, apoyo de audio.
   - Primaria: tiles con nombre de la materia, frases cortas y paleta algo más sobria.
-- **Pantallas clave:** inicio (elegir perfil), materias de Infantil, materias de Primaria. Siempre hay un botón de inicio y un botón de audio, grandes, en la esquina.
+- **Pantallas clave:** inicio (elegir perfil), materias de Infantil y de Primaria, ejercicio de Infantil, ejercicio de Primaria con un fallo ("¡Casi! Inténtalo otra vez") y pantalla de acierto. Siempre hay un botón de inicio y un botón de audio, grandes, en la esquina.
 - **Sin tiempos límite ni penalizaciones**, y sin recogida de datos (ver `CLAUDE.md`).
 
 ## Estilos propuestos
 
 Los bocetos son orientativos: iconos (emojis), colores y tipografías del sistema se afinarán después.
 
-| Estilo | Idea | Imagen |
+| Estilo | Idea | Imágenes (en `docs/diseno/`) |
 |---|---|---|
-| A. Recortables de papel | Formas planas de colores vivos, bordes gruesos y sombras sólidas, como pegatinas | `docs/diseno/estilo-A.png` |
-| B. Cuaderno y rotuladores | Papel cuadriculado, trazos de rotulador y tipografía manuscrita | `docs/diseno/estilo-B.png` |
-| C. Mundo de cuento | Cielo y colinas, tarjetas redondeadas con iconos en círculos de colores | `docs/diseno/estilo-C.png` |
+| A. Recortables de papel | Formas planas de colores vivos, bordes gruesos y sombras sólidas, como pegatinas | `estilo-A.png`, `estilo-A-ejercicios.png` |
+| B. Cuaderno y rotuladores | Papel cuadriculado, trazos de rotulador y tipografía manuscrita | `estilo-B.png`, `estilo-B-ejercicios.png` |
+| C. Mundo de cuento | Cielo y colinas, tarjetas redondeadas con iconos en círculos de colores | `estilo-C.png`, `estilo-C-ejercicios.png` |
 
 ## Para decidir después de elegir el estilo
 
