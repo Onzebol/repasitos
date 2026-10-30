@@ -33,7 +33,7 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 
 ## Organización del contenido
 
-- Cada perfil (`infantil`, `primaria`) tiene su carpeta en `src/` con una pantalla por materia.
+- Cada perfil (`infantil`, `primaria`) tiene su carpeta en `src/` con sus materias como datos (`materias.ts`) y, más adelante, una pantalla por materia. La navegación es por estado en `App.tsx` (sin router por ahora); la lectura en voz alta usa la síntesis de voz del navegador (`src/speak.ts`).
 - Los ejercicios se definen como datos (arrays tipados en TS) separados de la lógica, para añadir contenido sin tocar los componentes.
 - Componentes y estilos compartidos en `src/components/` y `src/assets/`.
 - Repositorio público: no subir datos personales ni fotos de menores.
