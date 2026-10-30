@@ -67,7 +67,7 @@ Se descartan Educación Física y Religión (no encajan en un repaso en pantalla
 ## Pendiente
 
 - [ ] Confirmar qué materias quedan (regla de `CLAUDE.md`: confirmar el temario antes de añadir una materia).
-- [ ] Editorial de 2º de Primaria: Santillana, Construyendo Mundos (hecho). Falta la de 3º de Infantil y el índice de unidades de los libros de 2º.
+- [ ] Editorial de 2º de Primaria: Santillana, Construyendo Mundos (hecho). Índices de unidades de Matemáticas, Lengua y Conocimiento del Medio en `docs/` (hecho). Falta la editorial de 3º de Infantil y los libros de Inglés, Música, Teatro y Educación emocional.
 - [ ] Conseguir el texto del Decreto 41/2022 (Primaria) para detallar los contenidos de cada área de 2º.
 - [ ] Concretar los contenidos de lectoescritura y números de 3º de Infantil.
 - [ ] Después, crear el índice como datos tipados en `src/infantil/` y `src/primaria/` y buscar contenido materia por materia.
