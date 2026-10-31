@@ -96,6 +96,21 @@ describe('TraceExercise: repasar la cifra con el dedo', () => {
     expect(screen.getByRole('status')).toBeEmptyDOMElement()
   })
 
+  it('el aviso se queda mientras el dedo sigue fuera y al levantarlo, hasta que se vuelve a empezar', () => {
+    abrir(1)
+    const puntos = resample(TRAZOS[1][0], 2)
+    fireEvent.pointerDown(superficie(), { clientX: puntos[0][0] + MARGIN, clientY: puntos[0][1] + MARGIN, pointerId: 1 })
+    for (const [x, y] of puntos.slice(1, 12)) fireEvent.pointerMove(superficie(), { clientX: x + MARGIN, clientY: y + MARGIN, pointerId: 1 })
+    fireEvent.pointerMove(superficie(), { clientX: 2 + MARGIN, clientY: 138 + MARGIN, pointerId: 1 })
+    fireEvent.pointerMove(superficie(), { clientX: 5 + MARGIN, clientY: 136 + MARGIN, pointerId: 1 })
+    expect(screen.getByRole('status')).toHaveTextContent('¡Casi! Inténtalo otra vez')
+    fireEvent.pointerUp(superficie(), { pointerId: 1 })
+    expect(screen.getByRole('status')).toHaveTextContent('¡Casi! Inténtalo otra vez')
+    // al volver a poner el dedo en la salida y avanzar, el aviso se va
+    fireEvent.pointerDown(superficie(), { clientX: puntos[0][0] + MARGIN, clientY: puntos[0][1] + MARGIN, pointerId: 2 })
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+  })
+
   it('sin tocar nada no hay avisos', () => {
     abrir(3)
     expect(screen.getByRole('status')).toBeEmptyDOMElement()
@@ -125,6 +140,11 @@ describe('TraceExercise: repasar la cifra con el dedo', () => {
 })
 
 describe('estilos del trazo para tableta', () => {
+  it('la tarjeta de la cifra y el aviso van en una columna de ancho fijo, así la tarjeta no crece al salir el aviso', () => {
+    expect(regla('.trace-exercise')).toMatch(/width:\s*min\(100%,\s*22rem\)/)
+    expect(regla('.trace-surface')).toMatch(/width:\s*100%/)
+  })
+
   it('la superficie no se desplaza ni se amplía con el dedo y no selecciona texto', () => {
     const estilos = regla('.trace-surface')
     expect(estilos).toMatch(/touch-action:\s*none/)
