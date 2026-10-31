@@ -44,14 +44,16 @@ body {
   overflow: hidden;
 }
 
+/* Fijas a la ventana (no a la página) y con altura en svh: el fondo es siempre igual aunque haya scroll */
 .hills {
-  position: absolute;
+  position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   width: 100%;
-  height: 42%;
+  height: 42svh;
   z-index: 0;
+  pointer-events: none;
 }
 
 .greeting,
