@@ -1,6 +1,5 @@
 import type { CSSProperties } from 'react'
 import type { Profile, Subject } from '../types'
-import { speak } from '../speak'
 import { Hills } from './Hills'
 import { TopBar } from './TopBar'
 
@@ -19,7 +18,7 @@ export function SubjectsScreen({ profile, subjects, available, onHome, onSelect 
   return (
     <main className={`screen ${profile}`}>
       <Hills />
-      <TopBar title={infantil ? undefined : prompt} prompt={prompt} onHome={onHome} />
+      <TopBar title={prompt} prompt={prompt} onHome={onHome} />
       <ul className="subjects">
         {subjects.map((subject) => (
           <li key={subject.id}>
@@ -27,13 +26,10 @@ export function SubjectsScreen({ profile, subjects, available, onHome, onSelect 
               className="subject"
               disabled={!available(subject)}
               style={{ '--tint': subject.tint } as CSSProperties}
-              onClick={() => {
-                if (infantil) speak(subject.name)
-                onSelect(subject)
-              }}
+              onClick={() => onSelect(subject)}
             >
               <span className="subject-icon" aria-hidden="true">{subject.icon}</span>
-              <span className={infantil ? 'sr-only' : 'subject-name'}>{subject.name}</span>
+              <span className="subject-name">{subject.name}</span>
               {!infantil && !available(subject) && <small className="subject-note" aria-hidden="true">Muy pronto</small>}
             </button>
           </li>
