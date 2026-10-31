@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import type { CSSProperties } from 'react'
 import { ComingSoon } from './components/ComingSoon'
 import { Hills } from './components/Hills'
@@ -6,21 +6,22 @@ import { ListScreen } from './components/ListScreen'
 import { Mascot } from './components/Mascot'
 import { Practice } from './components/Practice'
 import { SubjectsScreen } from './components/SubjectsScreen'
-import { materiasInfantil } from './infantil/materias'
-import { unidadesPorMateria } from './primaria/contenido'
-import { materiasPrimaria } from './primaria/materias'
-import type { Profile, Subject, Topic, Unit } from './types'
+import { hashFromScreen, screenForSubject, screenFromHash, subjectsOf } from './routes'
+import type { Screen } from './routes'
 
-type Screen =
-  | { name: 'home' }
-  | { name: 'subjects'; profile: Profile }
-  | { name: 'subject'; profile: Profile; subject: Subject }
-  | { name: 'units'; subject: Subject; units: Unit[] }
-  | { name: 'topics'; subject: Subject; units: Unit[]; unit: Unit }
-  | { name: 'practice'; subject: Subject; units: Unit[]; unit: Unit; topic: Topic }
+// La pantalla vive en la dirección (#/...): así funciona el botón atrás del navegador y del móvil
+const subscribe = (onChange: () => void) => {
+  window.addEventListener('hashchange', onChange)
+  return () => window.removeEventListener('hashchange', onChange)
+}
+const getHash = () => window.location.hash
+
+const setScreen = (screen: Screen) => {
+  window.location.hash = hashFromScreen(screen)
+}
 
 function App() {
-  const [screen, setScreen] = useState<Screen>({ name: 'home' })
+  const screen = screenFromHash(useSyncExternalStore(subscribe, getHash))
   const goHome = () => setScreen({ name: 'home' })
 
   if (screen.name === 'subjects') {
@@ -28,12 +29,9 @@ function App() {
     return (
       <SubjectsScreen
         profile={profile}
-        subjects={profile === 'infantil' ? materiasInfantil : materiasPrimaria}
+        subjects={subjectsOf(profile)}
         onHome={goHome}
-        onSelect={(subject) => {
-          const units = profile === 'primaria' ? unidadesPorMateria[subject.id] : undefined
-          setScreen(units ? { name: 'units', subject, units } : { name: 'subject', profile, subject })
-        }}
+        onSelect={(subject) => setScreen(screenForSubject(profile, subject))}
       />
     )
   }
