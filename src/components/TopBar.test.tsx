@@ -68,6 +68,11 @@ describe('estilos de la barra superior', () => {
     expect(regla('.round-button span')).toMatch(/line-height:\s*1/)
   })
 
+  it('los lados miden lo que ocupan sus botones (no se estiran) para poder volver a subir el título', () => {
+    expect(regla('.topbar-left')).toMatch(/justify-self:\s*start/)
+    expect(regla('.topbar-right')).toMatch(/justify-self:\s*end/)
+  })
+
   it('el título va siempre centrado', () => {
     expect(regla('.topbar-title')).toMatch(/text-align:\s*center/)
   })

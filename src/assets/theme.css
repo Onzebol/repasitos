@@ -159,14 +159,15 @@ body {
 
 .topbar-left {
   grid-area: left;
+  justify-self: start;
   display: flex;
   gap: 1rem;
 }
 
 .topbar-right {
   grid-area: right;
+  justify-self: end;
   display: flex;
-  justify-content: flex-end;
 }
 
 /* El título va centrado, entre los botones si cabe */
