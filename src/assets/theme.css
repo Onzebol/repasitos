@@ -908,6 +908,73 @@ body {
   gap: 1rem;
 }
 
+/* Herramienta de voces (#/voces) */
+.voices-content {
+  display: grid;
+  gap: 1rem;
+}
+
+.voices-card {
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  background: var(--card);
+}
+
+.voices-card h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.4rem;
+}
+
+.voices-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.voices-chip {
+  position: static;
+}
+
+.voices-field {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.voices-field textarea {
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--card-shadow);
+  border-radius: 0.75rem;
+  font: inherit;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.voices-field input[type='range'] {
+  width: 100%;
+  min-height: 2rem;
+}
+
+.voices-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.voices-list li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.voices-name {
+  font-weight: 700;
+
 /* Infantil: dibujos y botones de respuesta grandes, para dedos pequeños y poco texto */
 .infantil .visual {
   font-size: clamp(3rem, 14vw, 5rem);
