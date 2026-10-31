@@ -35,6 +35,15 @@ describe('botones: efecto de pulsar', () => {
     expect(sombraPulsado).toBe(sombraReposo - baja)
   })
 
+  it('los botones redondos usan la misma sombra que los botones de las unidades, en reposo y al pulsar', () => {
+    const sombra = (estilos: string) => /box-shadow:\s*([^;]+);/.exec(estilos)?.[1]
+    const baja = (estilos: string) => /translateY\(([^)]+)\)/.exec(estilos)?.[1]
+    expect(sombra(regla('.round-button'))).toBeDefined()
+    expect(sombra(regla('.round-button'))).toBe(sombra(regla('.subject')))
+    expect(sombra(regla('.round-button:active'))).toBe(sombra(regla('.subject:active')))
+    expect(baja(regla('.round-button:active'))).toBe(baja(regla('.subject:active')))
+  })
+
   it('con movimiento reducido ningún botón se mueve al pulsar', () => {
     const reducido = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'))
     for (const selector of ['.round-button:active', '.action:active', '.subject:active']) {
