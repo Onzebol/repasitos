@@ -48,12 +48,19 @@ describe('trazos de las cifras', () => {
     }
   })
 
-  it('el 4 se hace en dos trazos: primero la diagonal con la raya, luego el palo desde arriba', () => {
-    const [primero, segundo] = TRAZOS[4]
-    expect(primero[0][1]).toBeLessThan(primero[primero.length - 1][1])
-    expect(primero[primero.length - 1][0]).toBeGreaterThan(primero[1][0])
-    expect(segundo[0][1]).toBeLessThan(segundo[segundo.length - 1][1])
-    expect(segundo[0][0]).toBe(segundo[segundo.length - 1][0])
+  it('el 4 es el de la silla invertida: brazo recto hacia abajo y raya a la derecha; luego el palo largo desde arriba', () => {
+    const [brazo, palo] = TRAZOS[4]
+    // el brazo baja en vertical, sin diagonal, y gira a la derecha formando la raya
+    expect(brazo).toHaveLength(3)
+    expect(brazo[0][0]).toBe(brazo[1][0])
+    expect(brazo[1][1]).toBeGreaterThan(brazo[0][1])
+    expect(brazo[2][1]).toBe(brazo[1][1])
+    expect(brazo[2][0]).toBeGreaterThan(brazo[1][0])
+    // el palo cae en vertical por la derecha del brazo, hasta pasar por debajo de la raya
+    expect(palo[0][0]).toBe(palo[1][0])
+    expect(palo[0][0]).toBeGreaterThan(brazo[0][0])
+    expect(palo[0][1]).toBeLessThan(brazo[1][1])
+    expect(palo[1][1]).toBeGreaterThan(brazo[1][1])
   })
 
   it('el 5 se hace en dos trazos: primero el cuerpo, al final la raya de arriba', () => {
@@ -62,6 +69,16 @@ describe('trazos de las cifras', () => {
     expect(raya[0][1]).toBe(raya[1][1])
     expect(raya[1][0]).toBeGreaterThan(raya[0][0])
     expect(Math.max(...cuerpo.map(([, y]) => y))).toBeGreaterThan(100)
+  })
+
+  it('el 8 es una sola línea cerrada con dos lazos: sale de arriba hacia la izquierda y vuelve al punto de salida', () => {
+    const [ocho] = TRAZOS[8]
+    expect(TRAZOS[8]).toHaveLength(1)
+    expect(ocho.at(-1)).toEqual(ocho[0])
+    expect(ocho[1][0]).toBeLessThan(ocho[0][0])
+    // se cruza en el centro del cuadro: pasa dos veces por el medio
+    const cruces = ocho.filter(([x, y]) => Math.abs(x - WIDTH / 2) < 1 && Math.abs(y - HEIGHT / 2) < 3)
+    expect(cruces).toHaveLength(2)
   })
 
   it('el 7 no lleva raya cruzada: un solo trazo con la raya de arriba y la diagonal', () => {
