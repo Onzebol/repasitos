@@ -123,6 +123,82 @@ describe('Ejercicio en columna: comprobar', () => {
   })
 })
 
+describe('Ejercicio en columna: sumas llevando', () => {
+  const llevando: Exercise = { type: 'column', question: 'Suma en columna', operator: '+', top: 28, bottom: 17, answer: 45, carry: true }
+  const conCentenas: Exercise = { type: 'column', question: 'Suma en columna', operator: '+', top: 85, bottom: 47, answer: 132, carry: true }
+  const llevada = () => screen.getByRole('button', { name: /Llevada/ })
+  const centenas = () => screen.getByRole('button', { name: /Centenas/ })
+  const comprobar = () => screen.getByRole('button', { name: 'Comprobar' })
+
+  it('muestra el cuadro de llevada solo en las sumas llevando', () => {
+    abrir(llevando)
+    expect(llevada()).toBeInTheDocument()
+  })
+
+  it('las columnas sin llevar no tienen cuadro de llevada', () => {
+    abrir(suma)
+    expect(screen.queryByRole('button', { name: /Llevada/ })).not.toBeInTheDocument()
+  })
+
+  it('la llevada es opcional: el resultado se comprueba sin escribirla', async () => {
+    const user = abrir(llevando)
+    await tecla(user, '54')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+
+  it('se puede escribir la llevada, vuelve a las decenas y no cuenta como respuesta', async () => {
+    const user = abrir(llevando)
+    await tecla(user, '5')
+    await user.click(llevada())
+    await tecla(user, '1')
+    expect(llevada()).toHaveTextContent('1')
+    expect(decenas()).toHaveAttribute('aria-pressed', 'true')
+    await tecla(user, '4')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+
+  it('una llevada equivocada no impide acertar y al fallar se vacía todo', async () => {
+    const user = abrir(llevando)
+    await tecla(user, '6')
+    await user.click(llevada())
+    await tecla(user, '1')
+    await tecla(user, '4')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Casi! Inténtalo otra vez')).toBeInTheDocument()
+    expect(llevada()).toHaveTextContent('?')
+    expect(unidades()).toHaveTextContent('?')
+  })
+
+  it('con un resultado de 100 o más aparece el cuadro de centenas y hay que rellenar los tres', async () => {
+    const user = abrir(conCentenas)
+    expect(centenas()).toBeInTheDocument()
+    expect(screen.getByText('C')).toBeInTheDocument()
+    await tecla(user, '23')
+    expect(comprobar()).toBeDisabled()
+    await tecla(user, '1')
+    expect(comprobar()).toBeEnabled()
+    expect(centenas()).toHaveTextContent('1')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+
+  it('con un resultado menor de 100 no hay cuadro de centenas', () => {
+    abrir(llevando)
+    expect(screen.queryByRole('button', { name: /Centenas/ })).not.toBeInTheDocument()
+    expect(screen.queryByText('C')).not.toBeInTheDocument()
+  })
+
+  it('un resultado de tres cifras con una cifra mal anima y deja reintentar', async () => {
+    const user = abrir(conCentenas)
+    await tecla(user, '241')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Casi! Inténtalo otra vez')).toBeInTheDocument()
+    expect(unidades()).toHaveAttribute('aria-pressed', 'true')
+  })
+})
+
 describe('Ejercicio en columna: estilos', () => {
   it('las cifras se alinean en una cuadrícula de 3 columnas y el cuadro activo se resalta', async () => {
     const { default: css } = await import('../assets/theme.css?raw')
@@ -130,7 +206,7 @@ describe('Ejercicio en columna: estilos', () => {
       const inicio = css.indexOf(`\n${selector} {`)
       return inicio < 0 ? '' : css.slice(inicio, css.indexOf('}', inicio))
     }
-    expect(regla('.column')).toMatch(/grid-template-columns:\s*2rem repeat\(2, 3\.5rem\)/)
+    expect(regla('.column')).toMatch(/grid-template-columns:\s*2rem repeat\(var\(--places\), 3\.5rem\)/)
     expect(regla('.column-line')).toMatch(/grid-column:\s*1\s*\/\s*-1/)
     expect(regla('.column-box.active')).toMatch(/border-color|background/)
   })

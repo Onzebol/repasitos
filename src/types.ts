@@ -24,7 +24,8 @@ export type NumberExercise = {
   answer: number
 }
 
-// Suma o resta sin llevar en columna: resultado de dos cifras (decenas y unidades)
+// Suma o resta en columna: el resultado se escribe cifra a cifra (unidades, decenas y, si llega a 100,
+// centenas). Con `carry` las unidades llevan y se muestra un cuadro de llevada opcional (no se comprueba).
 export type ColumnExercise = {
   type: 'column'
   question: string
@@ -32,6 +33,7 @@ export type ColumnExercise = {
   top: number
   bottom: number
   answer: number
+  carry?: boolean
 }
 
 export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise
@@ -50,8 +52,8 @@ export type BlockSpec =
   | { kind: 'place-value'; ask: 'read' | 'tens' | 'units' | 'compose' | 'blocks' }
   // Comparar números: signo > o <, frase correcta u ordenar tres números (elegir)
   | { kind: 'compare'; mode: 'sign' | 'statement' | 'order' }
-  // Suma o resta sin llevar en columna
-  | { kind: 'column'; operator: '+' | '−' }
+  // Suma o resta en columna: sin llevar, o con `carry` (solo sumas) llevando en las unidades
+  | { kind: 'column'; operator: '+' | '−'; carry?: boolean }
   // Problema de suma o resta sin llevar con un enunciado corto (escribir)
   | { kind: 'word-problem'; operator: '+' | '−' }
   // Decena más cercana a un número (elegir)

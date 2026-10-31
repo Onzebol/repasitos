@@ -53,8 +53,15 @@ function restandos(rng: Rng): [number, number] {
 
 const operandos = (operator: '+' | '−', rng: Rng) => (operator === '+' ? sumandos(rng) : restandos(rng))
 
-const columna = (operator: '+' | '−', rng: Rng): ColumnExercise => {
-  const [top, bottom] = operandos(operator, rng)
+// Dos números de dos cifras cuyas unidades suman 10 o más (se lleva una decena)
+function sumandosLlevando(rng: Rng): [number, number] {
+  const topUnits = int(rng, 1, 9)
+  const bottomUnits = int(rng, 10 - topUnits, 9)
+  return [int(rng, 1, 9) * 10 + topUnits, int(rng, 1, 9) * 10 + bottomUnits]
+}
+
+const columna = (operator: '+' | '−', carry: boolean, rng: Rng): ColumnExercise => {
+  const [top, bottom] = carry ? sumandosLlevando(rng) : operandos(operator, rng)
   return {
     type: 'column',
     question: operator === '+' ? 'Suma en columna' : 'Resta en columna',
@@ -62,6 +69,7 @@ const columna = (operator: '+' | '−', rng: Rng): ColumnExercise => {
     top,
     bottom,
     answer: operator === '+' ? top + bottom : top - bottom,
+    ...(carry && { carry }),
   }
 }
 
@@ -165,7 +173,8 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'column':
-      return columna(spec.operator, rng)
+      if (spec.carry && spec.operator !== '+') throw new Error('Solo las sumas pueden llevar en esta plantilla')
+      return columna(spec.operator, spec.carry ?? false, rng)
 
     case 'word-problem':
       return problema(spec.operator, rng)

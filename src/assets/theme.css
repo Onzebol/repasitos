@@ -533,7 +533,7 @@ body {
 /* Suma o resta en columna */
 .column {
   display: grid;
-  grid-template-columns: 2rem repeat(2, 3.5rem);
+  grid-template-columns: 2rem repeat(var(--places), 3.5rem);
   align-items: center;
   justify-items: center;
   gap: 0.1rem 0.3rem;
@@ -577,4 +577,13 @@ body {
   border-color: #3a9be0;
   background: #fff7cc;
   box-shadow: 0 0 0 4px #3a9be055;
+}
+
+/* Cuadro de llevada: pequeño y opcional, encima de las decenas */
+.column-box.carry {
+  min-height: 2rem;
+  font-size: 1.25rem;
+  border-width: 3px;
+  border-radius: 0.75rem;
+  color: #3d6f8a;
 }

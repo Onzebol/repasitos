@@ -35,10 +35,15 @@ function esValido(e: Exercise) {
     expect(e.bottom, nombre).toBeLessThanOrEqual(99)
     expect(e.answer, nombre).toBe(e.operator === '+' ? e.top + e.bottom : e.top - e.bottom)
     expect(e.answer, nombre).toBeGreaterThan(0)
-    expect(e.answer, nombre).toBeLessThanOrEqual(99)
-    // sin llevar: cada columna se resuelve por separado
-    if (e.operator === '+') expect((e.top % 10) + (e.bottom % 10), nombre).toBeLessThan(10)
-    else {
+    expect(e.answer, nombre).toBeLessThanOrEqual(e.carry ? 199 : 99)
+    if (e.carry) {
+      // llevando: las unidades suman 10 o más
+      expect(e.operator, nombre).toBe('+')
+      expect((e.top % 10) + (e.bottom % 10), nombre).toBeGreaterThanOrEqual(10)
+    } else if (e.operator === '+') {
+      // sin llevar: cada columna se resuelve por separado
+      expect((e.top % 10) + (e.bottom % 10), nombre).toBeLessThan(10)
+    } else {
       expect(e.top % 10, nombre).toBeGreaterThanOrEqual(e.bottom % 10)
       expect(Math.floor(e.top / 10), nombre).toBeGreaterThanOrEqual(Math.floor(e.bottom / 10))
     }
@@ -63,6 +68,7 @@ const SPECS: BlockSpec[] = [
   { kind: 'compare', mode: 'order' },
   { kind: 'column', operator: '+' },
   { kind: 'column', operator: '−' },
+  { kind: 'column', operator: '+', carry: true },
   { kind: 'word-problem', operator: '+' },
   { kind: 'word-problem', operator: '−' },
   { kind: 'nearest-ten' },
@@ -216,6 +222,24 @@ describe('generate: reglas de cada plantilla', () => {
       expect(n % 10, e.question).not.toBe(0)
       expect(e.answer, e.question).toBe(String(Math.round(n / 10) * 10))
       expect(e.options, e.question).toHaveLength(2)
+    }
+  })
+
+  it('las sumas llevando salen marcadas, llevan en las unidades y a veces pasan de 99', () => {
+    const resultados = muchos({ kind: 'column', operator: '+', carry: true }).map((e) => {
+      if (e.type !== 'column') throw new Error('se esperaba una columna')
+      expect(e.carry).toBe(true)
+      return e.answer
+    })
+    expect(resultados.some((r) => r < 100)).toBe(true)
+    expect(resultados.some((r) => r >= 100)).toBe(true)
+  })
+
+  it('las columnas sin llevar no llevan la marca', () => {
+    for (const operator of ['+', '−'] as const) {
+      for (const e of muchos({ kind: 'column', operator })) {
+        expect(e.type === 'column' && e.carry).toBeFalsy()
+      }
     }
   })
 
