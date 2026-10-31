@@ -13,6 +13,14 @@ const abrir = () => {
 }
 
 describe('App: navegación', () => {
+  it('#/iconos abre la página de iconos y se vuelve al inicio con el botón de la barra', async () => {
+    window.location.hash = '#/iconos'
+    const user = abrir()
+    expect(screen.getByRole('heading', { level: 2, name: 'Iconos que usa la aplicación' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Volver al inicio' }))
+    expect(screen.getByText('¡Hola! ¿Quién repasa hoy?')).toBeInTheDocument()
+  })
+
   it('empieza en el inicio con los dos perfiles', () => {
     abrir()
     expect(screen.getByText('¡Hola! ¿Quién repasa hoy?')).toBeInTheDocument()

@@ -700,7 +700,8 @@ body {
   cursor: pointer;
 }
 
-.icon-cell[data-used="true"]::after {
+.icon-cell[data-used="true"]::after,
+.icon-cell[data-used="avoid"]::after {
   content: "";
   position: absolute;
   top: 0.25rem;
@@ -709,4 +710,8 @@ body {
   height: 0.6rem;
   border-radius: 50%;
   background: #2e9e4f;
+}
+
+.icon-cell[data-used="avoid"]::after {
+  background: #d63b3b;
 }

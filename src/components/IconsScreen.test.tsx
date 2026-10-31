@@ -51,6 +51,15 @@ describe('IconsScreen: los iconos de la web', () => {
     expect(within(catalogo).getByRole('button', { name: /^Copiar 🐶/ }).getAttribute('aria-label')).not.toMatch(/en uso/)
   })
 
+  it('avisa de que ◀ y ▶ no se usan: salen como emoji con cuadrado y para eso está la flecha SVG', () => {
+    abrir()
+    for (const flecha of ['◀', '▶']) {
+      const celda = screen.getByRole('button', { name: new RegExp('^Copiar ' + flecha) })
+      expect(celda).toHaveAccessibleName(/no usar/)
+      expect(celda).toHaveAttribute('data-used', 'avoid')
+    }
+  })
+
   it('al pulsar un icono lo copia y lo avisa', async () => {
     const { user } = abrir()
     await user.click(screen.getByRole('button', { name: /^Copiar 🦊/ }))

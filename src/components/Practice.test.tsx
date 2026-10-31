@@ -46,7 +46,7 @@ describe('Practice: ejercicios de elegir', () => {
     expect(screen.queryByText('¡Muy bien!')).not.toBeInTheDocument()
   })
 
-  it('Siguiente y Elegir otro tema llevan su flecha en SVG, no como carácter', async () => {
+  it('Siguiente lleva su flecha en SVG, no como carácter', async () => {
     const { user } = renderPractice()
     await user.click(screen.getByRole('button', { name: '40' }))
     const siguiente = screen.getByRole('button', { name: /Siguiente/ })
