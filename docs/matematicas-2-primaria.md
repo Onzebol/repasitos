@@ -65,7 +65,7 @@ Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el 
 
 | Unidad | Estado | Temas |
 |---|---|---|
-| 1 | Hecha (56 ejercicios) | Números hasta el 99 · Decenas y unidades · Los signos > y < · Sumas y restas sin llevar (en columna, con cuadros de decenas y unidades) · La decena más cercana · Cálculo mental |
+| 1 | Hecha (sesiones de 10 ejercicios aleatorios por tema) | Números hasta el 99 · Decenas y unidades · Los signos > y < · Sumas y restas sin llevar (en columna, con cuadros de decenas y unidades) · La decena más cercana · Cálculo mental |
 | 2 a 9 | Muy pronto | |
 
-Los ejercicios están en `src/primaria/matematicas/` y se escriben desde cero. En la web las unidades se muestran como "Unidad 1", "Unidad 2"... con un resumen del contenido, sin usar los títulos del libro.
+Los ejercicios están en `src/primaria/matematicas/` y se escriben desde cero. Cada tema es un plan de 10 ejercicios por sesión (plantillas con rangos y reglas, por ejemplo "suma sin llevar", más listas escritas a mano); las unidades nuevas se escriben ya con este modelo. En la web las unidades se muestran como "Unidad 1", "Unidad 2"... con un resumen del contenido, sin usar los títulos del libro.

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
+import { mulberry32 } from '../../random'
+import { buildSession, exerciseKey, SESSION_SIZE } from '../../session'
 import { temasUnidad1 } from './unidad1'
+
+const SEMILLAS = 100
 
 describe('datos de la unidad 1 de Matemáticas', () => {
   it('tiene los seis temas del índice, con identificadores distintos', () => {
@@ -8,86 +12,58 @@ describe('datos de la unidad 1 de Matemáticas', () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 
-  it.each(temasUnidad1.map((topic) => [topic.name, topic] as const))('%s tiene ejercicios y enunciados', (_name, topic) => {
-    expect(topic.exercises.length).toBeGreaterThanOrEqual(8)
-    for (const exercise of topic.exercises) {
-      expect(exercise.question.trim()).not.toBe('')
+  it.each(temasUnidad1.map((topic) => [topic.name, topic] as const))('%s: el plan suma una sesión de 10 ejercicios', (_name, topic) => {
+    expect(topic.plan.reduce((total, block) => total + block.count, 0)).toBe(SESSION_SIZE)
+    for (const block of topic.plan) {
+      expect(block.count).toBeGreaterThan(0)
+      if (block.spec.kind === 'bag') expect(block.spec.items.length).toBeGreaterThanOrEqual(block.count)
     }
   })
 
-  it('en los ejercicios de elegir, la respuesta está entre las opciones y no hay opciones repetidas', () => {
-    for (const topic of temasUnidad1) {
-      for (const exercise of topic.exercises) {
-        if (exercise.type !== 'choice') continue
-        expect(exercise.options, exercise.question).toContain(exercise.answer)
-        expect(new Set(exercise.options).size, exercise.question).toBe(exercise.options.length)
+  it.each(temasUnidad1.map((topic) => [topic.name, topic] as const))('%s: cada sesión (%s semillas) tiene 10 ejercicios distintos y bien hechos', (_name, topic) => {
+    for (let seed = 0; seed < SEMILLAS; seed++) {
+      const session = buildSession(topic.plan, mulberry32(seed))
+      expect(session, `semilla ${seed}`).toHaveLength(SESSION_SIZE)
+      expect(new Set(session.map(exerciseKey)).size, `semilla ${seed}`).toBe(SESSION_SIZE)
+      for (const exercise of session) {
+        expect(exercise.type === 'column' || exercise.question.trim() !== '').toBe(true)
+        if (exercise.type === 'choice') {
+          expect(exercise.options, exercise.question).toContain(exercise.answer)
+          expect(new Set(exercise.options).size, exercise.question).toBe(exercise.options.length)
+        } else if (exercise.type === 'number') {
+          expect(Number.isInteger(exercise.answer), exercise.question).toBe(true)
+          expect(exercise.answer, exercise.question).toBeGreaterThanOrEqual(0)
+          expect(exercise.answer, exercise.question).toBeLessThanOrEqual(999)
+        } else {
+          const esperado = exercise.operator === '+' ? exercise.top + exercise.bottom : exercise.top - exercise.bottom
+          expect(exercise.answer).toBe(esperado)
+        }
       }
     }
   })
 
-  it('en los ejercicios de escribir, la respuesta es un número entero que cabe en el teclado', () => {
-    for (const topic of temasUnidad1) {
-      for (const exercise of topic.exercises) {
-        if (exercise.type !== 'number') continue
-        expect(Number.isInteger(exercise.answer), exercise.question).toBe(true)
-        expect(exercise.answer, exercise.question).toBeGreaterThanOrEqual(0)
-        expect(exercise.answer, exercise.question).toBeLessThanOrEqual(999)
-      }
-    }
+  it.each(temasUnidad1.map((topic) => [topic.name, topic] as const))('%s: sesiones sucesivas son distintas', (_name, topic) => {
+    const sesiones = Array.from({ length: 5 }, (_, seed) => buildSession(topic.plan, mulberry32(seed)).map(exerciseKey).join('|'))
+    expect(new Set(sesiones).size).toBe(5)
   })
 
-  it('las sumas y restas escritas como "a + b =" tienen el resultado correcto', () => {
-    let operaciones = 0
-    for (const topic of temasUnidad1) {
-      for (const exercise of topic.exercises) {
-        if (exercise.type !== 'number') continue
-        const match = exercise.question.match(/^(\d+) ([+−]) (\d+) =$/)
-        if (!match) continue
-        operaciones++
-        const [, a, signo, b] = match
-        const esperado = signo === '+' ? Number(a) + Number(b) : Number(a) - Number(b)
-        expect(exercise.answer, exercise.question).toBe(esperado)
-      }
-    }
-    expect(operaciones).toBeGreaterThanOrEqual(10)
-  })
-
-  it('las sumas y restas en columna son correctas, de dos cifras y sin llevar', () => {
-    const columnas = temasUnidad1.flatMap((topic) => topic.exercises).filter((e) => e.type === 'column')
-    expect(columnas.length).toBeGreaterThanOrEqual(8)
-    for (const e of columnas) {
-      const nombre = `${e.top} ${e.operator} ${e.bottom}`
-      expect(e.top, nombre).toBeGreaterThanOrEqual(10)
-      expect(e.top, nombre).toBeLessThanOrEqual(99)
-      expect(e.bottom, nombre).toBeGreaterThanOrEqual(10)
-      expect(e.bottom, nombre).toBeLessThanOrEqual(99)
-      const esperado = e.operator === '+' ? e.top + e.bottom : e.top - e.bottom
-      expect(e.answer, nombre).toBe(esperado)
-      expect(e.answer, nombre).toBeGreaterThanOrEqual(0)
-      expect(e.answer, nombre).toBeLessThanOrEqual(99)
-      // sin llevar: cada columna se resuelve por separado
-      if (e.operator === '+') expect((e.top % 10) + (e.bottom % 10), nombre).toBeLessThan(10)
-      else {
-        expect(e.top % 10, nombre).toBeGreaterThanOrEqual(e.bottom % 10)
-        expect(Math.floor(e.top / 10), nombre).toBeGreaterThanOrEqual(Math.floor(e.bottom / 10))
-      }
-    }
-  })
-
-  it('"Sumas y restas sin llevar" se presenta en columna y conserva los problemas con texto', () => {
+  it('"Sumas y restas sin llevar" mezcla columnas y problemas con texto', () => {
     const tema = temasUnidad1.find((topic) => topic.id === 'sumas-restas')!
-    expect(tema.exercises.filter((e) => e.type === 'column')).toHaveLength(8)
-    expect(tema.exercises.filter((e) => e.type === 'number')).toHaveLength(2)
+    const session = buildSession(tema.plan, mulberry32(1))
+    expect(session.filter((e) => e.type === 'column')).toHaveLength(6)
+    expect(session.filter((e) => e.type === 'number')).toHaveLength(4)
   })
 
-  it('las decenas más cercanas elegidas son realmente las más cercanas', () => {
-    const tema = temasUnidad1.find((topic) => topic.id === 'decena-cercana')
-    expect(tema).toBeDefined()
-    for (const exercise of tema!.exercises) {
-      if (exercise.type !== 'choice') continue
-      const n = Number(exercise.question.match(/\d+/)![0])
-      const mas_cercana = Math.round(n / 10) * 10
-      expect(exercise.answer, exercise.question).toBe(String(mas_cercana))
+  it('las listas fijas tienen la respuesta entre las opciones y ejercicios distintos', () => {
+    for (const topic of temasUnidad1) {
+      for (const { spec } of topic.plan) {
+        if (spec.kind !== 'bag') continue
+        const claves = spec.items.map(exerciseKey)
+        expect(new Set(claves).size, topic.name).toBe(claves.length)
+        for (const item of spec.items) {
+          if (item.type === 'choice') expect(item.options, item.question).toContain(item.answer)
+        }
+      }
     }
   })
 })

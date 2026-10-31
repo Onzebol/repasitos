@@ -60,7 +60,8 @@ describe('App: navegación', () => {
     await user.click(screen.getByRole('button', { name: /Unidad 1/ }))
     expect(screen.getAllByRole('listitem')).toHaveLength(6)
     await user.click(screen.getByRole('button', { name: /Decenas y unidades/ }))
-    expect(screen.getByRole('heading', { name: 'El número 47 tiene…' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Decenas y unidades' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Ejercicio 1 de 10')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Volver al inicio' }))
     expect(screen.getByText('¡Hola! ¿Quién repasa hoy?')).toBeInTheDocument()
   })
@@ -99,7 +100,8 @@ describe('App: historial del navegador', () => {
   it('una dirección concreta abre esa pantalla', () => {
     window.location.hash = '#/primaria/matematicas/u1/decenas-unidades'
     render(<App />)
-    expect(screen.getByRole('heading', { name: 'El número 47 tiene…' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Decenas y unidades' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Ejercicio 1 de 10')).toBeInTheDocument()
   })
 
   it('una dirección desconocida abre el inicio', () => {

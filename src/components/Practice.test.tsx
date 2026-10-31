@@ -1,18 +1,23 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { mulberry32 } from '../random'
+import { topicFrom } from '../test/topics'
 import type { Topic } from '../types'
 import { Practice } from './Practice'
 
-const tema: Topic = {
-  id: 'prueba',
-  name: 'Tema de prueba',
+const tema = topicFrom([
+  { type: 'choice', question: '¿Qué número va después del 39?', options: ['38', '40', '49'], answer: '40' },
+  { type: 'number', question: '23 + 14 =', answer: 37 },
+])
+
+// Tema que genera ejercicios distintos cada vez: 10 sumas en columna
+const temaGenerado: Topic = {
+  id: 'generado',
+  name: 'Tema generado',
   icon: '🧪',
   tint: '#fff',
-  exercises: [
-    { type: 'choice', question: '¿Qué número va después del 39?', options: ['38', '40', '49'], answer: '40' },
-    { type: 'number', question: '23 + 14 =', answer: 37 },
-  ],
+  plan: [{ spec: { kind: 'column', operator: '+' }, count: 10 }],
 }
 
 const renderPractice = () => {
@@ -138,4 +143,43 @@ describe('Practice: final del tema y navegación', () => {
     await user.click(screen.getByRole('button', { name: 'Volver al inicio' }))
     expect(onHome).toHaveBeenCalledTimes(1)
   })
+})
+
+describe('Practice: sesiones aleatorias', () => {
+  const operaciones = () => screen.getByRole('group', { name: /^\d+ \+ \d+$/ }).getAttribute('aria-label')
+
+  const resolverSesion = async (user: ReturnType<typeof userEvent.setup>) => {
+    const hechas: string[] = []
+    for (let i = 0; i < 10; i++) {
+      const [a, b] = operaciones()!.match(/\d+/g)!.map(Number)
+      hechas.push(`${a}+${b}`)
+      const resultado = String(a + b).padStart(2, '0')
+      await user.click(screen.getByRole('button', { name: resultado[1] }))
+      await user.click(screen.getByRole('button', { name: resultado[0] }))
+      await user.click(screen.getByRole('button', { name: 'Comprobar' }))
+      await user.click(screen.getByRole('button', { name: /Siguiente|Terminar/ }))
+    }
+    return hechas
+  }
+
+  it('la sesión tiene 10 ejercicios y no cambia mientras se contesta', async () => {
+    render(<Practice topic={temaGenerado} onHome={vi.fn()} onBack={vi.fn()} rng={mulberry32(7)} />)
+    const user = userEvent.setup()
+    expect(screen.getByLabelText('Ejercicio 1 de 10')).toBeInTheDocument()
+    const primera = operaciones()
+    await user.click(screen.getByRole('button', { name: '5' }))
+    await user.click(screen.getByRole('button', { name: 'Unidades' }))
+    expect(operaciones()).toBe(primera)
+  })
+
+  it('Repetir empieza otra sesión con ejercicios distintos', async () => {
+    render(<Practice topic={temaGenerado} onHome={vi.fn()} onBack={vi.fn()} rng={mulberry32(7)} />)
+    const user = userEvent.setup()
+    const primera = await resolverSesion(user)
+    expect(new Set(primera).size).toBe(10)
+    await user.click(screen.getByRole('button', { name: /Repetir/ }))
+    const segunda = await resolverSesion(user)
+    expect(new Set(segunda).size).toBe(10)
+    expect(segunda.filter((operacion) => primera.includes(operacion))).toEqual([])
+  }, 30000)
 })

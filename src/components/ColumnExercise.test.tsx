@@ -1,15 +1,15 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import type { Exercise, Topic } from '../types'
+import { topicFrom } from '../test/topics'
+import type { Exercise } from '../types'
 import { Practice } from './Practice'
 
 const suma: Exercise = { type: 'column', question: 'Suma en columna', operator: '+', top: 23, bottom: 14, answer: 37 }
 const resta: Exercise = { type: 'column', question: 'Resta en columna', operator: '−', top: 68, bottom: 63, answer: 5 }
 
 const abrir = (...exercises: Exercise[]) => {
-  const topic: Topic = { id: 'columna', name: 'Columna', icon: '➕', tint: '#fff', exercises }
-  render(<Practice topic={topic} onHome={vi.fn()} onBack={vi.fn()} />)
+  render(<Practice topic={topicFrom(exercises, 'Columna')} onHome={vi.fn()} onBack={vi.fn()} />)
   return userEvent.setup()
 }
 

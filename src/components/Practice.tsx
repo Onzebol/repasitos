@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { randomRng } from '../random'
+import type { Rng } from '../random'
+import { buildSession, exerciseKey } from '../session'
 import type { Topic } from '../types'
 import { ColumnExercise } from './ColumnExercise'
 import { Hills } from './Hills'
@@ -10,19 +13,22 @@ type PracticeProps = {
   topic: Topic
   onHome: () => void
   onBack: () => void
+  rng?: Rng // los tests pasan uno con semilla
 }
 
-// Sesión de ejercicios de un tema. Sin tiempo ni límite de intentos: el error se corrige con ánimo.
-export function Practice({ topic, onHome, onBack }: PracticeProps) {
+// Sesión de ejercicios de un tema, distinta cada vez. Sin tiempo ni límite de intentos: el error se corrige con ánimo.
+export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
+  const [random] = useState<Rng>(() => rng ?? randomRng())
+  const [session, setSession] = useState(() => buildSession(topic.plan, random))
   const [index, setIndex] = useState(0)
   const [solved, setSolved] = useState(false)
   const [failed, setFailed] = useState(false)
   const [tried, setTried] = useState<string[]>([])
   const [input, setInput] = useState('')
 
-  const total = topic.exercises.length
+  const total = session.length
   const finished = index >= total
-  const exercise = topic.exercises[index]
+  const exercise = session[index]
 
   const next = () => {
     setIndex(index + 1)
@@ -32,7 +38,9 @@ export function Practice({ topic, onHome, onBack }: PracticeProps) {
     setInput('')
   }
 
+  // Repetir empieza otra sesión, evitando los ejercicios de la anterior
   const restart = () => {
+    setSession(buildSession(topic.plan, random, session.map(exerciseKey)))
     setIndex(0)
     setSolved(false)
     setFailed(false)
@@ -95,7 +103,7 @@ export function Practice({ topic, onHome, onBack }: PracticeProps) {
       <TopBar title={topic.name} prompt={exercise.question} onHome={onHome} onBack={onBack} />
       <section className="practice">
         <div className="progress" aria-label={`Ejercicio ${index + 1} de ${total}`}>
-          {topic.exercises.map((_, i) => (
+          {session.map((_, i) => (
             <span key={i} className={i < index ? 'dot done' : i === index ? 'dot current' : 'dot'} />
           ))}
         </div>
