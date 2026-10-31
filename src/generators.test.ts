@@ -77,6 +77,9 @@ const SPECS: BlockSpec[] = [
   { kind: 'mental', mode: 'sub-bridge' },
   { kind: 'mental', mode: 'tens-add' },
   { kind: 'mental', mode: 'tens-sub' },
+  { kind: 'inverse', mode: 'subtract' },
+  { kind: 'inverse', mode: 'missing' },
+  { kind: 'inverse', mode: 'operation' },
 ]
 
 describe('generate: todo ejercicio generado es válido', () => {
@@ -229,6 +232,38 @@ describe('generate: reglas de cada plantilla', () => {
 
   it('un problema de resta no puede llevar en esta plantilla', () => {
     expect(() => generate({ kind: 'word-problem', operator: '−', carry: true }, mulberry32(1))).toThrow()
+  })
+
+  it('la resta que comprueba una suma da el otro sumando', () => {
+    for (const e of muchos({ kind: 'inverse', mode: 'subtract' }).map(number)) {
+      const [a, b, c, c2, b2] = e.question.match(/\d+/g)!.map(Number)
+      expect(a + b, e.question).toBe(c)
+      expect([c2, b2], e.question).toEqual([c, b])
+      expect(e.answer, e.question).toBe(a)
+      expect(c, e.question).toBeLessThanOrEqual(99)
+    }
+  })
+
+  it('el sumando que falta completa la suma', () => {
+    for (const e of muchos({ kind: 'inverse', mode: 'missing' }).map(number)) {
+      const [a, c] = e.question.match(/\d+/g)!.map(Number)
+      expect(a + e.answer, e.question).toBe(c)
+      expect(e.answer, e.question).toBeGreaterThanOrEqual(10)
+    }
+  })
+
+  it('la operación que comprueba la suma es la única resta válida entre las opciones', () => {
+    for (const e of muchos({ kind: 'inverse', mode: 'operation' }).map(choice)) {
+      const [a, b, c] = e.question.match(/\d+/g)!.map(Number)
+      expect(a + b, e.question).toBe(c)
+      expect(e.answer, e.question).toBe(`${c} − ${b}`)
+      const comprueba = (opcion: string) => {
+        const [x, signo, y] = opcion.split(' ')
+        // comprueba la suma: se resta un sumando del total
+        return signo === '−' && Number(x) === c && (Number(y) === a || Number(y) === b)
+      }
+      expect(e.options.filter(comprueba), e.question).toEqual([e.answer])
+    }
   })
 
   it('la decena más cercana es la más cercana y nunca hay empate', () => {

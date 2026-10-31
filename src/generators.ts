@@ -188,6 +188,16 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       return elegir(`¿Cuál es la decena más cercana a ${n}?`, [bajo, bajo + 10], Math.round(n / 10) * 10)
     }
 
+    case 'inverse': {
+      // a + b = c, con a mayor que b y c menor que 100
+      const a = int(rng, 20, 89)
+      const b = int(rng, 10, Math.min(a - 1, 99 - a))
+      const c = a + b
+      if (spec.mode === 'subtract') return numero(`${a} + ${b} = ${c}. Entonces, ${c} − ${b} =`, a)
+      if (spec.mode === 'missing') return numero(`Completa: ${a} + ▢ = ${c}`, b)
+      return elegir(`¿Qué resta comprueba que ${a} + ${b} = ${c}?`, [`${c} − ${b}`, `${a} − ${b}`, `${c} + ${b}`], `${c} − ${b}`)
+    }
+
     case 'mental': {
       if (spec.mode === 'add-bridge') {
         let a = int(rng, 2, 9)

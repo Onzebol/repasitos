@@ -60,6 +60,9 @@ export type BlockSpec =
   | { kind: 'nearest-ten' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir)
   | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' }
+  // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
+  // o qué resta comprueba una suma (elegir)
+  | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }
 
 // Un bloque del plan: cuántos ejercicios de esa plantilla entran en cada sesión
 export type PlanBlock = { spec: BlockSpec; count: number }
