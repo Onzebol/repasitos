@@ -69,7 +69,8 @@ describe('App: navegación', () => {
     await user.click(screen.getByRole('button', { name: /Primaria/ }))
     expect(screen.getByRole('button', { name: 'Matemáticas' })).toBeEnabled()
     expect(screen.getByRole('button', { name: 'Conocimiento del medio' })).toBeEnabled()
-    for (const materia of ['Lengua', 'Inglés', 'Música']) {
+    expect(screen.getByRole('button', { name: 'Lengua' })).toBeEnabled()
+    for (const materia of ['Inglés', 'Música']) {
       expect(screen.getByRole('button', { name: materia })).toBeDisabled()
     }
     await user.click(screen.getByRole('button', { name: 'Volver al inicio' }))
@@ -81,11 +82,25 @@ describe('App: navegación', () => {
   })
 
   it('una materia sin contenido abre «¡Muy pronto!» por dirección y se puede volver', async () => {
-    window.location.hash = '#/primaria/lengua'
+    window.location.hash = '#/primaria/ingles'
     const user = abrir()
     expect(screen.getByText('¡Muy pronto!')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /Volver a las materias/ }))
     expect(screen.getByRole('button', { name: 'Matemáticas' })).toBeInTheDocument()
+  })
+
+  it('Lengua abre sus 9 unidades: la 1 con su tema y las demás «Muy pronto»', async () => {
+    const user = abrir()
+    await user.click(screen.getByRole('button', { name: /Primaria/ }))
+    await user.click(screen.getByRole('button', { name: 'Lengua' }))
+    expect(window.location.hash).toBe('#/primaria/lengua')
+    expect(screen.getByRole('button', { name: /Unidad 1/ })).toBeEnabled()
+    expect(screen.getAllByText('Muy pronto')).toHaveLength(8)
+    await user.click(screen.getByRole('button', { name: /Unidad 1/ }))
+    expect(window.location.hash).toBe('#/primaria/lengua/u1')
+    await user.click(screen.getByRole('button', { name: /Sinónimos y palabras del colegio/ }))
+    expect(window.location.hash).toBe('#/primaria/lengua/u1/sinonimos')
+    expect(screen.getByLabelText('Ejercicio 1 de 10')).toBeInTheDocument()
   })
 
   it('Conocimiento del medio abre sus 9 unidades: la 1 con su tema y las demás «Muy pronto»', async () => {

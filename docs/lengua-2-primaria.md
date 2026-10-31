@@ -32,6 +32,19 @@ Las 9 unidades se agrupan en 3 bloques de 3, cada uno cerrado por un "Reto" (pro
 
 Secciones del libro: la biblioteca del colegio (tras la unidad 3), club de lectura (tras la 6) e itinerario de lectura (tras la 9).
 
+## Unidad 1: términos clave para escribir los ejercicios
+
+Resumen de los términos de la unidad 1 (hecho a partir de las páginas del libro; solo vocabulario, sin copiar textos):
+
+- **Comenzamos (repaso de principio de curso, antes de la unidad):** el abecedario (27 letras, con la ñ), ordenar sílabas para formar palabras, contar sílabas y letras, separar palabras en una oración.
+- **Vocabulario:** las personas del colegio (profesorado, alumnado, directora, conserje); sinónimos (profesor y maestro, escuela y colegio, clase y aula); palabras para el aspecto, el pelo, los ojos y la forma de ser.
+- **Uso de la mayúscula:** los nombres de personas, animales y lugares; la primera palabra de un escrito y la que va después de un punto.
+- **Una gran variedad de lenguas:** el lenguaje, las lenguas del mundo, el castellano o español y las otras lenguas de España (gallego, catalán y vasco), el español en América y la lengua de signos.
+- **Palabras que riman:** que acaban igual o de forma parecida.
+- **Escritura:** alargar oraciones con más detalles; describir a una persona (aspecto físico, forma de ser y aficiones).
+
+Fuera de la web: las tres lecturas (un cuento, un diálogo y un poema) tienen derechos de autor y no se usan ni se parafrasean; los textos para comprensión lectora se escriben propios. Tampoco entran las preguntas personales («¿qué lengua hablas?», «describe a alguien que conozcas», la ficha sobre uno mismo), el rincón de las emociones ni las actividades de hablar, dramatizar o dibujar.
+
 ## Qué entra primero en la web
 
 Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el bloque 1:
