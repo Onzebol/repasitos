@@ -26,6 +26,9 @@ describe('routes: dirección ↔ pantalla', () => {
       '#/primaria/matematicas',
       '#/primaria/matematicas/u1',
       '#/primaria/matematicas/u1/decenas-unidades',
+      '#/primaria/medio',
+      '#/primaria/medio/u1',
+      '#/primaria/medio/u1/alimentacion',
       '#/iconos',
       '#/trazo',
       '#/voces',
@@ -85,6 +88,15 @@ describe('routes: dirección ↔ pantalla', () => {
     expect(hasContent('infantil', materia('letras'))).toBe(false)
     expect(hasContent('primaria', materia('matematicas'))).toBe(true)
     expect(hasContent('primaria', materia('lengua'))).toBe(false)
+    expect(hasContent('primaria', materia('medio'))).toBe(true)
+  })
+
+  it('Conocimiento del medio abre sus unidades: solo la 1 tiene temas y las demás vuelven al inicio', () => {
+    const unidades = screenFromHash('#/primaria/medio')
+    expect(unidades.name).toBe('units')
+    if (unidades.name === 'units') expect(unidades.units).toHaveLength(9)
+    expect(screenFromHash('#/primaria/medio/u1').name).toBe('topics')
+    expect(screenFromHash('#/primaria/medio/u2')).toEqual({ name: 'home' })
   })
 
   it('la dirección de un ejercicio abre ese tema', () => {

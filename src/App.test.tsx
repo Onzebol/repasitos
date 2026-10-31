@@ -68,7 +68,8 @@ describe('App: navegación', () => {
     const user = abrir()
     await user.click(screen.getByRole('button', { name: /Primaria/ }))
     expect(screen.getByRole('button', { name: 'Matemáticas' })).toBeEnabled()
-    for (const materia of ['Lengua', 'Conocimiento del medio', 'Inglés', 'Música']) {
+    expect(screen.getByRole('button', { name: 'Conocimiento del medio' })).toBeEnabled()
+    for (const materia of ['Lengua', 'Inglés', 'Música']) {
       expect(screen.getByRole('button', { name: materia })).toBeDisabled()
     }
     await user.click(screen.getByRole('button', { name: 'Volver al inicio' }))
@@ -85,6 +86,20 @@ describe('App: navegación', () => {
     expect(screen.getByText('¡Muy pronto!')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /Volver a las materias/ }))
     expect(screen.getByRole('button', { name: 'Matemáticas' })).toBeInTheDocument()
+  })
+
+  it('Conocimiento del medio abre sus 9 unidades: la 1 con su tema y las demás «Muy pronto»', async () => {
+    const user = abrir()
+    await user.click(screen.getByRole('button', { name: /Primaria/ }))
+    await user.click(screen.getByRole('button', { name: 'Conocimiento del medio' }))
+    expect(window.location.hash).toBe('#/primaria/medio')
+    expect(screen.getByRole('button', { name: /Unidad 1/ })).toBeEnabled()
+    expect(screen.getAllByText('Muy pronto')).toHaveLength(8)
+    await user.click(screen.getByRole('button', { name: /Unidad 1/ }))
+    expect(window.location.hash).toBe('#/primaria/medio/u1')
+    await user.click(screen.getByRole('button', { name: /¿Cómo nos alimentamos\?/ }))
+    expect(window.location.hash).toBe('#/primaria/medio/u1/alimentacion')
+    expect(screen.getByLabelText('Ejercicio 1 de 10')).toBeInTheDocument()
   })
 
   it('Infantil: Números abre sus temas sin unidades y atrás vuelve a las materias de Infantil', async () => {

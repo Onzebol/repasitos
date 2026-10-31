@@ -32,6 +32,18 @@ Las 9 unidades se agrupan en 3 bloques de 3, cada uno cerrado por un "Reto" (pro
 
 Proyecto digital del libro: navegamos por Internet.
 
+## Unidad 1: términos clave para escribir los ejercicios
+
+Resumen de los términos de la unidad 1 (hecho a partir de las páginas del libro; solo vocabulario, sin copiar textos):
+
+- **Nuestro cuerpo cambia:** etapas de la vida (infancia, adolescencia, edad adulta, ancianidad); dientes de leche y definitivos; cambian la altura, el peso, el número de pie, la voz y los dientes (no el color de los ojos).
+- **¿Cómo funciona nuestro cuerpo?:** las tres funciones vitales (relación, nutrición y reproducción) y los cinco sentidos con su órgano (vista-ojos, olfato-nariz, oído-orejas, gusto-lengua, tacto-piel).
+- **¿Cómo nos movemos?:** huesos (esqueleto), articulaciones y músculos.
+- **Necesitamos respirar:** aire, oxígeno, nariz o boca, tráquea, pulmones; inspiración y espiración; respiración tranquila o acelerada.
+- **¿Cómo nos alimentamos?:** digestión, nutrientes, boca, esófago, estómago, intestinos y ano; los tres grupos de alimentos (vitaminas y fibra, energía, ayudan a crecer) y los menús variados. **Cuidado:** hay alimentos, como las legumbres, que el libro no coloca con claridad en un grupo; los ejercicios solo usan los inequívocos.
+
+Fuera de la web: «Mi cuestionario de salud» (datos personales), las medidas y notas sobre la propia persona o la familia, y el rincón de las emociones (no es un saber que se pueda comprobar tocando).
+
 ## Qué entra primero en la web
 
 Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el bloque 1:
