@@ -13,7 +13,7 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 - `vite.config.ts` usa `base: '/repasitos/'`: mantenerlo si se renombra el repositorio.
 - Para ficheros de `public/` usar `import.meta.env.BASE_URL` como prefijo (en `index.html` y `manifest.webmanifest`, rutas relativas).
 - App instalable (PWA): `public/manifest.webmanifest`, `public/sw.js` (red primero, copia sin conexión) y iconos de Repi (`icon.svg` es la fuente de los PNG). Si se cambian los ficheros de `public/` que el service worker guarda, subir `CACHE` en `sw.js`.
-- Sitio estático sin servidor: si se añade router, usar `HashRouter` (Pages no hace fallback a `index.html`).
+- Sitio estático sin servidor: la navegación usa la dirección con almohadilla (`#/primaria/matematicas/u1/...`), porque Pages no hace fallback a `index.html`.
 - Comandos: `npm run dev`, `npm test` (tests), `npm run build` (debe pasar sin errores antes de cada push), `npm run lint`.
 - Versiones de referencia (revisadas el 2026-10-30): Node 24 LTS (`.nvmrc`, usado por CI y despliegue; mínimo `>=22.12` por Vite 8), Vite 8, React 19, TypeScript 7, `@types/node` alineado con la major de Node (24).
 - Sin dependencias nuevas salvo necesidad clara.
@@ -34,7 +34,7 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 
 ## Organización del contenido
 
-- Cada perfil (`infantil`, `primaria`) tiene su carpeta en `src/` con sus materias como datos (`materias.ts`) y, más adelante, una pantalla por materia. La navegación es por estado en `App.tsx` (sin router por ahora); la lectura en voz alta usa la síntesis de voz del navegador (`src/speak.ts`).
+- Cada perfil (`infantil`, `primaria`) tiene su carpeta en `src/` con sus materias como datos (`materias.ts`) y, más adelante, una pantalla por materia. La navegación se sincroniza con `location.hash` (sin dependencias): `src/routes.ts` convierte dirección ↔ pantalla y `App.tsx` la lee con `hashchange`, así funciona el botón atrás del navegador y del móvil, recargar y compartir una pantalla; la lectura en voz alta usa la síntesis de voz del navegador (`src/speak.ts`).
 - Los ejercicios se definen como datos (arrays tipados en TS) separados de la lógica, para añadir contenido sin tocar los componentes. Tipos en `src/types.ts` (`Unit` → `Topic` → `Exercise`; ejercicios de elegir una respuesta o de escribir un número). Ejemplo: `src/primaria/matematicas/unidad1.ts`; las unidades sin temas salen como "Muy pronto". Los ejercicios se escriben desde cero, sin copiar los del libro.
 - Componentes y estilos compartidos en `src/components/` y `src/assets/`.
 - Repositorio público: no subir datos personales ni fotos de menores.

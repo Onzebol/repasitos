@@ -27,7 +27,7 @@ Los bocetos son orientativos: iconos (emojis), colores y tipografías del sistem
 - Ilustraciones definitivas de Repi (expresiones: contento, animando, celebrando) y de los iconos de cada materia.
 - Componentes comunes: botón grande, tarjeta de materia, pantalla de ejercicio, feedback de acierto y de error.
 - Audio: cuándo se usa y cómo se activa (sin reproducción automática molesta).
-- Router: `HashRouter` (Pages no hace fallback a `index.html`).
+- Navegación por dirección con almohadilla (`#/...`, solución propia en `src/routes.ts`; Pages no hace fallback a `index.html`).
 
 ## Implementado
 
