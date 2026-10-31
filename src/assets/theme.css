@@ -404,6 +404,13 @@ body {
   font-size: clamp(1.5rem, 5vw, 2.5rem);
   font-weight: 700;
   letter-spacing: 0.1em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1.5rem;
+}
+
+.visual-part {
   word-break: break-all;
 }
 
