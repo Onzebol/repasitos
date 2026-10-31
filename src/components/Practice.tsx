@@ -5,6 +5,7 @@ import { buildSession, exerciseKey } from '../session'
 import type { Topic } from '../types'
 import { ColumnExercise } from './ColumnExercise'
 import { Hills } from './Hills'
+import { Icon } from './Icon'
 import { Keypad } from './Keypad'
 import { Mascot } from './Mascot'
 import { TopBar } from './TopBar'
@@ -87,10 +88,10 @@ export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
           <Mascot size={180} />
           <p className="bubble" role="status">¡Muy bien! Has terminado</p>
           <button className="action" onClick={restart}>
-            <span aria-hidden="true">↻</span> Repetir
+            <Icon name="repeat" /> Repetir
           </button>
           <button className="action" onClick={onBack}>
-            <span aria-hidden="true">◀</span> Elegir otro tema
+            <Icon name="back" /> Elegir otro tema
           </button>
         </section>
       </main>
@@ -123,12 +124,12 @@ export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
             {visual}
             <div className="feedback solved" role="status">
               <p className="answer-ok">
-                <span aria-hidden="true">✔</span> {exercise.answer}
+                <Icon name="check" /> {exercise.answer}
               </p>
               <Mascot size={150} />
               <p className="bubble">¡Muy bien!</p>
               <button className="action" onClick={next} autoFocus>
-                {index + 1 < total ? 'Siguiente' : 'Terminar'} <span aria-hidden="true">▶</span>
+                {index + 1 < total ? 'Siguiente' : 'Terminar'} <Icon name="next" />
               </button>
             </div>
           </>

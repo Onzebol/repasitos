@@ -2,6 +2,8 @@ import { useSyncExternalStore } from 'react'
 import type { CSSProperties } from 'react'
 import { ComingSoon } from './components/ComingSoon'
 import { Hills } from './components/Hills'
+import { Icon } from './components/Icon'
+import { IconsScreen } from './components/IconsScreen'
 import { ListScreen } from './components/ListScreen'
 import { Mascot } from './components/Mascot'
 import { Practice } from './components/Practice'
@@ -23,6 +25,8 @@ const setScreen = (screen: Screen) => {
 function App() {
   const screen = screenFromHash(useSyncExternalStore(subscribe, getHash))
   const goHome = () => setScreen({ name: 'home' })
+
+  if (screen.name === 'icons') return <IconsScreen onHome={goHome} />
 
   if (screen.name === 'subjects') {
     const { profile } = screen
@@ -104,7 +108,7 @@ function App() {
           style={{ '--tint': '#ffd1dc' } as CSSProperties}
           onClick={() => setScreen({ name: 'subjects', profile: 'infantil' })}
         >
-          <span className="profile-icon" aria-hidden="true">🧩</span>
+          <Icon className="profile-icon" name="infantil" />
           <span className="profile-name">Infantil</span>
           <small>3º de Infantil</small>
         </button>
@@ -113,7 +117,7 @@ function App() {
           style={{ '--tint': '#bfe3ff' } as CSSProperties}
           onClick={() => setScreen({ name: 'subjects', profile: 'primaria' })}
         >
-          <span className="profile-icon" aria-hidden="true">📚</span>
+          <Icon className="profile-icon" name="primaria" />
           <span className="profile-name">Primaria</span>
           <small>2º de Primaria</small>
         </button>

@@ -1,5 +1,6 @@
 import type { Subject } from '../types'
 import { Hills } from './Hills'
+import { Icon } from './Icon'
 import { Mascot } from './Mascot'
 import { TopBar } from './TopBar'
 
@@ -19,7 +20,7 @@ export function ComingSoon({ subject, onHome, onBack }: ComingSoonProps) {
         <Mascot size={140} />
         <p className="bubble">¡Muy pronto!</p>
         <button className="action" onClick={onBack}>
-          <span aria-hidden="true">◀</span> Volver a las materias
+          <Icon name="back" /> Volver a las materias
         </button>
       </section>
     </main>

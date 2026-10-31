@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { speak } from '../speak'
+import { Icon } from './Icon'
 import { titleFits } from './titleFits'
 
 type TopBarProps = {
@@ -43,11 +44,11 @@ export function TopBar({ title, prompt, onHome, onBack }: TopBarProps) {
     <header className="topbar" ref={bar} data-stacked={stacked}>
       <div className="topbar-left" role="group" aria-label="Navegación" ref={left}>
         <button className="round-button" onClick={onHome} aria-label="Volver al inicio">
-          <span aria-hidden="true">🏠</span>
+          <Icon name="home" />
         </button>
         {onBack && (
           <button className="round-button" onClick={onBack} aria-label="Volver atrás">
-            <span aria-hidden="true">◀</span>
+            <Icon name="back" />
           </button>
         )}
       </div>
@@ -61,7 +62,7 @@ export function TopBar({ title, prompt, onHome, onBack }: TopBarProps) {
       )}
       <div className="topbar-right" ref={right}>
         <button className="round-button" onClick={() => speak(prompt)} aria-label="Escuchar">
-          <span aria-hidden="true">🔊</span>
+          <Icon name="sound" />
         </button>
       </div>
     </header>

@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { Icon } from './Icon'
 import { applyUpdate, hasUpdate, subscribeUpdate } from '../swUpdate'
 
 // Botón flotante que aparece cuando hay una versión nueva de la app instalada
@@ -7,7 +8,7 @@ export function UpdateButton() {
   if (!available) return null
   return (
     <button className="update-button" onClick={() => applyUpdate()}>
-      <span aria-hidden="true">🔄</span> Actualizar
+      <Icon name="update" /> Actualizar
     </button>
   )
 }

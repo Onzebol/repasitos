@@ -1,3 +1,5 @@
+import { Icon } from './Icon'
+
 type KeypadProps = {
   onDigit: (digit: string) => void
   onDelete: () => void
@@ -15,13 +17,13 @@ export function Keypad({ onDigit, onDelete, onSubmit, canSubmit }: KeypadProps) 
         </button>
       ))}
       <button className="key" onClick={onDelete} aria-label="Borrar">
-        ⌫
+        <Icon name="delete" />
       </button>
       <button className="key" onClick={() => onDigit('0')}>
         0
       </button>
       <button className="key key-ok" onClick={onSubmit} disabled={!canSubmit} aria-label="Comprobar">
-        ✔
+        <Icon name="check" />
       </button>
     </div>
   )

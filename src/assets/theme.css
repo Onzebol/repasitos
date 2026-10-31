@@ -207,6 +207,7 @@ body {
 
 .round-button {
   flex: none;
+  color: var(--ink);
   width: 4.5rem;
   aspect-ratio: 1;
   padding: 0;
@@ -592,6 +593,127 @@ body {
   border-width: 3px;
   border-radius: 0.75rem;
   color: #3d6f8a;
+}
+
+/* Flechas dibujadas en SVG (ArrowIcon): del tamaño del texto y del color del botón */
+.arrow-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+}
+
+.round-button .arrow-icon {
+  display: block;
+  vertical-align: baseline;
+}
+
+/* Página de iconos para adultos (#/iconos) */
+.icons-content {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 64rem);
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+.icons-section {
+  margin-bottom: 2rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 1.5rem;
+  background: var(--card);
+  box-shadow: 0 6px 0 var(--card-shadow);
+}
+
+.icons-section h2 {
+  margin: 0 0 0.5rem;
+}
+
+.icons-section h3 {
+  margin: 1.5rem 0 0.5rem;
+}
+
+.icon-groups {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.icon-groups ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.icon-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 1rem;
+  background: #e8f7ff;
+}
+
+.icon-sample {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: var(--card);
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+.icon-use {
+  font-weight: 700;
+}
+
+.icon-group small {
+  display: block;
+  font-size: 1rem;
+  color: #3d6f8a;
+}
+
+.icons-status {
+  min-height: 1.75rem;
+  margin: 0.5rem 0;
+  font-weight: 700;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.icon-cell {
+  position: relative;
+  padding: 0.25rem 0;
+  border: 2px solid #cfe9f7;
+  border-radius: 0.75rem;
+  background: var(--card);
+  font-size: 2rem;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.icon-cell[data-used="true"]::after,
+.icon-cell[data-used="avoid"]::after {
+  content: "";
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: #2e9e4f;
+}
+
+.icon-cell[data-used="avoid"]::after {
+  background: #d63b3b;
 }
 
 /* Botón «Actualizar»: aparece sobre cualquier pantalla cuando hay una versión nueva */
