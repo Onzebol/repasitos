@@ -44,13 +44,14 @@ describe('App: navegación', () => {
     expect(screen.getByRole('button', { name: 'Matemáticas' })).toBeInTheDocument()
   })
 
-  it('Matemáticas abre las unidades: la 1 activa y las demás "Muy pronto"', async () => {
+  it('Matemáticas abre las unidades: las hechas activas y las demás "Muy pronto"', async () => {
     const user = abrir()
     await user.click(screen.getByRole('button', { name: /Primaria/ }))
     await user.click(screen.getByRole('button', { name: 'Matemáticas' }))
     expect(screen.getByRole('button', { name: /Unidad 1/ })).toBeEnabled()
-    expect(screen.getByRole('button', { name: /Unidad 2/ })).toBeDisabled()
-    expect(screen.getAllByText('Muy pronto')).toHaveLength(8)
+    expect(screen.getByRole('button', { name: /Unidad 2/ })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /Unidad 3/ })).toBeDisabled()
+    expect(screen.getAllByText('Muy pronto')).toHaveLength(7)
   })
 
   it('de la unidad 1 se llega a los ejercicios de un tema y el botón de inicio vuelve al principio', async () => {
