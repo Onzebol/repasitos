@@ -23,6 +23,7 @@ export const iconosInterfaz = {
   check: { glyph: '✔', uso: 'Comprobar la respuesta y marcar el acierto', donde: 'Teclado numérico · respuesta correcta' },
   delete: { glyph: '⌫', uso: 'Borrar la última cifra', donde: 'Teclado numérico' },
   repeat: { glyph: '↻', uso: 'Repetir con ejercicios nuevos', donde: 'Pantalla final de cada tema' },
+  update: { glyph: '🔄', uso: 'Instalar la versión nueva de la aplicación', donde: 'Botón «Actualizar» flotante' },
   infantil: { glyph: '🧩', uso: 'Perfil Infantil', donde: 'Pantalla de inicio' },
   primaria: { glyph: '📚', uso: 'Perfil Primaria', donde: 'Pantalla de inicio' },
 } as const satisfies Record<string, UiIcon>
