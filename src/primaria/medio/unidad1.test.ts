@@ -1,23 +1,47 @@
 import { describe, expect, it } from 'vitest'
 import emojiCss from '../../assets/emoji-font.css?raw'
 import { emojisDeLaFuente } from '../../emojiFont'
-import { exerciseKey } from '../../session'
+import { mulberry32 } from '../../random'
+import { buildSession, exerciseKey } from '../../session'
 import { describeUnit } from '../../test/unitChecks'
-import type { ChoiceExercise, Exercise, Topic } from '../../types'
+import type { BlockSpec, ChoiceExercise, Topic } from '../../types'
 import { temasUnidad1 } from './unidad1'
 import { unidadesMedio } from './unidades'
 
 describeUnit('Unidad 1 de Conocimiento del medio', temasUnidad1)
 
-// Las listas de ejercicios escritas a mano de un tema, con cuántos se toman por sesión
-const bolsas = (tema: Topic) =>
-  tema.plan.flatMap((bloque) => (bloque.spec.kind === 'bag' ? [{ items: bloque.spec.items, count: bloque.count }] : []))
-const todos: Exercise[] = temasUnidad1.flatMap((tema) => bolsas(tema).flatMap((bolsa) => bolsa.items))
-const elegir = (e: Exercise): ChoiceExercise => {
-  if (e.type !== 'choice') throw new Error(`se esperaba elegir: ${e.question}`)
-  return e
+const tema = (id: string): Topic => temasUnidad1.find((t) => t.id === id)!
+
+// Cuántos hechos distintos puede preguntar un bloque (cada uno cuenta una vez, aunque se pregunte de varias formas)
+function hechosDe(spec: BlockSpec): number {
+  switch (spec.kind) {
+    case 'facts':
+      return spec.items.length
+    case 'classify':
+      return spec.items.length
+    case 'pick-member':
+      return spec.items.filter((m) => !m.plural).length
+    case 'pairs':
+      return spec.rows.length
+    case 'sequence': {
+      const n = spec.steps.length
+      return (spec.first ? 1 : 0) + (spec.last ? 1 : 0) + (spec.after ? n - 1 : 0) + (spec.before ? n - 1 : 0)
+    }
+    default:
+      throw new Error(`bloque inesperado: ${spec.kind}`)
+  }
 }
-const alimentacion = temasUnidad1.find((tema) => tema.id === 'alimentacion')!
+
+// Muchas sesiones de un tema (cada una con su semilla)
+const SESIONES = 150
+function ejercicios(t: Topic): ChoiceExercise[] {
+  return Array.from({ length: SESIONES }, (_, seed) => buildSession(t.plan, mulberry32(seed), [])).flatMap((sesion) =>
+    sesion.map((e) => {
+      if (e.type !== 'choice') throw new Error(`se esperaba elegir: ${e.question}`)
+      return e
+    }),
+  )
+}
 
 describe('Unidad 1 de Conocimiento del medio: estructura', () => {
   it('es la primera de las 9 unidades del índice y las demás aún no tienen temas', () => {
@@ -28,112 +52,109 @@ describe('Unidad 1 de Conocimiento del medio: estructura', () => {
   })
 
   it('cada unidad lleva el título del libro como nota', () => {
+    const fuente = new Set(emojisDeLaFuente(emojiCss))
     expect(unidadesMedio[0].note).toBe('Crecemos y cambiamos')
     for (const unidad of unidadesMedio) {
       expect(unidad.name).toMatch(/^Unidad [1-9]$/)
       expect(unidad.note.trim()).not.toBe('')
-      expect(unidad.icon).not.toBe('')
+      expect(fuente.has(unidad.icon.replace(/️/g, '')), `${unidad.icon} no está en la fuente`).toBe(true)
     }
   })
 
-  it('incluye el tema «¿Cómo nos alimentamos?» (los cinco temas están en unidad1-temas.test.ts)', () => {
-    expect(alimentacion.name).toBe('¿Cómo nos alimentamos?')
+  it('tiene los cinco temas de la unidad, en el orden del libro, con icono y color propios', () => {
+    expect(temasUnidad1.map((t) => t.id)).toEqual(['cambiamos', 'funciones', 'movimiento', 'respirar', 'alimentacion'])
+    expect(temasUnidad1.map((t) => t.name)).toEqual([
+      'Nuestro cuerpo cambia',
+      '¿Cómo funciona nuestro cuerpo?',
+      '¿Cómo nos movemos?',
+      'Necesitamos respirar',
+      '¿Cómo nos alimentamos?',
+    ])
+    expect(new Set(temasUnidad1.map((t) => t.icon)).size).toBe(5)
+    for (const t of temasUnidad1) expect(t.tint).toMatch(/^#/)
   })
 
-  it('cada sesión mezcla 4 del camino de los alimentos, 4 de los grupos y 2 de buenos hábitos', () => {
-    expect(bolsas(alimentacion).map((bolsa) => bolsa.count)).toEqual([4, 4, 2])
+  it('cada sesión mezcla los bloques de cada tema como está previsto', () => {
+    const cuentas = (id: string) => tema(id).plan.map((b) => b.count)
+    expect(cuentas('cambiamos')).toEqual([3, 3, 4])
+    expect(cuentas('funciones')).toEqual([2, 3, 3, 2])
+    expect(cuentas('movimiento')).toEqual([3, 3, 4])
+    expect(cuentas('respirar')).toEqual([2, 3, 5])
+    expect(cuentas('alimentacion')).toEqual([2, 2, 2, 3, 1])
   })
 
-  it('cada lista tiene bastantes más ejercicios de los que se toman, para que las sesiones cambien', () => {
-    for (const bolsa of bolsas(alimentacion)) expect(bolsa.items.length).toBeGreaterThanOrEqual(bolsa.count + 4)
+  it('cada bloque tiene al menos el doble de hechos distintos que los que toma una sesión, para que una sesión no repita la anterior', () => {
+    for (const t of temasUnidad1) {
+      for (const bloque of t.plan) {
+        expect(hechosDe(bloque.spec), `${t.name} (${bloque.spec.kind})`).toBeGreaterThanOrEqual(2 * bloque.count)
+      }
+    }
+  })
+
+  it('una sesión seguida de otra no repite ningún hecho si hay donde elegir (todos los temas)', () => {
+    for (const t of temasUnidad1) {
+      let repetidos = 0
+      for (let seed = 0; seed < 100; seed++) {
+        const rng = mulberry32(seed)
+        const primera = buildSession(t.plan, rng, [])
+        const segunda = buildSession(t.plan, rng, primera.map(exerciseKey))
+        const hechos = new Set(primera.map((e) => (e.type === 'choice' ? e.fact : '')))
+        repetidos += segunda.filter((e) => e.type === 'choice' && hechos.has(e.fact)).length
+      }
+      expect(repetidos, t.name).toBe(0)
+    }
   })
 })
 
-describe('Unidad 1 de Conocimiento del medio: ejercicios bien hechos', () => {
+describe('Unidad 1 de Conocimiento del medio: lo generado está bien hecho', () => {
   it('todos son de elegir, con la respuesta entre tres opciones distintas y sin textos vacíos', () => {
-    expect(todos.length).toBeGreaterThanOrEqual(30)
-    for (const e of todos.map(elegir)) {
-      expect(e.question.trim(), 'enunciado').not.toBe('')
-      expect(e.options, e.question).toHaveLength(3)
-      expect(new Set(e.options).size, e.question).toBe(3)
-      expect(e.options, e.question).toContain(e.answer)
-      for (const opcion of e.options) expect(opcion.trim(), e.question).not.toBe('')
+    for (const t of temasUnidad1) {
+      for (const e of ejercicios(t)) {
+        expect(e.question.trim(), `${t.name}: enunciado`).not.toBe('')
+        expect(e.options, e.question).toHaveLength(3)
+        expect(new Set(e.options).size, e.question).toBe(3)
+        expect(e.options, e.question).toContain(e.answer)
+        for (const opcion of e.options) expect(opcion.trim(), e.question).not.toBe('')
+        expect(e.fact, e.question).toBeDefined()
+      }
     }
   })
 
-  it('no hay ejercicios repetidos', () => {
-    const claves = todos.map(exerciseKey)
-    expect(new Set(claves).size).toBe(claves.length)
+  it('la gramática es correcta: sin «de el» ni «a el» y con mayúscula al empezar', () => {
+    for (const t of temasUnidad1) {
+      for (const e of ejercicios(t)) {
+        for (const texto of [e.question, ...e.options]) expect(texto, texto).not.toMatch(/\b(de|a) el\b/)
+        const primera = e.question.replace(/^¿/, '')[0]
+        expect(primera, e.question).toBe(primera.toUpperCase())
+      }
+    }
   })
 
-  it('los emojis que se usan son los que dibuja la fuente de la web', () => {
+  it('todos los emojis de las tablas están en la fuente de la web', () => {
     const fuente = new Set(emojisDeLaFuente(emojiCss))
-    const texto = todos.flatMap((e) => (e.type === 'choice' ? [e.question, e.visual ?? '', ...e.options] : [])).join('')
-    for (const simbolo of texto.replace(/️/g, '').matchAll(/\p{Extended_Pictographic}/gu)) {
-      expect(fuente.has(simbolo[0]), `${simbolo[0]} no está en la fuente`).toBe(true)
+    const texto = JSON.stringify(temasUnidad1.map((t) => t.plan.map((b) => b.spec)))
+    const simbolos = [...texto.replace(/️/g, '').matchAll(/\p{Extended_Pictographic}/gu)].map((m) => m[0])
+    expect(simbolos.length).toBeGreaterThan(40)
+    for (const simbolo of simbolos) expect(fuente.has(simbolo), `${simbolo} no está en la fuente`).toBe(true)
+  })
+
+  it('no se pone nada que el libro no sitúe con claridad (legumbres, arroz, frutos secos, fritos...)', () => {
+    const texto = JSON.stringify(temasUnidad1.map((t) => t.plan.map((b) => b.spec)))
+    expect(texto).not.toMatch(/legumbre|lenteja|garbanzo|alubia|arroz|maíz|frutos secos|nueces|almendra|frito|chorizo/i)
+  })
+
+  it('ninguna pregunta habla de la persona que contesta ni de su familia (no se piden datos personales)', () => {
+    for (const t of temasUnidad1) {
+      for (const e of ejercicios(t)) expect(e.question, e.question).not.toMatch(/\btu\b|\btus\b|\bmi\b|\bmis\b/i)
     }
   })
 
-  it('no se pone nada que el libro no sitúe con claridad en un grupo de alimentos', () => {
-    expect(JSON.stringify(todos)).not.toMatch(/legumbre|lenteja|garbanzo|alubia|arroz|frutos secos|nueces|almendra/i)
-  })
-})
-
-describe('«¿Cómo nos alimentamos?»: grupos de alimentos', () => {
-  const VITAMINAS = 'para tener vitaminas y fibra'
-  const ENERGIA = 'para tener energía'
-  const CRECER = 'para crecer'
-  const GRUPO_DE: Record<string, string> = {
-    '🥕': VITAMINAS, '🍎': VITAMINAS, '🍌': VITAMINAS, '🍊': VITAMINAS, '🥦': VITAMINAS, '🍅': VITAMINAS, '🥬': VITAMINAS,
-    '🍞': ENERGIA, '🍝': ENERGIA, '🥔': ENERGIA,
-    '🥛': CRECER, '🥚': CRECER, '🐟': CRECER, '🍗': CRECER, '🧀': CRECER, '🥩': CRECER,
-  }
-  const grupos = bolsas(alimentacion)[1].items.map(elegir)
-
-  it('hay un ejercicio por alimento, con su dibujo, y todos los alimentos de la tabla', () => {
-    expect(grupos.map((e) => e.visual).sort()).toEqual(Object.keys(GRUPO_DE).sort())
-  })
-
-  it('cada alimento está en su grupo (frutas y verduras: vitaminas y fibra; pan, pasta y patatas: energía; lácteos, huevos, pescado y carne: crecer)', () => {
-    for (const e of grupos) expect(e.answer, `${e.visual} ${e.question}`).toBe(GRUPO_DE[e.visual!])
-  })
-
-  it('las tres opciones son siempre los tres grupos', () => {
-    for (const e of grupos) expect([...e.options].sort()).toEqual([CRECER, ENERGIA, VITAMINAS].sort())
-  })
-})
-
-describe('«¿Cómo nos alimentamos?»: el camino de los alimentos', () => {
-  const camino = bolsas(alimentacion)[0].items.map(elegir)
-  const respuesta = (pregunta: string) => camino.find((e) => e.question === pregunta)?.answer
-
-  it('el camino es boca, esófago, estómago, intestinos y ano', () => {
-    expect(respuesta('Después de la boca, ¿por qué tubo pasa la comida?')).toBe('por el esófago')
-    expect(respuesta('¿Qué órgano va justo antes del estómago?')).toBe('el esófago')
-    expect(respuesta('¿Qué órgano va justo después del esófago?')).toBe('el estómago')
-    expect(respuesta('¿Qué viene después del estómago?')).toBe('los intestinos')
-    expect(respuesta('¿Por dónde salen los restos que el cuerpo no aprovecha?')).toBe('por el ano')
-  })
-
-  it('cada órgano hace lo suyo: los dientes trituran, el estómago deshace y los intestinos absorben', () => {
-    expect(respuesta('¿Para qué sirven los dientes al comer?')).toBe('para triturar la comida')
-    expect(respuesta('¿Dónde se deshace la comida?')).toBe('en el estómago')
-    expect(respuesta('¿Dónde pasan al cuerpo las sustancias que necesitamos de la comida?')).toBe('en los intestinos')
-  })
-
-  it('el proceso se llama digestión y la comida entra por la boca', () => {
-    expect(respuesta('¿Cómo se llama el proceso en el que la comida se transforma en nutrientes?')).toBe('la digestión')
-    expect(respuesta('¿Por dónde entra la comida a nuestro cuerpo?')).toBe('por la boca')
-  })
-
-  it('«qué ocurre primero» y «qué ocurre al final» tienen una sola respuesta posible', () => {
-    expect(respuesta('¿Qué ocurre primero?')).toBe('masticamos la comida con los dientes')
-    expect(respuesta('¿Qué ocurre al final?')).toBe('salen los restos por el ano')
-  })
-
-  it('la tráquea solo aparece como opción equivocada (es del aire, no de la comida)', () => {
-    for (const e of camino) {
-      if (e.options.some((o) => /tráquea/.test(o))) expect(e.answer).not.toMatch(/tráquea/)
+  it('los dos sentidos de una pregunta de pares, y los de una tabla de clasificar y elegir, comparten hecho (no salen los dos en una sesión)', () => {
+    for (const t of temasUnidad1) {
+      for (let seed = 0; seed < 100; seed++) {
+        const hechos = buildSession(t.plan, mulberry32(seed), []).map((e) => (e.type === 'choice' ? e.fact : ''))
+        expect(new Set(hechos).size, `${t.name} semilla ${seed}`).toBe(hechos.length)
+      }
     }
   })
 })

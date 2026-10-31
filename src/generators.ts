@@ -25,6 +25,23 @@ const ORDINALES = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto',
 // Un solo carácter cada uno (sin variantes), para poder dibujar una fila de 10 y contarlos
 const ANIMALES = ['🐘', '🐢', '🐰', '🐸', '🐱', '🐶', '🐟', '🐧', '🐮', '🐷', '🦁', '🐵', '🐻', '🦊']
 
+// «de el» → «del» y «a el» → «al» (las tablas guardan cada elemento con su artículo)
+export const contrae = (texto: string): string => texto.replace(/\bde el\b/g, 'del').replace(/\ba el\b/g, 'al')
+
+// Primera letra en mayúscula, también tras la apertura de interrogación
+export const capitaliza = (texto: string): string => texto.replace(/^(¿?)(\p{L})/u, (_, signo: string, letra: string) => signo + letra.toUpperCase())
+
+const frase = (texto: string): string => capitaliza(contrae(texto))
+
+// Dos opciones equivocadas al azar de una lista (distintas entre sí y de la respuesta); avisa si no hay suficientes
+function dosAlAzar(rng: Rng, candidatas: string[], respuesta: string, de: string): string[] {
+  const distintas = [...new Set(candidatas)].filter((c) => c !== respuesta)
+  if (distintas.length < 2) throw new Error(`Hacen falta al menos dos opciones equivocadas para: ${de}`)
+  return shuffle(rng, distintas).slice(0, 2)
+}
+
+const conDibujo = (m: { label: string; emoji?: string }) => (m.emoji ? `${m.emoji} ${m.label}` : m.label)
+
 // Tres cifras distintas entre min y max, con la respuesta entre ellas (las opciones se barajan al montar la sesión)
 function tresCifras(rng: Rng, answer: number, min: number, max: number): number[] {
   if (max - min < 2) throw new Error('Hacen falta al menos tres cifras distintas en el rango')
@@ -217,6 +234,62 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       const animal = pick(rng, ANIMALES_CON_NOMBRE)
       const ejercicio = elegir(`¿Cuánt${animal.fem ? 'as' : 'os'} ${animal.plural} hay?`, tresCifras(rng, n, min, max), n, animal.emoji.repeat(n))
       return spec.tap ? { ...ejercicio, tapToCount: true } : ejercicio
+    }
+
+    case 'classify': {
+      const miembro = pick(rng, spec.items)
+      const grupo = spec.groups.find((g) => g.id === miembro.group)
+      if (!grupo) throw new Error(`Sin categoría para ${miembro.label}`)
+      const otras = spec.groups.filter((g) => g.id !== grupo.id).map((g) => g.label)
+      const opciones = [grupo.label, ...dosAlAzar(rng, otras, grupo.label, miembro.label)]
+      const ejercicio = elegir(frase(spec.question.replace('{item}', miembro.label)), opciones, grupo.label, miembro.emoji)
+      return { ...ejercicio, fact: `member:${miembro.group}:${miembro.label}` }
+    }
+
+    case 'pick-member': {
+      const elementos = spec.items.filter((m) => !m.plural)
+      const miembro = pick(rng, elementos)
+      const grupo = spec.groups.find((g) => g.id === miembro.group)
+      if (!grupo) throw new Error(`Sin categoría para ${miembro.label}`)
+      if (!grupo.question) throw new Error(`La categoría ${grupo.id} no tiene pregunta`)
+      const respuesta = conDibujo(miembro)
+      const otras = elementos.filter((m) => m.group !== grupo.id).map(conDibujo)
+      const ejercicio = elegir(frase(grupo.question), [respuesta, ...dosAlAzar(rng, otras, respuesta, miembro.label)], respuesta)
+      return { ...ejercicio, fact: `member:${miembro.group}:${miembro.label}` }
+    }
+
+    case 'sequence': {
+      const { steps } = spec
+      type Hecho = { modo: 'first' | 'last' | 'after' | 'before'; i: number }
+      const hechos: Hecho[] = []
+      if (spec.first) hechos.push({ modo: 'first', i: 0 })
+      if (spec.last) hechos.push({ modo: 'last', i: steps.length - 1 })
+      for (let i = 0; i < steps.length - 1; i++) if (spec.after) hechos.push({ modo: 'after', i })
+      for (let i = 1; i < steps.length; i++) if (spec.before) hechos.push({ modo: 'before', i })
+      const hecho = pick(rng, hechos)
+      const respuesta = hecho.modo === 'after' ? steps[hecho.i + 1] : hecho.modo === 'before' ? steps[hecho.i - 1] : steps[hecho.i]
+      const plantilla = { first: spec.first, last: spec.last, after: spec.after, before: spec.before }[hecho.modo]!
+      const pregunta = frase(plantilla.replace('{step}', steps[hecho.i]))
+      const referido = steps[hecho.i]
+      const candidatas = [...steps, ...(spec.extra ?? [])].filter((p) => p !== respuesta && p !== referido)
+      const ejercicio = elegir(pregunta, [respuesta, ...dosAlAzar(rng, candidatas, respuesta, pregunta)], respuesta)
+      return { ...ejercicio, fact: `seq:${spec.id}:${hecho.modo}:${hecho.i}` }
+    }
+
+    case 'pairs': {
+      const i = int(rng, 0, spec.rows.length - 1)
+      const fila = spec.rows[i]
+      const adelante = rng() < 0.5
+      const respuesta = adelante ? fila.answer : fila.answerBack
+      const otras = spec.rows.filter((_, j) => j !== i).map((f) => (adelante ? f.answer : f.answerBack))
+      const ejercicio = elegir(adelante ? fila.ask : fila.askBack, [respuesta, ...dosAlAzar(rng, otras, respuesta, fila.ask)], respuesta, fila.emoji)
+      return { ...ejercicio, fact: `pair:${i}` }
+    }
+
+    case 'facts': {
+      const item = pick(rng, spec.items)
+      const ejercicio = elegir(item.question, [item.answer, ...dosAlAzar(rng, item.wrong, item.answer, item.question)], item.answer, item.visual)
+      return { ...ejercicio, fact: `fact:${item.question}` }
     }
 
     case 'group': {

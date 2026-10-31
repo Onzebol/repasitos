@@ -13,6 +13,8 @@ const MAX_TRIES = 300
 export function exerciseKey(exercise: Exercise): string {
   switch (exercise.type) {
     case 'choice':
+      // Con identidad de hecho, lo que cuenta es el hecho y no las opciones (así no se pregunta dos veces lo mismo en una sesión)
+      if (exercise.fact !== undefined) return JSON.stringify([exercise.type, 'fact', exercise.fact])
       return JSON.stringify([exercise.type, exercise.question, exercise.visual, exercise.answer, [...exercise.options].sort()])
     case 'number':
       return JSON.stringify([exercise.type, exercise.question, exercise.visual, exercise.answer])

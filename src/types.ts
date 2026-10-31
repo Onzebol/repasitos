@@ -20,7 +20,16 @@ export type ChoiceExercise = {
   tapToCount?: boolean
   // Nombre accesible de cada opción cuando el texto es un dibujo (por ejemplo «3 perros»), por opción
   labels?: Record<string, string>
+  // Identidad del hecho que se pregunta (Conocimiento del medio): dos ejercicios con el mismo hecho, aunque cambien las
+  // opciones o la forma de preguntar, cuentan como el mismo en una sesión (ver exerciseKey)
+  fact?: string
 }
+
+// Tablas para generar preguntas de hechos (ver BlockSpec: classify, pick-member, sequence, pairs y facts)
+export type Group = { id: string; label: string; question?: string } // categoría: su nombre como respuesta y (para pick-member) cómo se pregunta por ella
+export type Member = { label: string; group: string; emoji?: string; plural?: boolean } // elemento de una categoría, con su artículo
+export type FactItem = { question: string; answer: string; wrong: string[]; visual?: string } // respuestas equivocadas seguras (al menos 3)
+export type PairRow = { ask: string; answer: string; askBack: string; answerBack: string; emoji?: string }
 
 // Escribir un número con el teclado en pantalla
 export type NumberExercise = {
@@ -81,6 +90,20 @@ export type BlockSpec =
   | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }
   // ¿Cuántos hay? (Infantil): contar un grupo de animales dibujados y elegir la cifra (por defecto, del 1 al 7)
   | { kind: 'how-many'; min?: number; max?: number; tap?: boolean }
+  // Conocimiento del medio: preguntas generadas a partir de tablas cerradas. Las opciones equivocadas salen de la propia
+  // tabla (otras categorías, otros pasos, otras filas) o de la lista de respuestas falsas de cada pregunta, nunca de otras
+  // preguntas escritas a mano. Siempre tres opciones.
+  // De un elemento a su categoría. «{item}» se sustituye por el elemento; con más de tres categorías salen la correcta y dos más
+  | { kind: 'classify'; question: string; groups: Group[]; items: Member[] }
+  // De una categoría a uno de sus elementos: uno de la categoría y dos de otras (los elementos en plural no salen)
+  | { kind: 'pick-member'; groups: Group[]; items: Member[] }
+  // Orden de unos pasos: el primero, el último y el que va justo antes o justo después de uno («{step}» se sustituye por el paso).
+  // Las opciones equivocadas salen de los otros pasos (nunca el que se pregunta) y de `extra`: cosas de fuera que son falsas seguro
+  | { kind: 'sequence'; id: string; steps: string[]; extra?: string[]; first?: string; last?: string; after?: string; before?: string }
+  // Pares que se preguntan en los dos sentidos (sentido ↔ órgano); las equivocadas son las respuestas de las otras filas
+  | { kind: 'pairs'; rows: PairRow[] }
+  // Preguntas con su respuesta y sus respuestas equivocadas escritas a mano (dos al azar de ellas)
+  | { kind: 'facts'; items: FactItem[] }
   // ¿Dónde hay 3? (Infantil): elegir entre tres grupos de dibujos el que tiene tantos como el número (por defecto, del 1 al 7)
   | { kind: 'group'; min?: number; max?: number }
   // Antes, después y el que falta (Infantil): tres cifras para elegir (por defecto, del 1 al 9)
