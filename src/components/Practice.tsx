@@ -109,7 +109,14 @@ export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
         </div>
 
         <h2 className="question">{exercise.question}</h2>
-        {exercise.type !== 'column' && exercise.visual && <p className="visual" aria-hidden="true">{exercise.visual}</p>}
+        {exercise.type !== 'column' && exercise.visual && (
+          // Cada bloque (decenas, unidades…) va aparte: si no caben juntos, pasan a otra línea
+          <p className="visual" aria-hidden="true">
+            {exercise.visual.split('  ').map((part, i) => (
+              <span key={i} className="visual-part">{part}</span>
+            ))}
+          </p>
+        )}
 
         {solved ? (
           <div className="feedback solved" role="status">

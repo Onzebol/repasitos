@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import css from '../assets/theme.css?raw'
 import { mulberry32 } from '../random'
 import { topicFrom } from '../test/topics'
 import type { Topic } from '../types'
@@ -182,4 +183,27 @@ describe('Practice: sesiones aleatorias', () => {
     expect(new Set(segunda).size).toBe(10)
     expect(segunda.filter((operacion) => primera.includes(operacion))).toEqual([])
   }, 30000)
+})
+
+describe('Practice: piezas de decenas y unidades', () => {
+  const regla = (selector: string) => {
+    const inicio = css.indexOf(`\n${selector} {`)
+    return inicio < 0 ? '' : css.slice(inicio, css.indexOf('}', inicio))
+  }
+
+  it('las decenas y las unidades son dos bloques separados para poder pasar a otra línea', () => {
+    const topic = topicFrom([{ type: 'number', question: '¿Qué número es?', answer: 43, visual: '🟦🟦🟦🟦  🟨🟨🟨' }])
+    render(<Practice topic={topic} onHome={vi.fn()} onBack={vi.fn()} />)
+    const decenas = screen.getByText('🟦🟦🟦🟦')
+    const unidades = screen.getByText('🟨🟨🟨')
+    expect(decenas).not.toBe(unidades)
+    expect(decenas.parentElement).toBe(unidades.parentElement)
+  })
+
+  it('los bloques van juntos si caben y, si no, cada uno en su línea y centrados', () => {
+    expect(regla('.visual')).toMatch(/display:\s*flex/)
+    expect(regla('.visual')).toMatch(/flex-wrap:\s*wrap/)
+    expect(regla('.visual')).toMatch(/justify-content:\s*center/)
+    expect(regla('.visual-part')).toMatch(/word-break:\s*break-all/)
+  })
 })
