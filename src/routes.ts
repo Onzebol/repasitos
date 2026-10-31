@@ -6,6 +6,7 @@ import type { Profile, Subject, Topic, Unit } from './types'
 export type Screen =
   | { name: 'home' }
   | { name: 'icons' }
+  | { name: 'trace' }
   | { name: 'subjects'; profile: Profile }
   | { name: 'subject'; profile: Profile; subject: Subject }
   | { name: 'units'; subject: Subject; units: Unit[] }
@@ -29,6 +30,7 @@ export function screenFromHash(hash: string): Screen {
   if (rest.length > 0) return HOME
   if (profile === undefined) return HOME
   if (profile === 'iconos') return subjectId === undefined ? { name: 'icons' } : HOME
+  if (profile === 'trazo') return subjectId === undefined ? { name: 'trace' } : HOME
   if (profile !== 'infantil' && profile !== 'primaria') return HOME
   if (subjectId === undefined) return { name: 'subjects', profile }
 
@@ -54,6 +56,8 @@ export function hashFromScreen(screen: Screen): string {
       return '#/'
     case 'icons':
       return '#/iconos'
+    case 'trace':
+      return '#/trazo'
     case 'subjects':
       return `#/${screen.profile}`
     case 'subject':

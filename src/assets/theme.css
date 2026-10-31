@@ -739,3 +739,50 @@ body {
   outline: 4px solid var(--focus);
   outline-offset: 3px;
 }
+
+/* Hoja de trazos de las cifras para adultos (#/trazo) */
+.trace-content {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 64rem);
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+.trace-note {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 1rem;
+  background: var(--card);
+}
+
+.trace-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+}
+
+.trace-grid li {
+  position: relative;
+  padding: 0.5rem;
+  border-radius: 1.5rem;
+  background: var(--card);
+  box-shadow: 0 6px 0 var(--card-shadow);
+}
+
+.trace-digit {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.trace-label {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.9rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}

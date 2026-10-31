@@ -23,6 +23,7 @@ describe('routes: dirección ↔ pantalla', () => {
       '#/primaria/matematicas/u1',
       '#/primaria/matematicas/u1/decenas-unidades',
       '#/iconos',
+      '#/trazo',
     ]
     for (const hash of hashes) {
       expect(hashFromScreen(screenFromHash(hash))).toBe(hash)
@@ -38,6 +39,12 @@ describe('routes: dirección ↔ pantalla', () => {
     expect(screenFromHash('#/iconos')).toEqual({ name: 'icons' })
     expect(hashFromScreen({ name: 'icons' })).toBe('#/iconos')
     expect(screenFromHash('#/iconos/otra')).toEqual({ name: 'home' })
+  })
+
+  it('#/trazo abre la hoja de trazos de las cifras (solo por dirección)', () => {
+    expect(screenFromHash('#/trazo')).toEqual({ name: 'trace' })
+    expect(hashFromScreen({ name: 'trace' })).toBe('#/trazo')
+    expect(screenFromHash('#/trazo/otra')).toEqual({ name: 'home' })
   })
 
   it('la dirección de un ejercicio abre ese tema', () => {

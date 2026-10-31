@@ -4,6 +4,7 @@ import { ComingSoon } from './components/ComingSoon'
 import { Hills } from './components/Hills'
 import { Icon } from './components/Icon'
 import { IconsScreen } from './components/IconsScreen'
+import { TracePreview } from './components/TracePreview'
 import { ListScreen } from './components/ListScreen'
 import { Mascot } from './components/Mascot'
 import { Practice } from './components/Practice'
@@ -27,6 +28,8 @@ function App() {
   const goHome = () => setScreen({ name: 'home' })
 
   if (screen.name === 'icons') return <IconsScreen onHome={goHome} />
+
+  if (screen.name === 'trace') return <TracePreview onHome={goHome} />
 
   if (screen.name === 'subjects') {
     const { profile } = screen
