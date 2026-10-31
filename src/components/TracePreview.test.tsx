@@ -1,6 +1,9 @@
 import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { TracePreview } from './TracePreview'
+
+vi.mock('../speak', () => ({ speak: vi.fn() }))
 
 describe('TracePreview: hoja con el recorrido de cada cifra', () => {
   it('muestra las diez cifras con su recorrido', () => {
@@ -24,6 +27,18 @@ describe('TracePreview: hoja con el recorrido de cada cifra', () => {
     render(<TracePreview onHome={vi.fn()} />)
     const siete = screen.getByRole('img', { name: /^Cifra 7:/ })
     expect(siete.querySelectorAll('[data-end]')).toHaveLength(2)
+  })
+
+  it('cada cifra se puede probar: abre el ejercicio de trazo y, al terminar, vuelve a la hoja', async () => {
+    const user = userEvent.setup()
+    render(<TracePreview onHome={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: 'Probar el número 4' }))
+    expect(screen.getByRole('img', { name: 'Repasa el número 4 con el dedo' })).toBeInTheDocument()
+    expect(screen.queryByRole('list', { name: 'Cifras' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Ya lo he hecho' }))
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Volver a la hoja/ }))
+    expect(screen.getByRole('list', { name: 'Cifras' })).toBeInTheDocument()
   })
 
   it('marca el punto de salida y el orden de cada trazo', () => {

@@ -877,3 +877,31 @@ body {
     animation: none;
   }
 }
+
+/* Hoja de trazos: botón para probar cada cifra y pantalla de prueba */
+.trace-try {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.9rem;
+  border: 0;
+  border-radius: 1rem;
+  background: #ffd93d;
+  box-shadow: 0 3px 0 var(--card-shadow);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.trace-try:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--card-shadow);
+}
+
+.trace-try-screen {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+}
