@@ -130,7 +130,7 @@ describe('Ejercicio en columna: estilos', () => {
       const inicio = css.indexOf(`\n${selector} {`)
       return inicio < 0 ? '' : css.slice(inicio, css.indexOf('}', inicio))
     }
-    expect(regla('.column')).toMatch(/grid-template-columns:\s*repeat\(3,/)
+    expect(regla('.column')).toMatch(/grid-template-columns:\s*2rem repeat\(2, 3\.5rem\)/)
     expect(regla('.column-line')).toMatch(/grid-column:\s*1\s*\/\s*-1/)
     expect(regla('.column-box.active')).toMatch(/border-color|background/)
   })
