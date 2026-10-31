@@ -228,9 +228,15 @@ body {
   line-height: 1;
 }
 
-.round-button:active,
+/* Al pulsar el botón baja y su sombra se acorta lo mismo: se hunde y el borde de la sombra se queda quieto */
+.round-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #5aa7d6;
+}
+
 .action:active {
   transform: translateY(3px);
+  box-shadow: 0 3px 0 var(--card-shadow);
 }
 
 .subjects {
@@ -445,6 +451,7 @@ body {
 
 .option:active:not(:disabled) {
   transform: translateY(4px);
+  box-shadow: 0 2px 0 var(--card-shadow);
 }
 
 .option:disabled {
@@ -487,6 +494,7 @@ body {
 
 .key:active:not(:disabled) {
   transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--card-shadow);
 }
 
 .key-ok {
