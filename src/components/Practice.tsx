@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Topic } from '../types'
+import { ColumnExercise } from './ColumnExercise'
 import { Hills } from './Hills'
 import { Keypad } from './Keypad'
 import { Mascot } from './Mascot'
@@ -61,6 +62,14 @@ export function Practice({ topic, onHome, onBack }: PracticeProps) {
     }
   }
 
+  // Devuelve si el resultado en columna es correcto (si no, ColumnExercise vacía los cuadros)
+  const checkColumn = (value: number) => {
+    const correct = exercise.type === 'column' && value === exercise.answer
+    setSolved(correct)
+    setFailed(!correct)
+    return correct
+  }
+
   if (finished) {
     return (
       <main className="screen primaria">
@@ -92,7 +101,7 @@ export function Practice({ topic, onHome, onBack }: PracticeProps) {
         </div>
 
         <h2 className="question">{exercise.question}</h2>
-        {exercise.visual && <p className="visual" aria-hidden="true">{exercise.visual}</p>}
+        {exercise.type !== 'column' && exercise.visual && <p className="visual" aria-hidden="true">{exercise.visual}</p>}
 
         {solved ? (
           <div className="feedback solved" role="status">
@@ -128,6 +137,8 @@ export function Practice({ topic, onHome, onBack }: PracticeProps) {
                   </button>
                 ))}
               </div>
+            ) : exercise.type === 'column' ? (
+              <ColumnExercise key={index} exercise={exercise} onCheck={checkColumn} />
             ) : (
               <>
                 <output className="answer-box" aria-label="Tu respuesta">{input || '?'}</output>

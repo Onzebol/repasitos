@@ -35,7 +35,7 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 ## Organización del contenido
 
 - Cada perfil (`infantil`, `primaria`) tiene su carpeta en `src/` con sus materias como datos (`materias.ts`) y, más adelante, una pantalla por materia. La navegación se sincroniza con `location.hash` (sin dependencias): `src/routes.ts` convierte dirección ↔ pantalla y `App.tsx` la lee con `hashchange`, así funciona el botón atrás del navegador y del móvil, recargar y compartir una pantalla; la lectura en voz alta usa la síntesis de voz del navegador (`src/speak.ts`).
-- Los ejercicios se definen como datos (arrays tipados en TS) separados de la lógica, para añadir contenido sin tocar los componentes. Tipos en `src/types.ts` (`Unit` → `Topic` → `Exercise`; ejercicios de elegir una respuesta o de escribir un número). Ejemplo: `src/primaria/matematicas/unidad1.ts`; las unidades sin temas salen como "Muy pronto". Los ejercicios se escriben desde cero, sin copiar los del libro.
+- Los ejercicios se definen como datos (arrays tipados en TS) separados de la lógica, para añadir contenido sin tocar los componentes. Tipos en `src/types.ts` (`Unit` → `Topic` → `Exercise`; ejercicios de elegir una respuesta, de escribir un número o de sumar/restar en columna con dos cuadros, decenas y unidades; el de columna es `ColumnExercise` en `src/components/`). Ejemplo: `src/primaria/matematicas/unidad1.ts`; las unidades sin temas salen como "Muy pronto". Los ejercicios se escriben desde cero, sin copiar los del libro.
 - Componentes y estilos compartidos en `src/components/` y `src/assets/`.
 - Repositorio público: no subir datos personales ni fotos de menores.
 

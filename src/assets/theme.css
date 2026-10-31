@@ -522,3 +522,52 @@ body {
   font-size: 2rem;
   font-weight: 700;
 }
+
+/* Suma o resta en columna */
+.column {
+  display: grid;
+  grid-template-columns: 2rem repeat(2, 3.5rem);
+  align-items: center;
+  justify-items: center;
+  gap: 0.1rem 0.3rem;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.column-head {
+  font-size: 1rem;
+  color: #3d6f8a;
+}
+
+.column-sign {
+  grid-column: 1;
+  justify-self: end;
+}
+
+.column-line {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ink);
+}
+
+.column-box {
+  width: 100%;
+  min-height: clamp(3.25rem, 8vh, 4rem);
+  padding: 0;
+  border: 4px dashed var(--ink);
+  border-radius: 1.25rem;
+  background: var(--card);
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.column-box.active {
+  border-style: solid;
+  border-color: #3a9be0;
+  background: #fff7cc;
+  box-shadow: 0 0 0 4px #3a9be055;
+}

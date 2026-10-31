@@ -1,4 +1,4 @@
-import type { ChoiceExercise, NumberExercise, Topic } from '../../types'
+import type { ChoiceExercise, ColumnExercise, NumberExercise, Topic } from '../../types'
 
 const elegir = (question: string, options: string[], answer: string, visual?: string): ChoiceExercise => ({
   type: 'choice',
@@ -13,6 +13,15 @@ const numero = (question: string, answer: number, visual?: string): NumberExerci
   question,
   answer,
   visual,
+})
+
+const columna = (top: number, operator: '+' | '−', bottom: number): ColumnExercise => ({
+  type: 'column',
+  question: operator === '+' ? 'Suma en columna' : 'Resta en columna',
+  operator,
+  top,
+  bottom,
+  answer: operator === '+' ? top + bottom : top - bottom,
 })
 
 const signo = (a: number, b: number, answer: '>' | '<'): ChoiceExercise =>
@@ -84,14 +93,14 @@ export const temasUnidad1: Topic[] = [
     icon: '➕',
     tint: '#b5ecc1',
     exercises: [
-      numero('23 + 14 =', 37),
-      numero('45 + 32 =', 77),
-      numero('61 + 28 =', 89),
-      numero('50 + 37 =', 87),
-      numero('68 − 25 =', 43),
-      numero('79 − 34 =', 45),
-      numero('96 − 41 =', 55),
-      numero('84 − 60 =', 24),
+      columna(23, '+', 14),
+      columna(45, '+', 32),
+      columna(61, '+', 28),
+      columna(50, '+', 37),
+      columna(68, '−', 25),
+      columna(79, '−', 34),
+      columna(96, '−', 41),
+      columna(84, '−', 60),
       numero('Tengo 24 pegatinas y me regalan 15. ¿Cuántas tengo ahora?', 39),
       numero('En la bolsa hay 48 canicas. Saco 23. ¿Cuántas quedan?', 25),
     ],
