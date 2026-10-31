@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { generate } from './generators'
+import { ANIMALES } from './infantil/animales'
 import { mulberry32 } from './random'
 import type { BlockSpec, Exercise } from './types'
 
@@ -119,6 +120,70 @@ describe('generate: todo ejercicio generado es válido', () => {
 
   it('una lista fija no se genera: se toma del plan', () => {
     expect(() => generate({ kind: 'bag', items: [] }, mulberry32(1))).toThrow()
+  })
+})
+
+describe('generate: ¿cuántos hay? (Infantil)', () => {
+  const ejercicios = () => muchos({ kind: 'how-many' }).map(choice)
+
+  it('dibuja tantos animales como dice la respuesta, del 1 al 7 por defecto', () => {
+    for (const e of ejercicios()) {
+      const dibujos = [...(e.visual ?? '')]
+      expect(dibujos.length, e.question).toBe(Number(e.answer))
+      expect(new Set(dibujos).size, 'todos del mismo animal').toBe(1)
+      expect(Number(e.answer)).toBeGreaterThanOrEqual(1)
+      expect(Number(e.answer)).toBeLessThanOrEqual(7)
+    }
+  })
+
+  it('la pregunta nombra al animal con su género y su plural', () => {
+    for (const e of ejercicios()) {
+      const animal = ANIMALES.find((a) => a.emoji === [...(e.visual ?? '')][0])
+      expect(animal, e.visual).toBeDefined()
+      expect(e.question).toBe(`¿Cuánt${animal!.fem ? 'as' : 'os'} ${animal!.plural} hay?`)
+    }
+  })
+
+  it('ofrece tres cifras distintas entre las que está la respuesta, todas dentro del rango', () => {
+    for (const e of ejercicios()) {
+      expect(e.options).toHaveLength(3)
+      expect(e.options).toContain(e.answer)
+      for (const opcion of e.options) {
+        expect(Number(opcion)).toBeGreaterThanOrEqual(1)
+        expect(Number(opcion)).toBeLessThanOrEqual(7)
+      }
+    }
+  })
+
+  it('respeta el rango pedido y salen todas las cantidades', () => {
+    const respuestas = muchos({ kind: 'how-many', min: 2, max: 5 }).map((e) => Number(choice(e).answer))
+    expect(new Set(respuestas)).toEqual(new Set([2, 3, 4, 5]))
+  })
+
+  it('usa todos los animales de la lista, para que las sesiones no se repitan', () => {
+    const usados = new Set(ejercicios().map((e) => [...(e.visual ?? '')][0]))
+    expect(usados.size).toBe(ANIMALES.length)
+  })
+})
+
+describe('generate: las cifras (Infantil)', () => {
+  const ejercicios = (spec: BlockSpec = { kind: 'digit' }) => muchos(spec).map(choice)
+
+  it('pide tocar una cifra del 1 al 9 por defecto, con tres cifras distintas entre las que está', () => {
+    for (const e of ejercicios()) {
+      expect(e.question).toBe(`Toca el número ${e.answer}`)
+      expect(e.options).toHaveLength(3)
+      expect(e.options).toContain(e.answer)
+      for (const opcion of e.options) {
+        expect(Number(opcion)).toBeGreaterThanOrEqual(1)
+        expect(Number(opcion)).toBeLessThanOrEqual(9)
+      }
+    }
+  })
+
+  it('respeta el rango pedido y salen todas las cifras', () => {
+    const respuestas = ejercicios({ kind: 'digit', min: 0, max: 4 }).map((e) => Number(e.answer))
+    expect(new Set(respuestas)).toEqual(new Set([0, 1, 2, 3, 4]))
   })
 })
 

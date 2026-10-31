@@ -1,4 +1,6 @@
 import type { CSSProperties } from 'react'
+import { speak } from '../speak'
+import type { Profile } from '../types'
 import { Hills } from './Hills'
 import { TopBar } from './TopBar'
 
@@ -12,6 +14,7 @@ export type ListItem = {
 }
 
 type ListScreenProps = {
+  profile: Profile
   title: string
   items: ListItem[]
   onHome: () => void
@@ -20,11 +23,12 @@ type ListScreenProps = {
 }
 
 // Lista de tarjetas grandes (unidades, temas...) con título y botón de volver
-export function ListScreen({ title, items, onHome, onBack, onSelect }: ListScreenProps) {
+export function ListScreen({ profile, title, items, onHome, onBack, onSelect }: ListScreenProps) {
+  const infantil = profile === 'infantil'
   return (
-    <main className="screen primaria">
+    <main className={`screen ${profile}`}>
       <Hills />
-      <TopBar title={title} prompt={title} onHome={onHome} onBack={onBack} />
+      <TopBar title={infantil ? undefined : title} prompt={title} onHome={onHome} onBack={onBack} />
       <ul className="subjects">
         {items.map((item) => (
           <li key={item.id}>
@@ -32,10 +36,13 @@ export function ListScreen({ title, items, onHome, onBack, onSelect }: ListScree
               className="subject"
               style={{ '--tint': item.tint } as CSSProperties}
               disabled={item.disabled}
-              onClick={() => onSelect(item.id)}
+              onClick={() => {
+                if (infantil) speak(item.name)
+                onSelect(item.id)
+              }}
             >
               <span className="subject-icon" aria-hidden="true">{item.icon}</span>
-              <span className="subject-name">{item.name}</span>
+              <span className={infantil ? 'sr-only' : 'subject-name'}>{item.name}</span>
               {(item.disabled || item.note) && (
                 <small className="subject-note">{item.disabled ? 'Muy pronto' : item.note}</small>
               )}

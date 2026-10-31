@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { randomRng } from '../random'
 import type { Rng } from '../random'
 import { buildSession, exerciseKey } from '../session'
-import type { Topic } from '../types'
+import type { Profile, Topic } from '../types'
 import { ColumnExercise } from './ColumnExercise'
 import { Hills } from './Hills'
 import { Icon } from './Icon'
@@ -12,6 +12,7 @@ import { TopBar } from './TopBar'
 import { TraceExercise } from './TraceExercise'
 
 type PracticeProps = {
+  profile?: Profile
   topic: Topic
   onHome: () => void
   onBack: () => void
@@ -19,7 +20,7 @@ type PracticeProps = {
 }
 
 // Sesión de ejercicios de un tema, distinta cada vez. Sin tiempo ni límite de intentos: el error se corrige con ánimo.
-export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
+export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: PracticeProps) {
   const [random] = useState<Rng>(() => rng ?? randomRng())
   const [session, setSession] = useState(() => buildSession(topic.plan, random))
   const [index, setIndex] = useState(0)
@@ -82,7 +83,7 @@ export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
 
   if (finished) {
     return (
-      <main className="screen primaria">
+      <main className={`screen ${profile}`}>
         <Hills />
         <TopBar prompt="¡Muy bien! Has terminado" onHome={onHome} onBack={onBack} />
         <section className="coming-soon">
@@ -109,7 +110,7 @@ export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
   )
 
   return (
-    <main className="screen primaria">
+    <main className={`screen ${profile}`}>
       <Hills />
       <TopBar title={topic.name} prompt={exercise.question} onHome={onHome} onBack={onBack} />
       <section className="practice">

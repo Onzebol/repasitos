@@ -75,6 +75,10 @@ export type BlockSpec =
   // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
   // o qué resta comprueba una suma (elegir)
   | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }
+  // ¿Cuántos hay? (Infantil): contar un grupo de animales dibujados y elegir la cifra (por defecto, del 1 al 7)
+  | { kind: 'how-many'; min?: number; max?: number }
+  // Las cifras (Infantil): «Toca el número 5» entre tres cifras (por defecto, del 1 al 9)
+  | { kind: 'digit'; min?: number; max?: number }
   // Trazo guiado: repasar con el dedo una cifra de min a max (por defecto, del 0 al 9)
   | { kind: 'trace'; min?: Digit; max?: Digit }
   // Ordinales hasta el 10.º: qué dibujo ocupa un lugar en una fila, o cómo se escribe un ordinal (elegir)

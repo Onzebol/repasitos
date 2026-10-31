@@ -1,5 +1,6 @@
+import { unidadesInfantil } from './infantil/contenido'
 import { materiasInfantil } from './infantil/materias'
-import { unidadesPorMateria } from './primaria/contenido'
+import { unidadesPorMateria as unidadesPrimaria } from './primaria/contenido'
 import { materiasPrimaria } from './primaria/materias'
 import type { Profile, Subject, Topic, Unit } from './types'
 
@@ -9,22 +10,33 @@ export type Screen =
   | { name: 'trace' }
   | { name: 'subjects'; profile: Profile }
   | { name: 'subject'; profile: Profile; subject: Subject }
-  | { name: 'units'; subject: Subject; units: Unit[] }
-  | { name: 'topics'; subject: Subject; units: Unit[]; unit: Unit }
-  | { name: 'practice'; subject: Subject; units: Unit[]; unit: Unit; topic: Topic }
+  | { name: 'units'; profile: Profile; subject: Subject; units: Unit[] }
+  | { name: 'topics'; profile: Profile; subject: Subject; units: Unit[]; unit: Unit }
+  | { name: 'practice'; profile: Profile; subject: Subject; units: Unit[]; unit: Unit; topic: Topic }
 
 const HOME: Screen = { name: 'home' }
 
 export const subjectsOf = (profile: Profile): Subject[] =>
   profile === 'infantil' ? materiasInfantil : materiasPrimaria
 
-// Pantalla de una materia: con unidades (Primaria) o "Muy pronto"
+// Unidades con ejercicios de cada materia, por perfil
+const unitsOf = (profile: Profile): Record<string, Unit[]> =>
+  profile === 'infantil' ? unidadesInfantil : unidadesPrimaria
+
+// Una materia tiene contenido cuando ya hay ejercicios; si no, su botón se muestra desactivado
+export const hasContent = (profile: Profile, subject: Subject): boolean => unitsOf(profile)[subject.id] !== undefined
+
+// Pantalla de una materia: en Primaria sus unidades; en Infantil, directamente sus temas (sin unidades); si no hay
+// contenido, "Muy pronto"
 export function screenForSubject(profile: Profile, subject: Subject): Screen {
-  const units = profile === 'primaria' ? unidadesPorMateria[subject.id] : undefined
-  return units ? { name: 'units', subject, units } : { name: 'subject', profile, subject }
+  const units = unitsOf(profile)[subject.id]
+  if (!units) return { name: 'subject', profile, subject }
+  return profile === 'infantil'
+    ? { name: 'topics', profile, subject, units, unit: units[0] }
+    : { name: 'units', profile, subject, units }
 }
 
-// Pantalla a la que lleva la dirección (#/primaria/matematicas/u1/...); si no existe, el inicio
+// Pantalla a la que lleva la dirección (#/primaria/matematicas/u1/... o #/infantil/numeros/<tema>); si no existe, el inicio
 export function screenFromHash(hash: string): Screen {
   const [profile, subjectId, unitId, topicId, ...rest] = hash.replace(/^#\/?/, '').split('/').filter(Boolean)
   if (rest.length > 0) return HOME
@@ -38,17 +50,22 @@ export function screenFromHash(hash: string): Screen {
   if (!subject) return HOME
   const screen = screenForSubject(profile, subject)
   if (unitId === undefined) return screen
-  if (screen.name !== 'units') return HOME
 
+  // Infantil: el tercer tramo es el tema (no hay unidades)
+  if (profile === 'infantil') {
+    if (screen.name !== 'topics' || topicId !== undefined) return HOME
+    const topic = screen.unit.topics.find((t) => t.id === unitId)
+    return topic ? { ...screen, name: 'practice', topic } : HOME
+  }
+
+  if (screen.name !== 'units') return HOME
   const unit = screen.units.find((u) => u.id === unitId)
   if (!unit || unit.topics.length === 0) return HOME
-  if (topicId === undefined) return { name: 'topics', subject, units: screen.units, unit }
+  if (topicId === undefined) return { name: 'topics', profile, subject, units: screen.units, unit }
 
   const topic = unit.topics.find((t) => t.id === topicId)
-  return topic ? { name: 'practice', subject, units: screen.units, unit, topic } : HOME
+  return topic ? { name: 'practice', profile, subject, units: screen.units, unit, topic } : HOME
 }
-
-const PROFILE_OF_UNITS: Profile = 'primaria'
 
 export function hashFromScreen(screen: Screen): string {
   switch (screen.name) {
@@ -63,10 +80,14 @@ export function hashFromScreen(screen: Screen): string {
     case 'subject':
       return `#/${screen.profile}/${screen.subject.id}`
     case 'units':
-      return `#/${PROFILE_OF_UNITS}/${screen.subject.id}`
+      return `#/${screen.profile}/${screen.subject.id}`
     case 'topics':
-      return `#/${PROFILE_OF_UNITS}/${screen.subject.id}/${screen.unit.id}`
+      return screen.profile === 'infantil'
+        ? `#/infantil/${screen.subject.id}`
+        : `#/${screen.profile}/${screen.subject.id}/${screen.unit.id}`
     case 'practice':
-      return `#/${PROFILE_OF_UNITS}/${screen.subject.id}/${screen.unit.id}/${screen.topic.id}`
+      return screen.profile === 'infantil'
+        ? `#/infantil/${screen.subject.id}/${screen.topic.id}`
+        : `#/${screen.profile}/${screen.subject.id}/${screen.unit.id}/${screen.topic.id}`
   }
 }
