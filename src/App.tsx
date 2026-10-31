@@ -10,7 +10,7 @@ import { ListScreen } from './components/ListScreen'
 import { Mascot } from './components/Mascot'
 import { Practice } from './components/Practice'
 import { SubjectsScreen } from './components/SubjectsScreen'
-import { hashFromScreen, screenForSubject, screenFromHash, subjectsOf } from './routes'
+import { hashFromScreen, hasContent, screenForSubject, screenFromHash, subjectsOf } from './routes'
 import type { Screen } from './routes'
 
 // La pantalla vive en la dirección (#/...): así funciona el botón atrás del navegador y del móvil
@@ -40,6 +40,7 @@ function App() {
       <SubjectsScreen
         profile={profile}
         subjects={subjectsOf(profile)}
+        available={(subject) => hasContent(profile, subject)}
         onHome={goHome}
         onSelect={(subject) => setScreen(screenForSubject(profile, subject))}
       />
@@ -58,45 +59,50 @@ function App() {
   }
 
   if (screen.name === 'units') {
-    const { subject, units } = screen
+    const { profile, subject, units } = screen
     return (
       <ListScreen
+        profile={profile}
         title={subject.name}
         items={units.map((unit) => ({ ...unit, disabled: unit.topics.length === 0 }))}
         onHome={goHome}
-        onBack={() => setScreen({ name: 'subjects', profile: 'primaria' })}
+        onBack={() => setScreen({ name: 'subjects', profile })}
         onSelect={(id) => {
           const unit = units.find((u) => u.id === id)
-          if (unit) setScreen({ name: 'topics', subject, units, unit })
+          if (unit) setScreen({ name: 'topics', profile, subject, units, unit })
         }}
       />
     )
   }
 
   if (screen.name === 'topics') {
-    const { subject, units, unit } = screen
+    const { profile, subject, units, unit } = screen
+    // En Infantil no hay unidades: atrás vuelve a las materias
+    const infantil = profile === 'infantil'
     return (
       <ListScreen
-        title={`${subject.name} · ${unit.name}`}
+        profile={profile}
+        title={infantil ? subject.name : `${subject.name} · ${unit.name}`}
         items={unit.topics}
         onHome={goHome}
-        onBack={() => setScreen({ name: 'units', subject, units })}
+        onBack={() => setScreen(infantil ? { name: 'subjects', profile } : { name: 'units', profile, subject, units })}
         onSelect={(id) => {
           const topic = unit.topics.find((t) => t.id === id)
-          if (topic) setScreen({ name: 'practice', subject, units, unit, topic })
+          if (topic) setScreen({ name: 'practice', profile, subject, units, unit, topic })
         }}
       />
     )
   }
 
   if (screen.name === 'practice') {
-    const { subject, units, unit, topic } = screen
+    const { profile, subject, units, unit, topic } = screen
     return (
       <Practice
         key={topic.id}
+        profile={profile}
         topic={topic}
         onHome={goHome}
-        onBack={() => setScreen({ name: 'topics', subject, units, unit })}
+        onBack={() => setScreen({ name: 'topics', profile, subject, units, unit })}
       />
     )
   }

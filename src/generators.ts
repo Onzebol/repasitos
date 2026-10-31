@@ -1,5 +1,7 @@
 import { int, pick, shuffle } from './random'
 import type { Rng } from './random'
+import { ANIMALES as ANIMALES_CON_NOMBRE } from './infantil/animales'
+import type { Animal } from './infantil/animales'
 import type { Digit } from './infantil/trazos'
 import type { BlockSpec, ChoiceExercise, ColumnExercise, Exercise, NumberExercise } from './types'
 
@@ -22,6 +24,20 @@ const ORDINALES = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto',
 
 // Un solo carácter cada uno (sin variantes), para poder dibujar una fila de 10 y contarlos
 const ANIMALES = ['🐘', '🐢', '🐰', '🐸', '🐱', '🐶', '🐟', '🐧', '🐮', '🐷', '🦁', '🐵', '🐻', '🦊']
+
+// Tres cifras distintas entre min y max, con la respuesta entre ellas (las opciones se barajan al montar la sesión)
+function tresCifras(rng: Rng, answer: number, min: number, max: number): number[] {
+  if (max - min < 2) throw new Error('Hacen falta al menos tres cifras distintas en el rango')
+  const otras = new Set<number>()
+  while (otras.size < 2) {
+    const n = int(rng, min, max)
+    if (n !== answer) otras.add(n)
+  }
+  return [answer, ...otras]
+}
+
+// «3 perros», «1 perro»: nombre accesible de un grupo de dibujos
+const etiqueta = (animal: Animal, k: number) => `${k} ${k === 1 ? animal.singular : animal.plural}`
 
 const decenas = (n: number) => `${n} ${n === 1 ? 'decena' : 'decenas'}`
 const unidades = (n: number) => `${n} ${n === 1 ? 'unidad' : 'unidades'}`
@@ -192,6 +208,64 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       while (n % 10 === 0 || n % 10 === 5) n = int(rng, 11, 99)
       const bajo = Math.floor(n / 10) * 10
       return elegir(`¿Cuál es la decena más cercana a ${n}?`, [bajo, bajo + 10], Math.round(n / 10) * 10)
+    }
+
+    case 'how-many': {
+      const min = spec.min ?? 1
+      const max = spec.max ?? 7
+      const n = int(rng, min, max)
+      const animal = pick(rng, ANIMALES_CON_NOMBRE)
+      const ejercicio = elegir(`¿Cuánt${animal.fem ? 'as' : 'os'} ${animal.plural} hay?`, tresCifras(rng, n, min, max), n, animal.emoji.repeat(n))
+      return spec.tap ? { ...ejercicio, tapToCount: true } : ejercicio
+    }
+
+    case 'group': {
+      const min = spec.min ?? 1
+      const max = spec.max ?? 7
+      const n = int(rng, min, max)
+      const animal = pick(rng, ANIMALES_CON_NOMBRE)
+      const cantidades = tresCifras(rng, n, min, max) // la primera es la respuesta
+      const grupos = cantidades.map((k) => animal.emoji.repeat(k))
+      const labels = Object.fromEntries(cantidades.map((k, i) => [grupos[i], etiqueta(animal, k)]))
+      return { ...elegir(`¿Dónde hay ${n}?`, grupos, grupos[0], String(n)), labels }
+    }
+
+    case 'next-number': {
+      const min = spec.min ?? 1
+      const max = spec.max ?? 9
+      if (spec.mode === 'after') {
+        const n = int(rng, min, max - 1)
+        return elegir(`¿Qué número va después del ${n}?`, tresCifras(rng, n + 1, min, max), n + 1)
+      }
+      if (spec.mode === 'before') {
+        const n = int(rng, min + 1, max)
+        return elegir(`¿Qué número va antes del ${n}?`, tresCifras(rng, n - 1, min, max), n - 1)
+      }
+      const n = int(rng, min, max - 2)
+      return elegir('¿Qué número falta?', tresCifras(rng, n + 1, min, max), n + 1, `${n}  ?  ${n + 2}`)
+    }
+
+    case 'more-less': {
+      const min = spec.min ?? 1
+      const max = spec.max ?? 7
+      const animal = pick(rng, ANIMALES_CON_NOMBRE)
+      const a = int(rng, min, max)
+      let b = int(rng, min, max)
+      while (b === a) b = int(rng, min, max)
+      const grupos = [a, b].map((k) => animal.emoji.repeat(k))
+      const respuesta = spec.mode === 'more' ? Math.max(a, b) : Math.min(a, b)
+      const labels = Object.fromEntries([a, b].map((k, i) => [grupos[i], etiqueta(animal, k)]))
+      return {
+        ...elegir(spec.mode === 'more' ? '¿Dónde hay más?' : '¿Dónde hay menos?', grupos, animal.emoji.repeat(respuesta)),
+        labels,
+      }
+    }
+
+    case 'digit': {
+      const min = spec.min ?? 1
+      const max = spec.max ?? 9
+      const n = int(rng, min, max)
+      return elegir(`Toca el número ${n}`, tresCifras(rng, n, min, max), n)
     }
 
     case 'trace': {
