@@ -12,11 +12,18 @@ describe('TracePreview: hoja con el recorrido de cada cifra', () => {
     }
   })
 
-  it('cada cifra explica en texto cuántos trazos tiene (el 4 y el 5, dos)', () => {
+  it('cada cifra explica en texto cuántos trazos tiene (el 4, el 5 y el 7, dos)', () => {
     render(<TracePreview onHome={vi.fn()} />)
     expect(screen.getByRole('img', { name: /^Cifra 4: 2 trazos/ })).toBeInTheDocument()
     expect(screen.getByRole('img', { name: /^Cifra 5: 2 trazos/ })).toBeInTheDocument()
-    expect(screen.getByRole('img', { name: /^Cifra 7: 1 trazo/ })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /^Cifra 7: 2 trazos/ })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /^Cifra 6: 1 trazo$/ })).toBeInTheDocument()
+  })
+
+  it('marca también el punto de llegada de cada trazo, como el punto verde de los cuadernos', () => {
+    render(<TracePreview onHome={vi.fn()} />)
+    const siete = screen.getByRole('img', { name: /^Cifra 7:/ })
+    expect(siete.querySelectorAll('[data-end]')).toHaveLength(2)
   })
 
   it('marca el punto de salida y el orden de cada trazo', () => {

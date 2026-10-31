@@ -5,7 +5,7 @@ import type { Digit } from './trazos'
 const CIFRAS = DIGITS.map((digit) => [digit] as [Digit])
 
 // Cuántos trazos (levantando el dedo) tiene cada cifra en el diseño
-const TRAZOS_POR_CIFRA = [1, 1, 1, 1, 2, 2, 1, 1, 1, 1]
+const TRAZOS_POR_CIFRA = [1, 1, 1, 1, 2, 2, 1, 2, 1, 1]
 
 describe('trazos de las cifras', () => {
   it('hay un recorrido para cada cifra del 0 al 9', () => {
@@ -48,6 +48,15 @@ describe('trazos de las cifras', () => {
     }
   })
 
+  it('el lazo del 6 termina a la izquierda, donde se junta con el palo, sin dar la vuelta entera', () => {
+    const seis = TRAZOS[6][0]
+    const [x, y] = seis.at(-1)!
+    expect(x).toBeLessThan(40)
+    expect(y).toBeGreaterThan(80)
+    expect(y).toBeLessThan(110)
+    expect(y).toBeLessThan(Math.max(...seis.map(([, py]) => py)))
+  })
+
   it('el 4 es el de la silla invertida: brazo recto hacia abajo y raya a la derecha; luego el palo largo desde arriba', () => {
     const [brazo, palo] = TRAZOS[4]
     // el brazo baja en vertical, sin diagonal, y gira a la derecha formando la raya
@@ -56,6 +65,8 @@ describe('trazos de las cifras', () => {
     expect(brazo[1][1]).toBeGreaterThan(brazo[0][1])
     expect(brazo[2][1]).toBe(brazo[1][1])
     expect(brazo[2][0]).toBeGreaterThan(brazo[1][0])
+    // la raya llega justo hasta el palo (como en el cuaderno) y no lo sobrepasa
+    expect(brazo[2][0]).toBe(palo[0][0])
     // el palo cae en vertical por la derecha del brazo, hasta pasar por debajo de la raya
     expect(palo[0][0]).toBe(palo[1][0])
     expect(palo[0][0]).toBeGreaterThan(brazo[0][0])
@@ -81,8 +92,18 @@ describe('trazos de las cifras', () => {
     expect(cruces).toHaveLength(2)
   })
 
-  it('el 7 no lleva raya cruzada: un solo trazo con la raya de arriba y la diagonal', () => {
-    expect(TRAZOS[7]).toHaveLength(1)
+  it('el 7 lleva raya cruzada: primero la raya de arriba y la diagonal, luego una raya horizontal que corta la diagonal', () => {
+    const [diagonal, raya] = TRAZOS[7]
+    expect(diagonal).toHaveLength(3)
+    expect(raya).toHaveLength(2)
+    expect(raya[0][1]).toBe(raya[1][1])
+    expect(raya[1][0]).toBeGreaterThan(raya[0][0])
+    // a la altura de la raya, la diagonal queda entre sus dos extremos
+    const [[, y1], [, y2]] = diagonal.slice(1)
+    const [[x1], [x2]] = diagonal.slice(1)
+    const x = x1 + ((x2 - x1) * (raya[0][1] - y1)) / (y2 - y1)
+    expect(raya[0][0]).toBeLessThan(x)
+    expect(raya[1][0]).toBeGreaterThan(x)
   })
 
   it('ninguna cifra tiene puntos repetidos seguidos (daría tramos de longitud cero)', () => {

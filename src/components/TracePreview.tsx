@@ -18,7 +18,7 @@ export function TracePreview({ onHome }: TracePreviewProps) {
       <TopBar title="Trazo de los números" prompt="Trazo de los números" onHome={onHome} />
       <div className="trace-content">
         <p className="trace-note">
-          Recorrido de cada cifra: el círculo es el punto de salida (con el número de orden del trazo) y la flecha, el sentido.
+          Recorrido de cada cifra: el círculo numerado es la salida (con el orden del trazo), la flecha el sentido y el punto pequeño la llegada.
           Hay que comprobar que coincide con los cuadernos.
         </p>
         <ul className="trace-grid" aria-label="Cifras">
@@ -39,6 +39,7 @@ export function TracePreview({ onHome }: TracePreviewProps) {
                     const stroke = strokes[i]
                     const color = COLORES[i % COLORES.length]
                     const [startX, startY] = stroke[0]
+                    const [endX, endY] = stroke[stroke.length - 1]
                     const arrow = arrowAt(stroke, 0.3)
                     return (
                       <g key={i} stroke={color} fill="none">
@@ -47,6 +48,7 @@ export function TracePreview({ onHome }: TracePreviewProps) {
                         <g transform={`translate(${arrow.x} ${arrow.y}) rotate(${arrow.angle})`}>
                           <path d="M-4 -4 4 0-4 4" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
                         </g>
+                        <circle data-end cx={endX} cy={endY} r="4" fill={color} stroke="none" />
                         <circle data-start cx={startX} cy={startY} r="7" fill={color} stroke="none" />
                         <text x={startX} y={startY + 3.5} fontSize="10" fontWeight="700" textAnchor="middle" fill="#fff" stroke="none">
                           {i + 1}
