@@ -82,6 +82,18 @@ const SPECS: BlockSpec[] = [
   { kind: 'inverse', mode: 'operation' },
   { kind: 'ordinal', mode: 'position' },
   { kind: 'ordinal', mode: 'name' },
+  { kind: 'neighbor', mode: 'after', min: 100, max: 199 },
+  { kind: 'neighbor', mode: 'before', min: 100, max: 199 },
+  { kind: 'neighbor', mode: 'between', min: 100, max: 199 },
+  { kind: 'extreme', mode: 'greatest', min: 100, max: 199 },
+  { kind: 'extreme', mode: 'smallest', min: 100, max: 199 },
+  { kind: 'compare', mode: 'sign', min: 100, max: 199 },
+  { kind: 'compare', mode: 'order', min: 100, max: 199 },
+  { kind: 'series', step: 1, min: 100, max: 199 },
+  { kind: 'series', step: 10, min: 100, max: 199 },
+  { kind: 'hundreds', ask: 'read' },
+  { kind: 'hundreds', ask: 'compose' },
+  { kind: 'mental', mode: 'add-three' },
 ]
 
 const ORDINALES = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno', 'décimo']
@@ -267,6 +279,76 @@ describe('generate: reglas de cada plantilla', () => {
         return signo === '−' && Number(x) === c && (Number(y) === a || Number(y) === b)
       }
       expect(e.options.filter(comprueba), e.question).toEqual([e.answer])
+    }
+  })
+
+  it('los números del 100 al 199 se quedan en ese rango en todas las plantillas', () => {
+    const numeros = (texto: string) => (texto.match(/\d+/g) ?? []).map(Number)
+    const enRango = (n: number, contexto: string) => {
+      expect(n, contexto).toBeGreaterThanOrEqual(100)
+      expect(n, contexto).toBeLessThanOrEqual(199)
+    }
+    for (const modo of ['after', 'before', 'between'] as const) {
+      // el número del enunciado está en rango (los distractores pueden salirse por poco)
+      for (const e of muchos({ kind: 'neighbor', mode: modo, min: 100, max: 199 })) {
+        numeros(e.question).forEach((n) => enRango(n, e.question))
+      }
+    }
+    for (const modo of ['greatest', 'smallest'] as const) {
+      for (const e of muchos({ kind: 'extreme', mode: modo, min: 100, max: 199 }).map(choice)) {
+        e.options.map(Number).forEach((n) => enRango(n, e.question))
+      }
+    }
+    for (const e of muchos({ kind: 'compare', mode: 'sign', min: 100, max: 199 })) {
+      numeros(e.type === 'choice' ? (e.visual ?? '') : '').forEach((n) => enRango(n, e.question))
+    }
+    for (const e of muchos({ kind: 'compare', mode: 'order', min: 100, max: 199 })) {
+      numeros(e.question).forEach((n) => enRango(n, e.question))
+    }
+    for (const paso of [1, 10] as const) {
+      for (const e of muchos({ kind: 'series', step: paso, min: 100, max: 199 }).map(number)) {
+        numeros(e.question).forEach((n) => enRango(n, e.question))
+        enRango(e.answer, e.question)
+      }
+    }
+  })
+
+  it('el siguiente de un número de 100 a 199 se calcula bien', () => {
+    for (const e of muchos({ kind: 'neighbor', mode: 'after', min: 100, max: 199 }).map(choice)) {
+      const n = Number(e.question.match(/\d+/)![0])
+      expect(n).toBeLessThan(199)
+      expect(e.answer).toBe(String(n + 1))
+    }
+  })
+
+  it('centenas: leer un número de 100 a 199 da 1 centena y sus decenas y unidades', () => {
+    for (const e of muchos({ kind: 'hundreds', ask: 'read' }).map(choice)) {
+      const n = Number(e.question.match(/\d+/)![0])
+      expect(n, e.question).toBeGreaterThanOrEqual(100)
+      expect(n, e.question).toBeLessThanOrEqual(199)
+      const d = Math.floor((n % 100) / 10)
+      const u = n % 10
+      expect(e.answer, e.question).toBe(`1 centena, ${d} ${d === 1 ? 'decena' : 'decenas'} y ${u} ${u === 1 ? 'unidad' : 'unidades'}`)
+      for (const opcion of e.options) expect(opcion).not.toMatch(/\b1 (decenas|unidades|centenas)\b/)
+    }
+  })
+
+  it('centenas: componer un número a partir de una centena, decenas y unidades', () => {
+    for (const e of muchos({ kind: 'hundreds', ask: 'compose' }).map(number)) {
+      const [c, d, u] = e.question.match(/\d+/g)!.map(Number)
+      expect(c).toBe(1)
+      expect(e.answer, e.question).toBe(100 + d * 10 + u)
+      expect(e.question).not.toMatch(/\b1 (decenas|unidades)\b/)
+    }
+  })
+
+  it('sumar tres números de una cifra', () => {
+    for (const e of muchos({ kind: 'mental', mode: 'add-three' }).map(number)) {
+      const m = e.question.match(/^(\d) \+ (\d) \+ (\d) =$/)
+      expect(m, e.question).not.toBeNull()
+      expect(e.answer, e.question).toBe(Number(m![1]) + Number(m![2]) + Number(m![3]))
+      expect(e.answer, e.question).toBeGreaterThanOrEqual(10)
+      expect(e.answer, e.question).toBeLessThanOrEqual(25)
     }
   })
 

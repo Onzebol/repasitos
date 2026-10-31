@@ -44,14 +44,16 @@ export type BlockSpec =
   | { kind: 'bag'; items: Exercise[] }
   // ¿Qué número va después, antes o entre otros? (elegir)
   | { kind: 'neighbor'; mode: 'after' | 'before' | 'between'; min: number; max: number }
-  // ¿Cuál es el número mayor o el menor de tres? (elegir)
-  | { kind: 'extreme'; mode: 'greatest' | 'smallest' }
-  // Completar una serie de 1 en 1 o de 10 en 10 (escribir)
-  | { kind: 'series'; step: 1 | 10 }
+  // ¿Cuál es el número mayor o el menor de tres? (elegir). Rango por defecto: 10 a 99
+  | { kind: 'extreme'; mode: 'greatest' | 'smallest'; min?: number; max?: number }
+  // Completar una serie de 1 en 1 o de 10 en 10 (escribir). Rango por defecto: 10 a 99
+  | { kind: 'series'; step: 1 | 10; min?: number; max?: number }
   // Decenas y unidades: leer un número, contar decenas o unidades, componerlo con cifras o con piezas
   | { kind: 'place-value'; ask: 'read' | 'tens' | 'units' | 'compose' | 'blocks' }
-  // Comparar números: signo > o <, frase correcta u ordenar tres números (elegir)
-  | { kind: 'compare'; mode: 'sign' | 'statement' | 'order' }
+  // Comparar números: signo > o <, frase correcta u ordenar tres números (elegir). Rango por defecto: 10 a 99
+  | { kind: 'compare'; mode: 'sign' | 'statement' | 'order'; min?: number; max?: number }
+  // Centenas (de 100 a 199): leer un número con centena, decenas y unidades (elegir) o componerlo (escribir)
+  | { kind: 'hundreds'; ask: 'read' | 'compose' }
   // Suma o resta en columna: sin llevar, o con `carry` (solo sumas) llevando en las unidades
   | { kind: 'column'; operator: '+' | '−'; carry?: boolean }
   // Problema de suma o resta con un enunciado corto (escribir): sin llevar, o con `carry` (solo sumas)
@@ -59,7 +61,7 @@ export type BlockSpec =
   // Decena más cercana a un número (elegir)
   | { kind: 'nearest-ten' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir)
-  | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' }
+  | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' }
   // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
   // o qué resta comprueba una suma (elegir)
   | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }
