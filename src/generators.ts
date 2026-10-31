@@ -1,5 +1,6 @@
 import { int, pick, shuffle } from './random'
 import type { Rng } from './random'
+import type { Digit } from './infantil/trazos'
 import type { BlockSpec, ChoiceExercise, ColumnExercise, Exercise, NumberExercise } from './types'
 
 const elegir = (question: string, options: (string | number)[], answer: string | number, visual?: string): ChoiceExercise => ({
@@ -191,6 +192,11 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       while (n % 10 === 0 || n % 10 === 5) n = int(rng, 11, 99)
       const bajo = Math.floor(n / 10) * 10
       return elegir(`¿Cuál es la decena más cercana a ${n}?`, [bajo, bajo + 10], Math.round(n / 10) * 10)
+    }
+
+    case 'trace': {
+      const digit = int(rng, spec.min ?? 0, spec.max ?? 9) as Digit
+      return { type: 'trace', question: `Repasa el número ${digit}`, digit, answer: digit }
     }
 
     case 'ordinal': {

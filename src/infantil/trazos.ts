@@ -8,6 +8,9 @@ export type Stroke = Point[]
 
 export const WIDTH = 100
 export const HEIGHT = 140
+// Cuadro visible del SVG: el de dibujo más un margen para que no se corten los extremos de los trazos
+export const MARGIN = 8
+export const VIEWBOX = { x: -MARGIN, y: -MARGIN, width: WIDTH + 2 * MARGIN, height: HEIGHT + 2 * MARGIN }
 export const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const
 export type Digit = (typeof DIGITS)[number]
 

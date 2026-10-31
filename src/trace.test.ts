@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { DIGITS, TRAZOS } from './infantil/trazos'
 import type { Digit, Point, Stroke } from './infantil/trazos'
 import { mulberry32 } from './random'
-import { advance, createGuide, initialState, lift, resample, traced } from './trace'
+import { advance, createGuide, initialState, lift, resample, toSvgPoint, traced } from './trace'
 import type { Guide, TraceState } from './trace'
 
 const CIFRAS = DIGITS.map((digit) => [digit] as [Digit])
@@ -151,6 +151,27 @@ describe('seguimiento del trazo con el dedo', () => {
     const hastaElCruce = puntos.slice(0, Math.floor(puntos.length * 0.25))
     const estado = mover(guide, initialState, [...hastaElCruce, puntos.at(-3)!])
     expect(estado.done).toBe(false)
+  })
+})
+
+describe('toSvgPoint: de la pantalla al cuadro de dibujo', () => {
+  const vista = { x: -8, y: -8, width: 116, height: 156 }
+
+  it('con el dibujo a su tamaño, resta la posición del cuadro y el margen', () => {
+    expect(toSvgPoint({ left: 10, top: 20, width: 116, height: 156 }, vista, 10, 20)).toEqual([-8, -8])
+    const [x, y] = toSvgPoint({ left: 10, top: 20, width: 116, height: 156 }, vista, 60, 70)
+    expect(x).toBeCloseTo(42, 9)
+    expect(y).toBeCloseTo(42, 9)
+  })
+
+  it('si el dibujo se ve más grande (tableta) lo escala', () => {
+    const [x, y] = toSvgPoint({ left: 10, top: 20, width: 232, height: 312 }, vista, 126, 176)
+    expect(x).toBeCloseTo(50, 9)
+    expect(y).toBeCloseTo(70, 9)
+  })
+
+  it('con un cuadro sin tamaño (aún sin pintar) no revienta', () => {
+    expect(toSvgPoint({ left: 0, top: 0, width: 0, height: 0 }, vista, 5, 5)).toEqual([-8, -8])
   })
 })
 

@@ -104,3 +104,19 @@ export function lift(state: TraceState): TraceState {
 export function traced(guide: Guide, state: TraceState): Point[][] {
   return guide.slice(0, state.stroke + 1).map((points, i) => (i < state.stroke ? points : points.slice(0, state.reached + 1)))
 }
+
+export type ViewBox = { x: number; y: number; width: number; height: number }
+
+// Posición de la pantalla (clientX, clientY) en el cuadro de dibujo, dado el tamaño que ocupa el SVG y su viewBox
+export function toSvgPoint(
+  rect: { left: number; top: number; width: number; height: number },
+  viewBox: ViewBox,
+  clientX: number,
+  clientY: number,
+): Point {
+  if (rect.width === 0 || rect.height === 0) return [viewBox.x, viewBox.y]
+  return [
+    viewBox.x + ((clientX - rect.left) / rect.width) * viewBox.width,
+    viewBox.y + ((clientY - rect.top) / rect.height) * viewBox.height,
+  ]
+}

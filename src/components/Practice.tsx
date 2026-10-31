@@ -9,6 +9,7 @@ import { Icon } from './Icon'
 import { Keypad } from './Keypad'
 import { Mascot } from './Mascot'
 import { TopBar } from './TopBar'
+import { TraceExercise } from './TraceExercise'
 
 type PracticeProps = {
   topic: Topic
@@ -99,7 +100,7 @@ export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
   }
 
   // Cada bloque del dibujo (decenas, unidades…) va aparte: si no caben juntos, pasan a otra línea
-  const visual = exercise.type !== 'column' && exercise.visual && (
+  const visual = (exercise.type === 'choice' || exercise.type === 'number') && exercise.visual && (
     <p className="visual" aria-hidden="true">
       {exercise.visual.split('  ').map((part, i) => (
         <span key={i} className="visual-part">{part}</span>
@@ -157,6 +158,8 @@ export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
                   </button>
                 ))}
               </div>
+            ) : exercise.type === 'trace' ? (
+              <TraceExercise key={index} digit={exercise.digit} onDone={() => setSolved(true)} />
             ) : exercise.type === 'column' ? (
               <ColumnExercise key={index} exercise={exercise} onCheck={checkColumn} />
             ) : (
