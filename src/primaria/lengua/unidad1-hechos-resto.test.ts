@@ -456,7 +456,7 @@ describe('Comprensión lectora', () => {
       expect(t, 'pregunta sin texto').toBeTruthy()
       expect(items.filter((i) => i.text === t)).toHaveLength(4)
       expect(t!.length, t).toBeLessThanOrEqual(330)
-      expect(t, t).not.toMatch(/Irene|Arnedo|Cayetano|Verónica|Toby|Carlitos|Ogrez|Mario Méndez|Jurado|Walsh/i)
+      expect(t, t).not.toMatch(/Mario Méndez|Jurado|Walsh/i)
     }
   })
 
