@@ -35,6 +35,13 @@ describe('TopBar', () => {
     expect(titulo.compareDocumentPosition(sonido) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
+  it('el botón de volver dibuja su flecha en SVG (el carácter ◀ salía como emoji dentro de un cuadrado)', () => {
+    render(<TopBar prompt="hola" onHome={vi.fn()} onBack={vi.fn()} />)
+    const volver = screen.getByRole('button', { name: 'Volver atrás' })
+    expect(volver.querySelector('svg')).not.toBeNull()
+    expect(volver).not.toHaveTextContent('◀')
+  })
+
   it('sin botón de volver ni título sigue mostrando inicio y sonido', () => {
     render(<TopBar prompt="hola" onHome={vi.fn()} />)
     expect(screen.queryByRole('button', { name: 'Volver atrás' })).not.toBeInTheDocument()

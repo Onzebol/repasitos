@@ -9,6 +9,7 @@ describe('routes: dirección ↔ pantalla', () => {
     expect(screenFromHash('#/primaria/nada')).toEqual({ name: 'home' })
     expect(screenFromHash('#/primaria/matematicas/u99')).toEqual({ name: 'home' })
     expect(screenFromHash('#/primaria/matematicas/u2/tema')).toEqual({ name: 'home' })
+    expect(screenFromHash('#/iconos/otra')).toEqual({ name: 'home' })
   })
 
   it('cada pantalla tiene su dirección y se recupera al leerla', () => {
@@ -21,10 +22,22 @@ describe('routes: dirección ↔ pantalla', () => {
       '#/primaria/matematicas',
       '#/primaria/matematicas/u1',
       '#/primaria/matematicas/u1/decenas-unidades',
+      '#/iconos',
     ]
     for (const hash of hashes) {
       expect(hashFromScreen(screenFromHash(hash))).toBe(hash)
     }
+  })
+
+  it('#/iconos abre la página de iconos (solo por dirección, sin botón en el inicio)', () => {
+    expect(screenFromHash('#/iconos')).toEqual({ name: 'icons' })
+    expect(hashFromScreen({ name: 'icons' })).toBe('#/iconos')
+  })
+
+  it('#/iconos abre la página de iconos (solo por dirección, sin botón en el inicio)', () => {
+    expect(screenFromHash('#/iconos')).toEqual({ name: 'icons' })
+    expect(hashFromScreen({ name: 'icons' })).toBe('#/iconos')
+    expect(screenFromHash('#/iconos/otra')).toEqual({ name: 'home' })
   })
 
   it('la dirección de un ejercicio abre ese tema', () => {
