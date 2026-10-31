@@ -92,7 +92,7 @@ Las tareas se anotan como issues (con imagen aclaratoria cuando haga falta). Cad
 
 **Hecho**
 - Icono de la app (Repi) y web instalable en el móvil, también sin conexión.
-- Pantalla de inicio y pantallas de materias con el estilo elegido (mundo de cuento); emojis con la fuente Noto Color Emoji incluida en la web, iguales en todos los dispositivos; flechas de volver y siguiente dibujadas en SVG; página `#/iconos` (solo por dirección) con los iconos que usa la aplicación, para qué sirven y los que se pueden usar; Infantil: materia Números (primeros temas: Contar tocando, ¿Cuántos hay?, Las cifras y trazo guiado de las cifras 0-9 con el dedo; la hoja de trazos sigue en `#/trazo`, solo por dirección); las materias sin contenido se ven desactivadas (#10).
+- Pantalla de inicio y pantallas de materias con el estilo elegido (mundo de cuento); emojis con la fuente Noto Color Emoji incluida en la web, iguales en todos los dispositivos; flechas de volver y siguiente dibujadas en SVG; página `#/iconos` (solo por dirección) con los iconos que usa la aplicación, para qué sirven y los que se pueden usar; Infantil: materia Números (temas: Contar tocando, ¿Cuántos hay?, ¿Dónde hay…?, Las cifras, Antes y después, Más y menos y trazo guiado de las cifras 0-9 con el dedo; la hoja de trazos sigue en `#/trazo`, solo por dirección); las materias sin contenido se ven desactivadas (#10).
 - Navegación con el botón atrás del navegador y del móvil (la pantalla vive en la dirección `#/…`).
 - Materias confirmadas y temario de 2º de Primaria.
 - Matemáticas de 2º, unidades 1 y 2: ejercicios aleatorios, cada sesión trae 10 distintos y "Repetir" empieza otra. Tipos de ejercicio: elegir, escribir un número y sumar o restar en columna (con llevada opcional).

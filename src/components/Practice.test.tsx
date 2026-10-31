@@ -46,6 +46,28 @@ describe('Practice: ejercicios de elegir', () => {
     expect(screen.queryByText('¡Muy bien!')).not.toBeInTheDocument()
   })
 
+  it('las opciones con dibujos usan su etiqueta como nombre accesible y tienen su propio estilo', () => {
+    const grupos = topicFrom([
+      {
+        type: 'choice',
+        question: '¿Dónde hay 2?',
+        visual: '2',
+        options: ['🐶🐶', '🐶🐶🐶'],
+        answer: '🐶🐶',
+        labels: { '🐶🐶': '2 perros', '🐶🐶🐶': '3 perros' },
+      },
+    ])
+    render(<Practice topic={grupos} profile="infantil" onHome={vi.fn()} onBack={vi.fn()} />)
+    for (const nombre of ['2 perros', '3 perros']) {
+      expect(screen.getByRole('button', { name: nombre })).toHaveClass('option', 'option-group')
+    }
+  })
+
+  it('las opciones normales no llevan el estilo de grupo', () => {
+    renderPractice()
+    expect(screen.getByRole('button', { name: '40' })).not.toHaveClass('option-group')
+  })
+
   describe('contar tocando', () => {
     const contar = topicFrom([
       { type: 'choice', question: '¿Cuántos perros hay?', visual: '🐶🐶🐶', options: ['3', '2', '4'], answer: '3', tapToCount: true },

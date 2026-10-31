@@ -11,7 +11,7 @@ const sesion = (id: string, seed = 3) => buildSession(temasNumeros.find((topic) 
 
 describe('Números de Infantil: contenido', () => {
   it('tiene sus temas y está registrada como la unidad de la materia Números', () => {
-    expect(temasNumeros.map((topic) => topic.id)).toEqual(['contar', 'cuantos-hay', 'las-cifras', 'trazo'])
+    expect(temasNumeros.map((topic) => topic.id)).toEqual(['contar', 'cuantos-hay', 'cantidad-numero', 'las-cifras', 'antes-despues', 'mas-menos', 'trazo'])
     expect(unidadNumeros.topics).toBe(temasNumeros)
     expect(unidadesInfantil.numeros).toEqual([unidadNumeros])
   })
@@ -44,6 +44,33 @@ describe('Números de Infantil: contenido', () => {
         expect(Number(e.answer)).toBeLessThanOrEqual(7)
       }
     }
+  })
+
+  it('«Cantidad y número» ofrece grupos de dibujos con su etiqueta, del 1 al 7', () => {
+    for (const e of sesion('cantidad-numero')) {
+      expect(e.type).toBe('choice')
+      if (e.type === 'choice') {
+        expect(e.question).toMatch(/^¿Dónde hay [1-7]\?$/)
+        for (const opcion of e.options) expect(e.labels?.[opcion]).toMatch(/^[1-7] /)
+      }
+    }
+  })
+
+  it('«Antes y después» mezcla el siguiente, el anterior y el que falta, del 1 al 9', () => {
+    const preguntas = sesion('antes-despues').map((e) => e.question)
+    expect(preguntas.filter((p) => p.includes('después')).length).toBeGreaterThan(0)
+    expect(preguntas.filter((p) => p.includes('antes')).length).toBeGreaterThan(0)
+    expect(preguntas.filter((p) => p === '¿Qué número falta?').length).toBeGreaterThan(0)
+    for (const e of sesion('antes-despues')) {
+      if (e.type === 'choice') for (const opcion of e.options) expect(Number(opcion)).toBeLessThanOrEqual(9)
+    }
+  })
+
+  it('«Más y menos» pregunta dónde hay más y dónde hay menos con dos grupos', () => {
+    const sesionMasMenos = sesion('mas-menos')
+    const preguntas = new Set(sesionMasMenos.map((e) => e.question))
+    expect(preguntas).toEqual(new Set(['¿Dónde hay más?', '¿Dónde hay menos?']))
+    for (const e of sesionMasMenos) if (e.type === 'choice') expect(e.options).toHaveLength(2)
   })
 
   it('«Las cifras» pide tocar cifras del 1 al 9', () => {

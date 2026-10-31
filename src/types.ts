@@ -18,6 +18,8 @@ export type ChoiceExercise = {
   answer: string
   // Contar tocando (Infantil): primero hay que tocar uno a uno los dibujos de `visual`; las opciones salen al contarlos todos
   tapToCount?: boolean
+  // Nombre accesible de cada opción cuando el texto es un dibujo (por ejemplo «3 perros»), por opción
+  labels?: Record<string, string>
 }
 
 // Escribir un número con el teclado en pantalla
@@ -79,6 +81,12 @@ export type BlockSpec =
   | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }
   // ¿Cuántos hay? (Infantil): contar un grupo de animales dibujados y elegir la cifra (por defecto, del 1 al 7)
   | { kind: 'how-many'; min?: number; max?: number; tap?: boolean }
+  // ¿Dónde hay 3? (Infantil): elegir entre tres grupos de dibujos el que tiene tantos como el número (por defecto, del 1 al 7)
+  | { kind: 'group'; min?: number; max?: number }
+  // Antes, después y el que falta (Infantil): tres cifras para elegir (por defecto, del 1 al 9)
+  | { kind: 'next-number'; mode: 'after' | 'before' | 'between'; min?: number; max?: number }
+  // Más y menos (Infantil): elegir el grupo de dibujos que tiene más o menos entre dos (por defecto, del 1 al 7)
+  | { kind: 'more-less'; mode: 'more' | 'less'; min?: number; max?: number }
   // Las cifras (Infantil): «Toca el número 5» entre tres cifras (por defecto, del 1 al 9)
   | { kind: 'digit'; min?: number; max?: number }
   // Trazo guiado: repasar con el dedo una cifra de min a max (por defecto, del 0 al 9)

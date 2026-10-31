@@ -18,11 +18,39 @@ export const temasNumeros: Topic[] = [
     plan: [{ spec: { kind: 'how-many', min: 1, max: 7 }, count: 10 }],
   },
   {
+    id: 'cantidad-numero',
+    name: '¿Dónde hay…?',
+    icon: '🍎',
+    tint: '#ffd2b0',
+    plan: [{ spec: { kind: 'group', min: 1, max: 7 }, count: 10 }],
+  },
+  {
     id: 'las-cifras',
     name: 'Las cifras',
     icon: '🔢',
     tint: '#cdb9ff',
     plan: [{ spec: { kind: 'digit', min: 1, max: 9 }, count: 10 }],
+  },
+  {
+    id: 'antes-despues',
+    name: 'Antes y después',
+    icon: '🚂',
+    tint: '#b5ecc1',
+    plan: [
+      { spec: { kind: 'next-number', mode: 'after', min: 1, max: 9 }, count: 4 },
+      { spec: { kind: 'next-number', mode: 'before', min: 1, max: 9 }, count: 3 },
+      { spec: { kind: 'next-number', mode: 'between', min: 1, max: 9 }, count: 3 },
+    ],
+  },
+  {
+    id: 'mas-menos',
+    name: 'Más y menos',
+    icon: '⚖️',
+    tint: '#ffe9a8',
+    plan: [
+      { spec: { kind: 'more-less', mode: 'more', min: 1, max: 7 }, count: 5 },
+      { spec: { kind: 'more-less', mode: 'less', min: 1, max: 7 }, count: 5 },
+    ],
   },
   {
     id: 'trazo',

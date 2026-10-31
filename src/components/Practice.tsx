@@ -164,7 +164,8 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
                     {exercise.options.map((option) => (
                       <button
                         key={option}
-                        className="option"
+                        className={exercise.labels ? 'option option-group' : 'option'}
+                        aria-label={exercise.labels?.[option]}
                         disabled={tried.includes(option)}
                         onClick={() => answerChoice(option)}
                       >
