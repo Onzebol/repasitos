@@ -6,13 +6,19 @@
   --card: #ffffff;
   --card-shadow: #0002;
   --focus: #14405a;
-  font-family: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  /* Noto Color Emoji va al final: solo se usa para los emojis (mismo aspecto que en Android) */
+  font-family: 'Trebuchet MS', 'Segoe UI', system-ui, 'Noto Color Emoji', sans-serif;
   color: var(--ink);
   background: var(--sky-bottom);
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Los botones no heredan la fuente por defecto: sin esto sus emojis no usarían Noto Color Emoji */
+button {
+  font-family: inherit;
 }
 
 body {
