@@ -36,8 +36,7 @@ describe('Unidad 1 de Conocimiento del medio: estructura', () => {
     }
   })
 
-  it('de momento tiene el tema «¿Cómo nos alimentamos?»', () => {
-    expect(temasUnidad1.map((tema) => tema.id)).toEqual(['alimentacion'])
+  it('incluye el tema «¿Cómo nos alimentamos?» (los cinco temas están en unidad1-temas.test.ts)', () => {
     expect(alimentacion.name).toBe('¿Cómo nos alimentamos?')
   })
 
