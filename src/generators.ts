@@ -283,13 +283,14 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       const respuesta = adelante ? fila.answer : fila.answerBack
       const otras = spec.rows.filter((_, j) => j !== i).map((f) => (adelante ? f.answer : f.answerBack))
       const ejercicio = elegir(adelante ? fila.ask : fila.askBack, [respuesta, ...dosAlAzar(rng, otras, respuesta, fila.ask)], respuesta, fila.emoji)
-      return { ...ejercicio, fact: `pair:${i}` }
+      // La identidad es la pregunta de ida (no la posición): dos tablas de pares en un mismo tema no se pisan
+      return { ...ejercicio, fact: `pair:${fila.ask}` }
     }
 
     case 'facts': {
       const item = pick(rng, spec.items)
       const ejercicio = elegir(item.question, [item.answer, ...dosAlAzar(rng, item.wrong, item.answer, item.question)], item.answer, item.visual)
-      return { ...ejercicio, fact: `fact:${item.question}` }
+      return { ...ejercicio, ...(item.text ? { text: item.text } : {}), fact: `fact:${item.question}` }
     }
 
     case 'group': {

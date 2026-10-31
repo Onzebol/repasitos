@@ -3,9 +3,12 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import css from '../assets/theme.css?raw'
 import { mulberry32 } from '../random'
+import { speak } from '../speak'
 import { topicFrom } from '../test/topics'
 import type { Topic } from '../types'
 import { Practice } from './Practice'
+
+vi.mock('../speak', () => ({ speak: vi.fn() }))
 
 const tema = topicFrom([
   { type: 'choice', question: '¿Qué número va después del 39?', options: ['38', '40', '49'], answer: '40' },
@@ -334,5 +337,43 @@ describe('Practice: separación entre la pregunta y lo que se contesta', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: '>' }))
     expect(screen.getByText('83')).toBeInTheDocument()
     expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+})
+
+describe('Practice: ejercicios con un texto para leer', () => {
+  const conTexto = topicFrom([
+    {
+      type: 'choice',
+      question: '¿Adónde va la tortuga?',
+      text: 'La tortuga va al río. Camina muy despacio.',
+      options: ['al río', 'al mar', 'al cole'],
+      answer: 'al río',
+    },
+  ])
+
+  it('muestra el texto antes de las opciones y lo sigue mostrando al acertar', async () => {
+    render(<Practice topic={conTexto} onHome={vi.fn()} onBack={vi.fn()} />)
+    const texto = screen.getByText('La tortuga va al río. Camina muy despacio.')
+    const opcion = screen.getByRole('button', { name: 'al río' })
+    expect(texto.compareDocumentPosition(opcion) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    await userEvent.setup().click(opcion)
+    expect(screen.getByText('La tortuga va al río. Camina muy despacio.')).toBeInTheDocument()
+  })
+
+  it('el botón de escuchar lee el texto y después la pregunta', async () => {
+    render(<Practice topic={conTexto} onHome={vi.fn()} onBack={vi.fn()} />)
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Escuchar' }))
+    expect(speak).toHaveBeenLastCalledWith('La tortuga va al río. Camina muy despacio. ¿Adónde va la tortuga?')
+  })
+
+  it('sin texto, escucha solo la pregunta y no aparece la tarjeta de lectura', async () => {
+    render(<Practice topic={tema} onHome={vi.fn()} onBack={vi.fn()} />)
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Escuchar' }))
+    expect(speak).toHaveBeenLastCalledWith('¿Qué número va después del 39?')
+    expect(document.querySelectorAll('.reading-text')).toHaveLength(0)
+  })
+
+  it('la tarjeta de lectura tiene su propio estilo', () => {
+    expect(css).toMatch(/\.reading-text\s*\{/)
   })
 })

@@ -249,7 +249,21 @@ describe('generate: pairs (pares que se preguntan en los dos sentidos)', () => {
 
   it('los dos sentidos de una misma fila son el mismo hecho', () => {
     const hechos = ejercicios.map((e) => e.fact)
-    expect(new Set(hechos)).toEqual(new Set(['pair:0', 'pair:1', 'pair:2', 'pair:3']))
+    expect(new Set(hechos)).toEqual(new Set(FILAS.map((f) => `pair:${f.ask}`)))
+    for (const e of ejercicios) {
+      const fila = FILAS.find((f) => f.ask === e.question || f.askBack === e.question)!
+      expect(e.fact).toBe(`pair:${fila.ask}`)
+    }
+  })
+
+  it('dos tablas de pares distintas no comparten hechos aunque sus filas estén en la misma posición', () => {
+    const otras: PairRow[] = [
+      { ask: '¿Qué usamos para borrar?', answer: 'la goma', askBack: '¿Para qué sirve la goma?', answerBack: 'para borrar' },
+      { ask: '¿Qué usamos para cortar?', answer: 'las tijeras', askBack: '¿Para qué sirven las tijeras?', answerBack: 'para cortar' },
+      { ask: '¿Qué usamos para pegar?', answer: 'el pegamento', askBack: '¿Para qué sirve el pegamento?', answerBack: 'para pegar' },
+    ]
+    const propios = new Set(ejercicios.map((e) => e.fact))
+    for (const e of muchos({ kind: 'pairs', rows: otras })) expect(propios.has(e.fact), e.fact).toBe(false)
   })
 })
 
@@ -317,6 +331,19 @@ describe('gramática de todo lo generado', () => {
         expect(e.question).not.toMatch(/ de el | a el /)
         expect(e.question.replace(/^¿/, '')[0]).toBe(e.question.replace(/^¿/, '')[0].toUpperCase())
       }
+    }
+  })
+})
+
+describe('generate: facts con texto para leer', () => {
+  it('el ejercicio lleva el texto del hecho, y sin texto no lo lleva', () => {
+    const items: FactItem[] = [
+      { question: '¿Adónde va?', answer: 'al río', wrong: ['al mar', 'al cole', 'a casa'], text: 'La tortuga va al río.' },
+      { question: '¿Cómo es?', answer: 'grande', wrong: ['pequeño', 'alto', 'bajo'] },
+    ]
+    for (const e of muchos({ kind: 'facts', items })) {
+      const item = items.find((i) => i.question === e.question)!
+      expect(e.text).toBe(item.text)
     }
   })
 })

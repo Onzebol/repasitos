@@ -14,6 +14,8 @@ export type ChoiceExercise = {
   type: 'choice'
   question: string
   visual?: string
+  // Texto para leer antes de contestar (comprensión lectora): se ve sobre las opciones y el botón de escuchar lo lee con la pregunta
+  text?: string
   options: string[]
   answer: string
   // Contar tocando (Infantil): primero hay que tocar uno a uno los dibujos de `visual`; las opciones salen al contarlos todos
@@ -28,7 +30,7 @@ export type ChoiceExercise = {
 // Tablas para generar preguntas de hechos (ver BlockSpec: classify, pick-member, sequence, pairs y facts)
 export type Group = { id: string; label: string; question?: string } // categoría: su nombre como respuesta y (para pick-member) cómo se pregunta por ella
 export type Member = { label: string; group: string; emoji?: string; plural?: boolean } // elemento de una categoría, con su artículo
-export type FactItem = { question: string; answer: string; wrong: string[]; visual?: string } // respuestas equivocadas seguras (al menos 3)
+export type FactItem = { question: string; answer: string; wrong: string[]; visual?: string; text?: string } // respuestas equivocadas seguras (al menos 3)
 export type PairRow = { ask: string; answer: string; askBack: string; answerBack: string; emoji?: string }
 
 // Escribir un número con el teclado en pantalla
