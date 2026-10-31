@@ -35,10 +35,15 @@ function esValido(e: Exercise) {
     expect(e.bottom, nombre).toBeLessThanOrEqual(99)
     expect(e.answer, nombre).toBe(e.operator === '+' ? e.top + e.bottom : e.top - e.bottom)
     expect(e.answer, nombre).toBeGreaterThan(0)
-    expect(e.answer, nombre).toBeLessThanOrEqual(99)
-    // sin llevar: cada columna se resuelve por separado
-    if (e.operator === '+') expect((e.top % 10) + (e.bottom % 10), nombre).toBeLessThan(10)
-    else {
+    expect(e.answer, nombre).toBeLessThanOrEqual(e.carry ? 199 : 99)
+    if (e.carry) {
+      // llevando: las unidades suman 10 o más
+      expect(e.operator, nombre).toBe('+')
+      expect((e.top % 10) + (e.bottom % 10), nombre).toBeGreaterThanOrEqual(10)
+    } else if (e.operator === '+') {
+      // sin llevar: cada columna se resuelve por separado
+      expect((e.top % 10) + (e.bottom % 10), nombre).toBeLessThan(10)
+    } else {
       expect(e.top % 10, nombre).toBeGreaterThanOrEqual(e.bottom % 10)
       expect(Math.floor(e.top / 10), nombre).toBeGreaterThanOrEqual(Math.floor(e.bottom / 10))
     }
@@ -63,14 +68,35 @@ const SPECS: BlockSpec[] = [
   { kind: 'compare', mode: 'order' },
   { kind: 'column', operator: '+' },
   { kind: 'column', operator: '−' },
+  { kind: 'column', operator: '+', carry: true },
   { kind: 'word-problem', operator: '+' },
   { kind: 'word-problem', operator: '−' },
+  { kind: 'word-problem', operator: '+', carry: true },
   { kind: 'nearest-ten' },
   { kind: 'mental', mode: 'add-bridge' },
   { kind: 'mental', mode: 'sub-bridge' },
   { kind: 'mental', mode: 'tens-add' },
   { kind: 'mental', mode: 'tens-sub' },
+  { kind: 'inverse', mode: 'subtract' },
+  { kind: 'inverse', mode: 'missing' },
+  { kind: 'inverse', mode: 'operation' },
+  { kind: 'ordinal', mode: 'position' },
+  { kind: 'ordinal', mode: 'name' },
+  { kind: 'neighbor', mode: 'after', min: 100, max: 199 },
+  { kind: 'neighbor', mode: 'before', min: 100, max: 199 },
+  { kind: 'neighbor', mode: 'between', min: 100, max: 199 },
+  { kind: 'extreme', mode: 'greatest', min: 100, max: 199 },
+  { kind: 'extreme', mode: 'smallest', min: 100, max: 199 },
+  { kind: 'compare', mode: 'sign', min: 100, max: 199 },
+  { kind: 'compare', mode: 'order', min: 100, max: 199 },
+  { kind: 'series', step: 1, min: 100, max: 199 },
+  { kind: 'series', step: 10, min: 100, max: 199 },
+  { kind: 'hundreds', ask: 'read' },
+  { kind: 'hundreds', ask: 'compose' },
+  { kind: 'mental', mode: 'add-three' },
 ]
+
+const ORDINALES = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno', 'décimo']
 
 describe('generate: todo ejercicio generado es válido', () => {
   it.each(SPECS.map((spec) => [JSON.stringify(spec), spec] as const))('%s', (_nombre, spec) => {
@@ -209,6 +235,151 @@ describe('generate: reglas de cada plantilla', () => {
     }
   })
 
+  it('los problemas llevando suman con llevada en las unidades', () => {
+    const resultados = muchos({ kind: 'word-problem', operator: '+', carry: true }).map(number).map((e) => {
+      const [a, b] = e.question.match(/\d+/g)!.map(Number)
+      expect(e.answer, e.question).toBe(a + b)
+      expect((a % 10) + (b % 10), e.question).toBeGreaterThanOrEqual(10)
+      expect(e.answer, e.question).toBeLessThanOrEqual(199)
+      return e.answer
+    })
+    expect(resultados.some((r) => r >= 100)).toBe(true)
+  })
+
+  it('un problema de resta no puede llevar en esta plantilla', () => {
+    expect(() => generate({ kind: 'word-problem', operator: '−', carry: true }, mulberry32(1))).toThrow()
+  })
+
+  it('la resta que comprueba una suma da el otro sumando', () => {
+    for (const e of muchos({ kind: 'inverse', mode: 'subtract' }).map(number)) {
+      const [a, b, c, c2, b2] = e.question.match(/\d+/g)!.map(Number)
+      expect(a + b, e.question).toBe(c)
+      expect([c2, b2], e.question).toEqual([c, b])
+      expect(e.answer, e.question).toBe(a)
+      expect(c, e.question).toBeLessThanOrEqual(99)
+    }
+  })
+
+  it('el sumando que falta completa la suma', () => {
+    for (const e of muchos({ kind: 'inverse', mode: 'missing' }).map(number)) {
+      const [a, c] = e.question.match(/\d+/g)!.map(Number)
+      expect(a + e.answer, e.question).toBe(c)
+      expect(e.answer, e.question).toBeGreaterThanOrEqual(10)
+    }
+  })
+
+  it('la operación que comprueba la suma es la única resta válida entre las opciones', () => {
+    for (const e of muchos({ kind: 'inverse', mode: 'operation' }).map(choice)) {
+      const [a, b, c] = e.question.match(/\d+/g)!.map(Number)
+      expect(a + b, e.question).toBe(c)
+      expect(e.answer, e.question).toBe(`${c} − ${b}`)
+      const comprueba = (opcion: string) => {
+        const [x, signo, y] = opcion.split(' ')
+        // comprueba la suma: se resta un sumando del total
+        return signo === '−' && Number(x) === c && (Number(y) === a || Number(y) === b)
+      }
+      expect(e.options.filter(comprueba), e.question).toEqual([e.answer])
+    }
+  })
+
+  it('los números del 100 al 199 se quedan en ese rango en todas las plantillas', () => {
+    const numeros = (texto: string) => (texto.match(/\d+/g) ?? []).map(Number)
+    const enRango = (n: number, contexto: string) => {
+      expect(n, contexto).toBeGreaterThanOrEqual(100)
+      expect(n, contexto).toBeLessThanOrEqual(199)
+    }
+    for (const modo of ['after', 'before', 'between'] as const) {
+      // el número del enunciado está en rango (los distractores pueden salirse por poco)
+      for (const e of muchos({ kind: 'neighbor', mode: modo, min: 100, max: 199 })) {
+        numeros(e.question).forEach((n) => enRango(n, e.question))
+      }
+    }
+    for (const modo of ['greatest', 'smallest'] as const) {
+      for (const e of muchos({ kind: 'extreme', mode: modo, min: 100, max: 199 }).map(choice)) {
+        e.options.map(Number).forEach((n) => enRango(n, e.question))
+      }
+    }
+    for (const e of muchos({ kind: 'compare', mode: 'sign', min: 100, max: 199 })) {
+      numeros(e.type === 'choice' ? (e.visual ?? '') : '').forEach((n) => enRango(n, e.question))
+    }
+    for (const e of muchos({ kind: 'compare', mode: 'order', min: 100, max: 199 })) {
+      numeros(e.question).forEach((n) => enRango(n, e.question))
+    }
+    for (const paso of [1, 10] as const) {
+      for (const e of muchos({ kind: 'series', step: paso, min: 100, max: 199 }).map(number)) {
+        numeros(e.question).forEach((n) => enRango(n, e.question))
+        enRango(e.answer, e.question)
+      }
+    }
+  })
+
+  it('el siguiente de un número de 100 a 199 se calcula bien', () => {
+    for (const e of muchos({ kind: 'neighbor', mode: 'after', min: 100, max: 199 }).map(choice)) {
+      const n = Number(e.question.match(/\d+/)![0])
+      expect(n).toBeLessThan(199)
+      expect(e.answer).toBe(String(n + 1))
+    }
+  })
+
+  it('centenas: leer un número de 100 a 199 da 1 centena y sus decenas y unidades', () => {
+    for (const e of muchos({ kind: 'hundreds', ask: 'read' }).map(choice)) {
+      const n = Number(e.question.match(/\d+/)![0])
+      expect(n, e.question).toBeGreaterThanOrEqual(100)
+      expect(n, e.question).toBeLessThanOrEqual(199)
+      const d = Math.floor((n % 100) / 10)
+      const u = n % 10
+      expect(e.answer, e.question).toBe(`1 centena, ${d} ${d === 1 ? 'decena' : 'decenas'} y ${u} ${u === 1 ? 'unidad' : 'unidades'}`)
+      for (const opcion of e.options) expect(opcion).not.toMatch(/\b1 (decenas|unidades|centenas)\b/)
+    }
+  })
+
+  it('centenas: componer un número a partir de una centena, decenas y unidades', () => {
+    for (const e of muchos({ kind: 'hundreds', ask: 'compose' }).map(number)) {
+      const [c, d, u] = e.question.match(/\d+/g)!.map(Number)
+      expect(c).toBe(1)
+      expect(e.answer, e.question).toBe(100 + d * 10 + u)
+      expect(e.question).not.toMatch(/\b1 (decenas|unidades)\b/)
+    }
+  })
+
+  it('sumar tres números de una cifra', () => {
+    for (const e of muchos({ kind: 'mental', mode: 'add-three' }).map(number)) {
+      const m = e.question.match(/^(\d) \+ (\d) \+ (\d) =$/)
+      expect(m, e.question).not.toBeNull()
+      expect(e.answer, e.question).toBe(Number(m![1]) + Number(m![2]) + Number(m![3]))
+      expect(e.answer, e.question).toBeGreaterThanOrEqual(10)
+      expect(e.answer, e.question).toBeLessThanOrEqual(25)
+    }
+  })
+
+  it('ordinales: el dibujo es una fila de 10 distintos y la respuesta es el que ocupa ese lugar', () => {
+    const vistos = new Set<string>()
+    for (const e of muchos({ kind: 'ordinal', mode: 'position' }).map(choice)) {
+      const fila = [...e.visual!]
+      expect(fila, e.question).toHaveLength(10)
+      expect(new Set(fila).size, e.question).toBe(10)
+      const lugar = ORDINALES.findIndex((palabra) => e.question.includes(` ${palabra}?`))
+      expect(lugar, e.question).toBeGreaterThanOrEqual(0)
+      expect(e.answer, e.question).toBe(fila[lugar])
+      for (const opcion of e.options) expect(fila, e.question).toContain(opcion)
+      vistos.add(ORDINALES[lugar])
+    }
+    expect(vistos.size).toBe(10)
+  })
+
+  it('ordinales: el nombre se asocia con su número, con opciones distintas', () => {
+    for (const e of muchos({ kind: 'ordinal', mode: 'name' }).map(choice)) {
+      const lugar = ORDINALES.findIndex((palabra) => e.question.includes(`"${palabra}"`))
+      expect(lugar, e.question).toBeGreaterThanOrEqual(0)
+      expect(e.answer, e.question).toBe(`${lugar + 1}.º`)
+      for (const opcion of e.options) {
+        const n = Number(opcion.replace('.º', ''))
+        expect(n).toBeGreaterThanOrEqual(1)
+        expect(n).toBeLessThanOrEqual(10)
+      }
+    }
+  })
+
   it('la decena más cercana es la más cercana y nunca hay empate', () => {
     for (const e of muchos({ kind: 'nearest-ten' }).map(choice)) {
       const n = Number(e.question.match(/\d+/)![0])
@@ -216,6 +387,24 @@ describe('generate: reglas de cada plantilla', () => {
       expect(n % 10, e.question).not.toBe(0)
       expect(e.answer, e.question).toBe(String(Math.round(n / 10) * 10))
       expect(e.options, e.question).toHaveLength(2)
+    }
+  })
+
+  it('las sumas llevando salen marcadas, llevan en las unidades y a veces pasan de 99', () => {
+    const resultados = muchos({ kind: 'column', operator: '+', carry: true }).map((e) => {
+      if (e.type !== 'column') throw new Error('se esperaba una columna')
+      expect(e.carry).toBe(true)
+      return e.answer
+    })
+    expect(resultados.some((r) => r < 100)).toBe(true)
+    expect(resultados.some((r) => r >= 100)).toBe(true)
+  })
+
+  it('las columnas sin llevar no llevan la marca', () => {
+    for (const operator of ['+', '−'] as const) {
+      for (const e of muchos({ kind: 'column', operator })) {
+        expect(e.type === 'column' && e.carry).toBeFalsy()
+      }
     }
   })
 

@@ -24,7 +24,8 @@ export type NumberExercise = {
   answer: number
 }
 
-// Suma o resta sin llevar en columna: resultado de dos cifras (decenas y unidades)
+// Suma o resta en columna: el resultado se escribe cifra a cifra (unidades, decenas y, si llega a 100,
+// centenas). Con `carry` las unidades llevan y se muestra un cuadro de llevada opcional (no se comprueba).
 export type ColumnExercise = {
   type: 'column'
   question: string
@@ -32,6 +33,7 @@ export type ColumnExercise = {
   top: number
   bottom: number
   answer: number
+  carry?: boolean
 }
 
 export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise
@@ -42,22 +44,29 @@ export type BlockSpec =
   | { kind: 'bag'; items: Exercise[] }
   // ¿Qué número va después, antes o entre otros? (elegir)
   | { kind: 'neighbor'; mode: 'after' | 'before' | 'between'; min: number; max: number }
-  // ¿Cuál es el número mayor o el menor de tres? (elegir)
-  | { kind: 'extreme'; mode: 'greatest' | 'smallest' }
-  // Completar una serie de 1 en 1 o de 10 en 10 (escribir)
-  | { kind: 'series'; step: 1 | 10 }
+  // ¿Cuál es el número mayor o el menor de tres? (elegir). Rango por defecto: 10 a 99
+  | { kind: 'extreme'; mode: 'greatest' | 'smallest'; min?: number; max?: number }
+  // Completar una serie de 1 en 1 o de 10 en 10 (escribir). Rango por defecto: 10 a 99
+  | { kind: 'series'; step: 1 | 10; min?: number; max?: number }
   // Decenas y unidades: leer un número, contar decenas o unidades, componerlo con cifras o con piezas
   | { kind: 'place-value'; ask: 'read' | 'tens' | 'units' | 'compose' | 'blocks' }
-  // Comparar números: signo > o <, frase correcta u ordenar tres números (elegir)
-  | { kind: 'compare'; mode: 'sign' | 'statement' | 'order' }
-  // Suma o resta sin llevar en columna
-  | { kind: 'column'; operator: '+' | '−' }
-  // Problema de suma o resta sin llevar con un enunciado corto (escribir)
-  | { kind: 'word-problem'; operator: '+' | '−' }
+  // Comparar números: signo > o <, frase correcta u ordenar tres números (elegir). Rango por defecto: 10 a 99
+  | { kind: 'compare'; mode: 'sign' | 'statement' | 'order'; min?: number; max?: number }
+  // Centenas (de 100 a 199): leer un número con centena, decenas y unidades (elegir) o componerlo (escribir)
+  | { kind: 'hundreds'; ask: 'read' | 'compose' }
+  // Suma o resta en columna: sin llevar, o con `carry` (solo sumas) llevando en las unidades
+  | { kind: 'column'; operator: '+' | '−'; carry?: boolean }
+  // Problema de suma o resta con un enunciado corto (escribir): sin llevar, o con `carry` (solo sumas)
+  | { kind: 'word-problem'; operator: '+' | '−'; carry?: boolean }
   // Decena más cercana a un número (elegir)
   | { kind: 'nearest-ten' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir)
-  | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' }
+  | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' }
+  // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
+  // o qué resta comprueba una suma (elegir)
+  | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }
+  // Ordinales hasta el 10.º: qué dibujo ocupa un lugar en una fila, o cómo se escribe un ordinal (elegir)
+  | { kind: 'ordinal'; mode: 'position' | 'name' }
 
 // Un bloque del plan: cuántos ejercicios de esa plantilla entran en cada sesión
 export type PlanBlock = { spec: BlockSpec; count: number }

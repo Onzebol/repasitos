@@ -8,35 +8,43 @@ type ColumnExerciseProps = {
   onCheck: (value: number) => boolean
 }
 
-type Box = 'tens' | 'units'
+type Place = 'hundreds' | 'tens' | 'units'
+type Box = Place | 'carry'
 
-const digitsOf = (n: number) => [Math.floor(n / 10), n % 10]
+const EMPTY: Record<Box, string> = { hundreds: '', tens: '', units: '', carry: '' }
 
-// Suma o resta en columna: un número encima del otro y el resultado en dos cuadros.
-// Se empieza por las unidades; el teclado pasa solo al siguiente cuadro.
+const LABELS: Record<Box, string> = { hundreds: 'Centenas', tens: 'Decenas', units: 'Unidades', carry: 'Llevada' }
+const HEADS: Record<Place, string> = { hundreds: 'C', tens: 'D', units: 'U' }
+
+// Suma o resta en columna: un número encima del otro y el resultado en un cuadro por cifra.
+// Se empieza por las unidades; el teclado pasa solo al siguiente cuadro. Con un resultado de 100 o más
+// aparece el cuadro de las centenas. En las sumas llevando hay un cuadro de llevada opcional que no se comprueba.
 export function ColumnExercise({ exercise, onCheck }: ColumnExerciseProps) {
-  const [digits, setDigits] = useState<Record<Box, string>>({ tens: '', units: '' })
+  const [digits, setDigits] = useState<Record<Box, string>>(EMPTY)
   const [active, setActive] = useState<Box>('units')
 
-  const [topTens, topUnits] = digitsOf(exercise.top)
-  const [bottomTens, bottomUnits] = digitsOf(exercise.bottom)
-  const ready = digits.tens !== '' && digits.units !== ''
+  const places: Place[] = exercise.answer >= 100 ? ['hundreds', 'tens', 'units'] : ['tens', 'units']
+  const ready = places.every((place) => digits[place] !== '')
 
   const write = (digit: string) => {
     setDigits({ ...digits, [active]: digit })
+    // units → decenas → centenas; tras la llevada se vuelve a las decenas
     if (active === 'units') setActive('tens')
+    else if (active === 'carry') setActive('tens')
+    else if (active === 'tens' && places.includes('hundreds')) setActive('hundreds')
   }
 
   const check = () => {
-    if (onCheck(Number(digits.tens + digits.units))) return
-    setDigits({ tens: '', units: '' })
+    if (onCheck(Number(places.map((place) => digits[place]).join('')))) return
+    setDigits(EMPTY)
     setActive('units')
   }
 
-  const box = (name: Box, label: string) => (
+  const box = (name: Box) => (
     <button
-      className={active === name ? 'column-box active' : 'column-box'}
-      aria-label={label}
+      key={name}
+      className={active === name ? `column-box ${name === 'carry' ? 'carry ' : ''}active` : `column-box${name === 'carry' ? ' carry' : ''}`}
+      aria-label={LABELS[name]}
       aria-pressed={active === name}
       onClick={() => setActive(name)}
     >
@@ -44,22 +52,29 @@ export function ColumnExercise({ exercise, onCheck }: ColumnExerciseProps) {
     </button>
   )
 
+  // Cifra de un operando en cada columna (las centenas quedan en blanco: los operandos tienen dos cifras)
+  const cell = (n: number, place: Place) =>
+    place === 'hundreds' ? '' : place === 'tens' ? Math.floor(n / 10) : n % 10
+  const blank = (key: string) => <span key={key} aria-hidden="true" />
+  const row = (render: (place: Place) => React.ReactNode, first: React.ReactNode = blank('first')) => [first, ...places.map(render)]
+
   return (
     <>
-      <div className="column" role="group" aria-label={`${exercise.top} ${exercise.operator} ${exercise.bottom}`}>
-        <span aria-hidden="true" />
-        <span className="column-head" aria-hidden="true">D</span>
-        <span className="column-head" aria-hidden="true">U</span>
-        <span aria-hidden="true" />
-        <span className="column-cell" aria-hidden="true">{topTens}</span>
-        <span className="column-cell" aria-hidden="true">{topUnits}</span>
-        <span className="column-sign" aria-hidden="true">{exercise.operator}</span>
-        <span className="column-cell" aria-hidden="true">{bottomTens}</span>
-        <span className="column-cell" aria-hidden="true">{bottomUnits}</span>
+      <div
+        className="column"
+        role="group"
+        aria-label={`${exercise.top} ${exercise.operator} ${exercise.bottom}`}
+        style={{ '--places': places.length } as React.CSSProperties}
+      >
+        {exercise.carry && row((place) => (place === 'tens' ? box('carry') : blank(place)))}
+        {row((place) => <span key={place} className="column-head" aria-hidden="true">{HEADS[place]}</span>)}
+        {row((place) => <span key={place} className="column-cell" aria-hidden="true">{cell(exercise.top, place)}</span>)}
+        {row(
+          (place) => <span key={place} className="column-cell" aria-hidden="true">{cell(exercise.bottom, place)}</span>,
+          <span key="sign" className="column-sign" aria-hidden="true">{exercise.operator}</span>,
+        )}
         <span className="column-line" aria-hidden="true" />
-        <span aria-hidden="true" />
-        {box('tens', 'Decenas')}
-        {box('units', 'Unidades')}
+        {row((place) => box(place))}
       </div>
       <Keypad
         onDigit={write}

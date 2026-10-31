@@ -1,4 +1,4 @@
-import { int, pick } from './random'
+import { int, pick, shuffle } from './random'
 import type { Rng } from './random'
 import type { BlockSpec, ChoiceExercise, ColumnExercise, Exercise, NumberExercise } from './types'
 
@@ -17,15 +17,20 @@ const numero = (question: string, answer: number, visual?: string): NumberExerci
   visual,
 })
 
+const ORDINALES = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno', 'décimo']
+
+// Un solo carácter cada uno (sin variantes), para poder dibujar una fila de 10 y contarlos
+const ANIMALES = ['🐘', '🐢', '🐰', '🐸', '🐱', '🐶', '🐟', '🐧', '🐮', '🐷', '🦁', '🐵', '🐻', '🦊']
+
 const decenas = (n: number) => `${n} ${n === 1 ? 'decena' : 'decenas'}`
 const unidades = (n: number) => `${n} ${n === 1 ? 'unidad' : 'unidades'}`
 
 const piezas = (d: number, u: number) => `${'🟦'.repeat(d)}  ${'🟨'.repeat(u)}`
 
 // Tres números distintos de dos cifras
-function tresDistintos(rng: Rng): [number, number, number] {
+function tresDistintos(rng: Rng, min = 10, max = 99): [number, number, number] {
   const numeros = new Set<number>()
-  while (numeros.size < 3) numeros.add(int(rng, 10, 99))
+  while (numeros.size < 3) numeros.add(int(rng, min, max))
   return [...numeros] as [number, number, number]
 }
 
@@ -53,8 +58,15 @@ function restandos(rng: Rng): [number, number] {
 
 const operandos = (operator: '+' | '−', rng: Rng) => (operator === '+' ? sumandos(rng) : restandos(rng))
 
-const columna = (operator: '+' | '−', rng: Rng): ColumnExercise => {
-  const [top, bottom] = operandos(operator, rng)
+// Dos números de dos cifras cuyas unidades suman 10 o más (se lleva una decena)
+function sumandosLlevando(rng: Rng): [number, number] {
+  const topUnits = int(rng, 1, 9)
+  const bottomUnits = int(rng, 10 - topUnits, 9)
+  return [int(rng, 1, 9) * 10 + topUnits, int(rng, 1, 9) * 10 + bottomUnits]
+}
+
+const columna = (operator: '+' | '−', carry: boolean, rng: Rng): ColumnExercise => {
+  const [top, bottom] = carry ? sumandosLlevando(rng) : operandos(operator, rng)
   return {
     type: 'column',
     question: operator === '+' ? 'Suma en columna' : 'Resta en columna',
@@ -62,6 +74,7 @@ const columna = (operator: '+' | '−', rng: Rng): ColumnExercise => {
     top,
     bottom,
     answer: operator === '+' ? top + bottom : top - bottom,
+    ...(carry && { carry }),
   }
 }
 
@@ -79,8 +92,8 @@ const HISTORIAS_RESTA: ((a: number, b: number) => string)[] = [
   (a, b) => `Hay ${a} globos y se pinchan ${b}. ¿Cuántos globos quedan?`,
 ]
 
-const problema = (operator: '+' | '−', rng: Rng): NumberExercise => {
-  const [a, b] = operandos(operator, rng)
+const problema = (operator: '+' | '−', carry: boolean, rng: Rng): NumberExercise => {
+  const [a, b] = carry ? sumandosLlevando(rng) : operandos(operator, rng)
   const historia = pick(rng, operator === '+' ? HISTORIAS_SUMA : HISTORIAS_RESTA)
   return numero(historia(a, b), operator === '+' ? a + b : a - b)
 }
@@ -105,7 +118,7 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'extreme': {
-      const opciones = tresDistintos(rng)
+      const opciones = tresDistintos(rng, spec.min, spec.max)
       const mayor = spec.mode === 'greatest'
       return elegir(
         mayor ? '¿Cuál es el número mayor?' : '¿Cuál es el número menor?',
@@ -115,7 +128,7 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'series': {
-      const inicio = int(rng, 10, 99 - 3 * spec.step)
+      const inicio = int(rng, spec.min ?? 10, (spec.max ?? 99) - 3 * spec.step)
       const mostrados = [0, 1, 2].map((i) => inicio + i * spec.step)
       return numero(`Completa la serie: ${mostrados.join(', ')}, …`, inicio + 3 * spec.step)
     }
@@ -144,7 +157,7 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'compare': {
-      const [a, b, c] = tresDistintos(rng)
+      const [a, b, c] = tresDistintos(rng, spec.min, spec.max)
       if (spec.mode === 'sign') {
         return elegir('¿Qué signo va en el recuadro?', ['>', '<'], a > b ? '>' : '<', `${a}  ❓  ${b}`)
       }
@@ -165,10 +178,12 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'column':
-      return columna(spec.operator, rng)
+      if (spec.carry && spec.operator !== '+') throw new Error('Solo las sumas pueden llevar en esta plantilla')
+      return columna(spec.operator, spec.carry ?? false, rng)
 
     case 'word-problem':
-      return problema(spec.operator, rng)
+      if (spec.carry && spec.operator !== '+') throw new Error('Solo las sumas pueden llevar en esta plantilla')
+      return problema(spec.operator, spec.carry ?? false, rng)
 
     case 'nearest-ten': {
       // Sin acabar en 0 (ya es decena) ni en 5 (a mitad de camino, no hay una más cercana)
@@ -178,7 +193,51 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       return elegir(`¿Cuál es la decena más cercana a ${n}?`, [bajo, bajo + 10], Math.round(n / 10) * 10)
     }
 
+    case 'ordinal': {
+      const lugar = int(rng, 0, 9)
+      if (spec.mode === 'position') {
+        const fila = shuffle(rng, ANIMALES).slice(0, 10)
+        const otros = shuffle(rng, fila.filter((_, i) => i !== lugar)).slice(0, 2)
+        return elegir(`Desde la izquierda, ¿cuál es el ${ORDINALES[lugar]}?`, [fila[lugar], ...otros], fila[lugar], fila.join(''))
+      }
+      const cerca = shuffle(rng, [lugar - 1, lugar + 1, lugar - 2, lugar + 2].filter((n) => n >= 0 && n <= 9)).slice(0, 2)
+      return elegir(`¿Cómo se escribe "${ORDINALES[lugar]}"?`, [lugar, ...cerca].map((n) => `${n + 1}.º`), `${lugar + 1}.º`)
+    }
+
+    case 'inverse': {
+      // a + b = c, con a mayor que b y c menor que 100
+      const a = int(rng, 20, 89)
+      const b = int(rng, 10, Math.min(a - 1, 99 - a))
+      const c = a + b
+      if (spec.mode === 'subtract') return numero(`${a} + ${b} = ${c}. Entonces, ${c} − ${b} =`, a)
+      if (spec.mode === 'missing') return numero(`Completa: ${a} + ▢ = ${c}`, b)
+      return elegir(`¿Qué resta comprueba que ${a} + ${b} = ${c}?`, [`${c} − ${b}`, `${a} − ${b}`, `${c} + ${b}`], `${c} − ${b}`)
+    }
+
+    case 'hundreds': {
+      const frase = (d: number, u: number) => `1 centena, ${decenas(d)} y ${unidades(u)}`
+      if (spec.ask === 'compose') {
+        const d = int(rng, 0, 9)
+        const u = int(rng, 0, 9)
+        return numero(`${frase(d, u)}. ¿Qué número es?`, 100 + d * 10 + u)
+      }
+      // Decenas y unidades distintas y sin cero, como en place-value
+      const d = int(rng, 1, 9)
+      let u = int(rng, 1, 9)
+      while (u === d) u = int(rng, 1, 9)
+      return elegir(`El número ${100 + d * 10 + u} tiene…`, [frase(d, u), frase(u, d), frase(d, d)], frase(d, u))
+    }
+
     case 'mental': {
+      if (spec.mode === 'add-three') {
+        let a: number, b: number, c: number
+        do {
+          a = int(rng, 1, 9)
+          b = int(rng, 1, 9)
+          c = int(rng, 1, 9)
+        } while (a + b + c < 10 || a + b + c > 25)
+        return numero(`${a} + ${b} + ${c} =`, a + b + c)
+      }
       if (spec.mode === 'add-bridge') {
         let a = int(rng, 2, 9)
         let b = int(rng, 2, 9)

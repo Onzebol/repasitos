@@ -88,4 +88,4 @@ Las tareas se anotan como issues (con imagen aclaratoria cuando haga falta). Cad
 
 ## Estado
 
-Hecho: icono de la app (Repi) y web instalable en el móvil; pantalla de inicio y pantallas de materias con el estilo elegido (mundo de cuento); materias confirmadas y temario de 2º de Primaria; Matemáticas de 2º, unidad 1 (6 temas con ejercicios aleatorios: cada sesión trae 10 distintos y "Repetir" empieza otra). Las demás materias abren "¡Muy pronto!". Pendiente: resto de unidades y materias, y el temario de 3º de Infantil.
+Hecho: icono de la app (Repi) y web instalable en el móvil; pantalla de inicio y pantallas de materias con el estilo elegido (mundo de cuento); materias confirmadas y temario de 2º de Primaria; Matemáticas de 2º, unidades 1 y 2 (con ejercicios aleatorios: cada sesión trae 10 distintos y "Repetir" empieza otra). Las demás materias abren "¡Muy pronto!". Pendiente: resto de unidades y materias, y el temario de 3º de Infantil.
