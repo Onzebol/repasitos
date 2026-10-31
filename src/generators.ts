@@ -87,8 +87,8 @@ const HISTORIAS_RESTA: ((a: number, b: number) => string)[] = [
   (a, b) => `Hay ${a} globos y se pinchan ${b}. ¿Cuántos globos quedan?`,
 ]
 
-const problema = (operator: '+' | '−', rng: Rng): NumberExercise => {
-  const [a, b] = operandos(operator, rng)
+const problema = (operator: '+' | '−', carry: boolean, rng: Rng): NumberExercise => {
+  const [a, b] = carry ? sumandosLlevando(rng) : operandos(operator, rng)
   const historia = pick(rng, operator === '+' ? HISTORIAS_SUMA : HISTORIAS_RESTA)
   return numero(historia(a, b), operator === '+' ? a + b : a - b)
 }
@@ -177,7 +177,8 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       return columna(spec.operator, spec.carry ?? false, rng)
 
     case 'word-problem':
-      return problema(spec.operator, rng)
+      if (spec.carry && spec.operator !== '+') throw new Error('Solo las sumas pueden llevar en esta plantilla')
+      return problema(spec.operator, spec.carry ?? false, rng)
 
     case 'nearest-ten': {
       // Sin acabar en 0 (ya es decena) ni en 5 (a mitad de camino, no hay una más cercana)

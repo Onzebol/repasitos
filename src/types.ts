@@ -54,8 +54,8 @@ export type BlockSpec =
   | { kind: 'compare'; mode: 'sign' | 'statement' | 'order' }
   // Suma o resta en columna: sin llevar, o con `carry` (solo sumas) llevando en las unidades
   | { kind: 'column'; operator: '+' | '−'; carry?: boolean }
-  // Problema de suma o resta sin llevar con un enunciado corto (escribir)
-  | { kind: 'word-problem'; operator: '+' | '−' }
+  // Problema de suma o resta con un enunciado corto (escribir): sin llevar, o con `carry` (solo sumas)
+  | { kind: 'word-problem'; operator: '+' | '−'; carry?: boolean }
   // Decena más cercana a un número (elegir)
   | { kind: 'nearest-ten' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir)

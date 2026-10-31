@@ -71,6 +71,7 @@ const SPECS: BlockSpec[] = [
   { kind: 'column', operator: '+', carry: true },
   { kind: 'word-problem', operator: '+' },
   { kind: 'word-problem', operator: '−' },
+  { kind: 'word-problem', operator: '+', carry: true },
   { kind: 'nearest-ten' },
   { kind: 'mental', mode: 'add-bridge' },
   { kind: 'mental', mode: 'sub-bridge' },
@@ -213,6 +214,21 @@ describe('generate: reglas de cada plantilla', () => {
         expect(e.answer, e.question).toBeGreaterThan(0)
       }
     }
+  })
+
+  it('los problemas llevando suman con llevada en las unidades', () => {
+    const resultados = muchos({ kind: 'word-problem', operator: '+', carry: true }).map(number).map((e) => {
+      const [a, b] = e.question.match(/\d+/g)!.map(Number)
+      expect(e.answer, e.question).toBe(a + b)
+      expect((a % 10) + (b % 10), e.question).toBeGreaterThanOrEqual(10)
+      expect(e.answer, e.question).toBeLessThanOrEqual(199)
+      return e.answer
+    })
+    expect(resultados.some((r) => r >= 100)).toBe(true)
+  })
+
+  it('un problema de resta no puede llevar en esta plantilla', () => {
+    expect(() => generate({ kind: 'word-problem', operator: '−', carry: true }, mulberry32(1))).toThrow()
   })
 
   it('la decena más cercana es la más cercana y nunca hay empate', () => {
