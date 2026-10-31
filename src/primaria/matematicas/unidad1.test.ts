@@ -20,7 +20,7 @@ describe('datos de la unidad 1 de Matemáticas', () => {
     }
   })
 
-  it.each(temasUnidad1.map((topic) => [topic.name, topic] as const))('%s: cada sesión (%s semillas) tiene 10 ejercicios distintos y bien hechos', (_name, topic) => {
+  it.each(temasUnidad1.map((topic) => [topic.name, topic] as const))(`%s: cada sesión (${SEMILLAS} semillas) tiene 10 ejercicios distintos y bien hechos`, (_name, topic) => {
     for (let seed = 0; seed < SEMILLAS; seed++) {
       const session = buildSession(topic.plan, mulberry32(seed))
       expect(session, `semilla ${seed}`).toHaveLength(SESSION_SIZE)
