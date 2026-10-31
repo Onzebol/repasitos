@@ -117,6 +117,28 @@ describe('seguimiento del trazo con el dedo', () => {
     expect(trazar(guide, fuera, palo, 2).done).toBe(true)
   })
 
+  it('el aviso slipped se mantiene mientras el dedo sigue fuera del camino y al levantarlo', () => {
+    const guide = createGuide(TRAZOS[1])
+    const puntos = resample(TRAZOS[1][0], 2)
+    const medio = mover(guide, initialState, puntos.slice(0, 10))
+    const fuera = advance(guide, medio, puntos[9], [0, 140])
+    expect(fuera.slipped).toBe(true)
+    const sigueFuera = mover(guide, fuera, [[2, 138], [4, 136], [6, 138]])
+    expect(sigueFuera.slipped).toBe(true)
+    expect(lift(sigueFuera).slipped).toBe(true)
+    expect(lift(fuera).slipped).toBe(true)
+  })
+
+  it('el aviso slipped se quita en cuanto el dedo vuelve a empezar el trazo por la salida', () => {
+    const guide = createGuide(TRAZOS[1])
+    const puntos = resample(TRAZOS[1][0], 2)
+    const fuera = advance(guide, mover(guide, initialState, puntos.slice(0, 10)), puntos[9], [0, 140])
+    expect(fuera.slipped).toBe(true)
+    const otra = advance(guide, lift(fuera), null, puntos[0])
+    expect(otra.slipped).toBe(false)
+    expect(otra.reached).toBeGreaterThanOrEqual(0)
+  })
+
   it('el aviso slipped se quita en cuanto el dedo vuelve a avanzar bien', () => {
     const guide = createGuide(TRAZOS[1])
     const puntos = resample(TRAZOS[1][0], 2)

@@ -21,7 +21,7 @@ export type TraceState = {
   stroke: number // trazo en curso
   reached: number // último punto alcanzado de ese trazo (-1: sin empezar)
   done: boolean // cifra completa
-  slipped: boolean // el último movimiento sacó el dedo del camino
+  slipped: boolean // el dedo se salió del camino y todavía no ha vuelto a empezar el trazo (para mostrar el «¡Casi!»)
 }
 
 export const initialState: TraceState = { stroke: 0, reached: -1, done: false, slipped: false }
@@ -68,7 +68,7 @@ export function advance(guide: Guide, state: TraceState, prev: Point | null, cur
 
   // Sin empezar: hay que entrar por la salida
   if (reached < 0) {
-    if (dist(cur, points[0]) > START_TOLERANCE) return state.slipped ? { ...state, slipped: false } : state
+    if (dist(cur, points[0]) > START_TOLERANCE) return state // el aviso (slipped) se queda hasta que se vuelve a empezar
     reached = 0
   }
 
@@ -94,9 +94,9 @@ export function advance(guide: Guide, state: TraceState, prev: Point | null, cur
   return { stroke: state.stroke, reached, done: false, slipped: false }
 }
 
-// Se levanta el dedo: si el trazo no estaba terminado, empieza otra vez (sin avisos)
+// Se levanta el dedo: si el trazo estaba a medias, empieza otra vez (sin avisos nuevos)
 export function lift(state: TraceState): TraceState {
-  if (state.done || (state.reached < 0 && !state.slipped)) return state
+  if (state.done || state.reached < 0) return state // sin empezar no hay nada que reiniciar y el aviso se queda
   return { stroke: state.stroke, reached: -1, done: false, slipped: false }
 }
 
