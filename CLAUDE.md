@@ -12,7 +12,7 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 
 - `vite.config.ts` usa `base: '/repasitos/'`: mantenerlo si se renombra el repositorio.
 - Para ficheros de `public/` usar `import.meta.env.BASE_URL` como prefijo (en `index.html` y `manifest.webmanifest`, rutas relativas).
-- App instalable (PWA): `public/manifest.webmanifest`, `public/sw.js` (red primero, copia sin conexión) y iconos de Repi (`icon.svg` es la fuente de los PNG). Si se cambian los ficheros de `public/` que el service worker guarda, subir `CACHE` en `sw.js`.
+- App instalable (PWA): `public/manifest.webmanifest`, `public/sw.js` (red primero, copia sin conexión; la versión nueva espera a que se pulse «Actualizar») y iconos de Repi (`icon.svg` es la fuente de los PNG). Si se cambian los ficheros de `public/` que el service worker guarda, subir `CACHE` en `sw.js`. Aviso de versión nueva: el build sustituye `__BUILD__` en `dist/sw.js` (plugin de `vite.config.ts`) para que `sw.js` cambie en cada versión; `src/swUpdate.ts` detecta el service worker en espera y `UpdateButton` muestra el botón «Actualizar» (envía `SKIP_WAITING` y recarga). No quitar el marcador `__BUILD__` de `sw.js`.
 - Sitio estático sin servidor: la navegación usa la dirección con almohadilla (`#/primaria/matematicas/u1/...`), porque Pages no hace fallback a `index.html`.
 - Comandos: `npm run dev`, `npm test` (tests), `npm run build` (debe pasar sin errores antes de cada push), `npm run lint`.
 - Versiones de referencia (revisadas el 2026-10-30): Node 24 LTS (`.nvmrc`, usado por CI y despliegue; mínimo `>=22.12` por Vite 8), Vite 8, React 19, TypeScript 7, `@types/node` alineado con la major de Node (24).
