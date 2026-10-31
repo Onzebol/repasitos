@@ -125,10 +125,6 @@ function App() {
           <small>2º de Primaria</small>
         </button>
       </div>
-      {/* TEMPORAL (#50): quitar (y su test en App.test.tsx) cuando el trazo esté probado en el móvil */}
-      <button className="action temp-button" onClick={() => (window.location.hash = '#/trazo')}>
-        Prueba de trazos (temporal)
-      </button>
     </main>
   )
 }
