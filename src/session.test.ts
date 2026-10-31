@@ -18,6 +18,17 @@ const plan: PlanBlock[] = [
 
 const claves = (session: Exercise[]) => session.map(exerciseKey)
 
+// Una sesión de trazo reparte las diez cifras sin repetir ninguna, con cualquier semilla
+describe('buildSession: trazo guiado', () => {
+  it('10 ejercicios del 0 al 9 son las diez cifras, cada una una vez', () => {
+    const trazo: PlanBlock[] = [{ spec: { kind: 'trace' }, count: SESSION_SIZE }]
+    for (let seed = 0; seed < 300; seed++) {
+      const digitos = buildSession(trazo, mulberry32(seed)).map((e) => (e.type === 'trace' ? e.digit : -1))
+      expect([...digitos].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    }
+  })
+})
+
 describe('buildSession: sesiones de 10', () => {
   it('SESSION_SIZE es 10', () => {
     expect(SESSION_SIZE).toBe(10)

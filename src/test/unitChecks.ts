@@ -37,6 +37,9 @@ export function describeUnit(name: string, topics: Topic[]) {
             expect(Number.isInteger(exercise.answer), exercise.question).toBe(true)
             expect(exercise.answer, exercise.question).toBeGreaterThanOrEqual(0)
             expect(exercise.answer, exercise.question).toBeLessThanOrEqual(999)
+          } else if (exercise.type === 'trace') {
+            expect(exercise.answer, exercise.question).toBe(exercise.digit)
+            expect(exercise.question, exercise.question).toContain(String(exercise.digit))
           } else {
             const nombre = `${exercise.top} ${exercise.operator} ${exercise.bottom}`
             expect(exercise.answer, nombre).toBe(exercise.operator === '+' ? exercise.top + exercise.bottom : exercise.top - exercise.bottom)

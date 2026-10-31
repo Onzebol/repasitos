@@ -1,3 +1,5 @@
+import type { Digit } from './infantil/trazos'
+
 export type Profile = 'infantil' | 'primaria'
 
 export type Subject = {
@@ -36,7 +38,15 @@ export type ColumnExercise = {
   carry?: boolean
 }
 
-export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise
+// Repasar una cifra con el dedo siguiendo su recorrido (trazo guiado, Infantil). Su recorrido está en src/infantil/trazos.ts
+export type TraceExercise = {
+  type: 'trace'
+  question: string
+  digit: Digit
+  answer: Digit // la propia cifra, para mostrarla al terminar
+}
+
+export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise | TraceExercise
 
 // Plantilla de un bloque de ejercicios: describe qué se quiere y src/generators.ts crea uno nuevo cada vez
 export type BlockSpec =
@@ -65,6 +75,8 @@ export type BlockSpec =
   // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
   // o qué resta comprueba una suma (elegir)
   | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }
+  // Trazo guiado: repasar con el dedo una cifra de min a max (por defecto, del 0 al 9)
+  | { kind: 'trace'; min?: Digit; max?: Digit }
   // Ordinales hasta el 10.º: qué dibujo ocupa un lugar en una fila, o cómo se escribe un ordinal (elegir)
   | { kind: 'ordinal'; mode: 'position' | 'name' }
 

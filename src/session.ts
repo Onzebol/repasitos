@@ -6,7 +6,8 @@ import type { Exercise, PlanBlock } from './types'
 // Ejercicios por sesión
 export const SESSION_SIZE = 10
 
-const MAX_TRIES = 50
+// Con pocas opciones (las diez cifras del trazo) hacen falta muchos intentos para dar con la última que queda libre
+const MAX_TRIES = 300
 
 // Identifica un ejercicio por sus datos (no por el enunciado, que se repite en las columnas o los signos)
 export function exerciseKey(exercise: Exercise): string {
@@ -15,6 +16,8 @@ export function exerciseKey(exercise: Exercise): string {
       return JSON.stringify([exercise.type, exercise.question, exercise.visual, exercise.answer, [...exercise.options].sort()])
     case 'number':
       return JSON.stringify([exercise.type, exercise.question, exercise.visual, exercise.answer])
+    case 'trace':
+      return JSON.stringify([exercise.type, exercise.digit])
     case 'column':
       return JSON.stringify([exercise.type, exercise.operator, exercise.top, exercise.bottom, exercise.carry ?? false])
   }

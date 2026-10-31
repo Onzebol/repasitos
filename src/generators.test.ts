@@ -27,6 +27,12 @@ function esValido(e: Exercise) {
     expect(Number.isInteger(e.answer), e.question).toBe(true)
     expect(e.answer, e.question).toBeGreaterThanOrEqual(0)
     expect(e.answer, e.question).toBeLessThanOrEqual(999)
+  } else if (e.type === 'trace') {
+    expect(Number.isInteger(e.digit), e.question).toBe(true)
+    expect(e.digit, e.question).toBeGreaterThanOrEqual(0)
+    expect(e.digit, e.question).toBeLessThanOrEqual(9)
+    expect(e.answer, e.question).toBe(e.digit)
+    expect(e.question, e.question).toContain(String(e.digit))
   } else {
     const nombre = `${e.top} ${e.operator} ${e.bottom}`
     expect(e.top, nombre).toBeGreaterThanOrEqual(10)
@@ -113,6 +119,24 @@ describe('generate: todo ejercicio generado es válido', () => {
 
   it('una lista fija no se genera: se toma del plan', () => {
     expect(() => generate({ kind: 'bag', items: [] }, mulberry32(1))).toThrow()
+  })
+})
+
+describe('generate: trazo guiado de cifras', () => {
+  it('por defecto salen las cifras del 0 al 9 y salen todas', () => {
+    const digitos = muchos({ kind: 'trace' }).map((e) => {
+      if (e.type !== 'trace') throw new Error('se esperaba trazar')
+      return e.digit
+    })
+    expect(new Set(digitos)).toEqual(new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))
+  })
+
+  it('respeta el rango pedido (por ejemplo solo hasta el 7)', () => {
+    for (const e of muchos({ kind: 'trace', min: 1, max: 7 })) {
+      if (e.type !== 'trace') throw new Error('se esperaba trazar')
+      expect(e.digit).toBeGreaterThanOrEqual(1)
+      expect(e.digit).toBeLessThanOrEqual(7)
+    }
   })
 })
 

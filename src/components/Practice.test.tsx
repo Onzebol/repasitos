@@ -46,6 +46,22 @@ describe('Practice: ejercicios de elegir', () => {
     expect(screen.queryByText('¡Muy bien!')).not.toBeInTheDocument()
   })
 
+  it('un ejercicio de trazo ofrece repasar la cifra y, al hacerlo, felicita y ofrece Siguiente', async () => {
+    const onBack = vi.fn()
+    render(
+      <Practice
+        topic={topicFrom([{ type: 'trace', question: 'Repasa el número 4', digit: 4, answer: 4 }])}
+        onHome={vi.fn()}
+        onBack={onBack}
+      />,
+    )
+    expect(screen.getByRole('heading', { name: 'Repasa el número 4' })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Repasa el número 4 con el dedo' })).toBeInTheDocument()
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Ya lo he hecho' }))
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Terminar/ })).toBeInTheDocument()
+  })
+
   it('Siguiente lleva su flecha en SVG, no como carácter', async () => {
     const { user } = renderPractice()
     await user.click(screen.getByRole('button', { name: '40' }))

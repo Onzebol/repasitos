@@ -750,3 +750,166 @@ body {
   outline: 4px solid var(--focus);
   outline-offset: 3px;
 }
+
+/* Hoja de trazos de las cifras para adultos (#/trazo) */
+.trace-content {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 64rem);
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+.trace-note {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 1rem;
+  background: var(--card);
+}
+
+.trace-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+}
+
+.trace-grid li {
+  position: relative;
+  padding: 0.5rem;
+  border-radius: 1.5rem;
+  background: var(--card);
+  box-shadow: 0 6px 0 var(--card-shadow);
+}
+
+.trace-digit {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.trace-label {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.9rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Trazo guiado de las cifras (TraceExercise) */
+.trace-exercise {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+}
+
+/* El dedo dibuja: ni scroll ni zoom ni selección mientras se traza */
+.trace-surface {
+  display: block;
+  width: min(100%, 22rem);
+  height: auto;
+  max-height: 60svh;
+  border-radius: 2rem;
+  background: var(--card);
+  box-shadow: 0 6px 0 var(--card-shadow);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: crosshair;
+}
+
+.trace-lane,
+.trace-dots,
+.trace-ink,
+.trace-arrow {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trace-lane {
+  stroke: #cfe6f7;
+  stroke-width: 14;
+}
+
+.trace-dots {
+  stroke: #5a8db0;
+  stroke-width: 1.8;
+  stroke-dasharray: 1 4;
+}
+
+.trace-ink {
+  stroke: #2e9e4f;
+  stroke-width: 10;
+}
+
+.trace-arrow {
+  stroke: var(--ink);
+  stroke-width: 2.6;
+}
+
+.trace-start {
+  fill: #ffd93d;
+  stroke: var(--ink);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: trace-pulse 1.2s ease-in-out infinite;
+}
+
+.trace-number {
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--ink);
+  pointer-events: none;
+}
+
+@keyframes trace-pulse {
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trace-start {
+    animation: none;
+  }
+}
+
+/* Hoja de trazos: botón para probar cada cifra y pantalla de prueba */
+.trace-try {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.9rem;
+  border: 0;
+  border-radius: 1rem;
+  background: #ffd93d;
+  box-shadow: 0 3px 0 var(--card-shadow);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.trace-try:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--card-shadow);
+}
+
+.trace-try-screen {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+}
+
+/* TEMPORAL (#50): botón de la prueba de trazos en el inicio; quitar con el botón */
+.temp-button {
+  position: relative;
+  z-index: 1;
+  padding: 0.5rem 1.25rem;
+  font-size: 1.1rem;
+}
