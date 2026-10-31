@@ -16,7 +16,8 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 - Sitio estático sin servidor: la navegación usa la dirección con almohadilla (`#/primaria/matematicas/u1/...`), porque Pages no hace fallback a `index.html`.
 - Comandos: `npm run dev`, `npm test` (tests), `npm run build` (debe pasar sin errores antes de cada push), `npm run lint`.
 - Versiones de referencia (revisadas el 2026-10-30): Node 24 LTS (`.nvmrc`, usado por CI y despliegue; mínimo `>=22.12` por Vite 8), Vite 8, React 19, TypeScript 7, `@types/node` alineado con la major de Node (24).
-- Sin dependencias nuevas salvo necesidad clara. Única dependencia de ejecución además de React: `@fontsource/noto-color-emoji` (OFL), para que los emojis se vean igual en todos los sistemas (estilo Android, sin el borde negro de Windows). Se sirve desde la propia web, sin terceros, y va al final de `font-family` en `theme.css` para que solo la usen los emojis.
+- Sin dependencias nuevas salvo necesidad clara.
+- Emojis: la web incluye la fuente Noto Color Emoji (OFL) en `src/assets/fonts/noto-color-emoji/`, declarada en `src/assets/emoji-font.css`, para que se vean igual en todos los sistemas (estilo Android, sin el borde negro de Windows). Va al final de `font-family` en `theme.css` (solo la usan los emojis) y los `button` heredan la fuente. Son copias de los ficheros que sirve Google Fonts (v50), servidos desde la propia web, sin terceros. No usar el paquete `@fontsource/noto-color-emoji`: sus ficheros se descargan pero no pintan nada en Chrome, Edge ni Brave.
 
 ## Idioma
 

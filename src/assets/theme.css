@@ -16,6 +16,11 @@
   box-sizing: border-box;
 }
 
+/* Los botones no heredan la fuente por defecto: sin esto sus emojis no usarían Noto Color Emoji */
+button {
+  font-family: inherit;
+}
+
 body {
   margin: 0;
   min-height: 100svh;

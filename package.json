@@ -15,7 +15,6 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@fontsource/noto-color-emoji": "^5.3.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
