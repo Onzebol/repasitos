@@ -149,24 +149,62 @@ body {
 .topbar {
   position: relative;
   z-index: 1;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-areas: 'left title right';
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem 1rem;
   padding: 1rem 1.5rem;
 }
 
-.topbar-title {
-  margin: 0;
-  font-size: clamp(1.5rem, 4vw, 2rem);
+.topbar-left {
+  grid-area: left;
+  justify-self: start;
+  display: flex;
+  gap: 1rem;
 }
 
-.push-right {
-  margin-left: auto;
+.topbar-right {
+  grid-area: right;
+  justify-self: end;
+  display: flex;
+}
+
+/* El título va centrado, entre los botones si cabe */
+.topbar-title {
+  grid-area: title;
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Copia invisible para medir el título en una sola línea */
+.topbar-measure {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Si no cabe entre los botones, pasa a una segunda línea (se decide en TopBar.tsx) */
+.topbar[data-stacked="true"] {
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    'left right'
+    'title title';
+}
+
+.topbar[data-stacked="true"] .topbar-title {
+  grid-area: title;
+  white-space: normal;
 }
 
 .round-button {
+  flex: none;
   width: 4.5rem;
-  height: 4.5rem;
+  aspect-ratio: 1;
+  padding: 0;
+  line-height: 1;
   display: grid;
   place-items: center;
   border: 0;
@@ -175,6 +213,12 @@ body {
   box-shadow: 0 4px 0 #5aa7d6;
   font-size: 2rem;
   cursor: pointer;
+}
+
+/* Los emojis traen espacio de línea propio: sin esto quedan descentrados */
+.round-button span {
+  display: block;
+  line-height: 1;
 }
 
 .round-button:active,
