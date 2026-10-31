@@ -207,3 +207,36 @@ describe('Practice: piezas de decenas y unidades', () => {
     expect(regla('.visual-part')).toMatch(/word-break:\s*break-all/)
   })
 })
+
+describe('Practice: separación entre la pregunta y lo que se contesta', () => {
+  const conDibujo = topicFrom([
+    { type: 'choice', question: '¿Qué signo va en el recuadro?', options: ['>', '<'], answer: '>', visual: '83  ❓  38' },
+  ])
+
+  it('con dibujo, el espacio del mensaje de ánimo va justo después de la pregunta y el dibujo después', () => {
+    render(<Practice topic={conDibujo} onHome={vi.fn()} onBack={vi.fn()} />)
+    const pregunta = screen.getByRole('heading', { name: '¿Qué signo va en el recuadro?' })
+    const animo = screen.getByRole('status')
+    const dibujo = screen.getByText('83')
+    const opcion = screen.getByRole('button', { name: '>' })
+    const despues = (a: Element, b: Element) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(despues(pregunta, animo)).toBe(true)
+    expect(despues(animo, dibujo)).toBe(true)
+    expect(despues(dibujo, opcion)).toBe(true)
+  })
+
+  it('sin dibujo, el orden es pregunta, espacio del mensaje y opciones', () => {
+    const sinDibujo = topicFrom([{ type: 'choice', question: '¿Qué número va después del 39?', options: ['38', '40', '49'], answer: '40' }])
+    render(<Practice topic={sinDibujo} onHome={vi.fn()} onBack={vi.fn()} />)
+    const animo = screen.getByRole('status')
+    const opcion = screen.getByRole('button', { name: '40' })
+    expect(animo.compareDocumentPosition(opcion) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('al acertar, el dibujo se sigue viendo bajo la pregunta', async () => {
+    render(<Practice topic={conDibujo} onHome={vi.fn()} onBack={vi.fn()} />)
+    await userEvent.setup().click(screen.getByRole('button', { name: '>' }))
+    expect(screen.getByText('83')).toBeInTheDocument()
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+})

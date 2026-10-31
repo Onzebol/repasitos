@@ -97,6 +97,15 @@ export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
     )
   }
 
+  // Cada bloque del dibujo (decenas, unidades…) va aparte: si no caben juntos, pasan a otra línea
+  const visual = exercise.type !== 'column' && exercise.visual && (
+    <p className="visual" aria-hidden="true">
+      {exercise.visual.split('  ').map((part, i) => (
+        <span key={i} className="visual-part">{part}</span>
+      ))}
+    </p>
+  )
+
   return (
     <main className="screen primaria">
       <Hills />
@@ -109,26 +118,20 @@ export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
         </div>
 
         <h2 className="question">{exercise.question}</h2>
-        {exercise.type !== 'column' && exercise.visual && (
-          // Cada bloque (decenas, unidades…) va aparte: si no caben juntos, pasan a otra línea
-          <p className="visual" aria-hidden="true">
-            {exercise.visual.split('  ').map((part, i) => (
-              <span key={i} className="visual-part">{part}</span>
-            ))}
-          </p>
-        )}
-
         {solved ? (
-          <div className="feedback solved" role="status">
-            <p className="answer-ok">
-              <span aria-hidden="true">✔</span> {exercise.answer}
-            </p>
-            <Mascot size={150} />
-            <p className="bubble">¡Muy bien!</p>
-            <button className="action" onClick={next} autoFocus>
-              {index + 1 < total ? 'Siguiente' : 'Terminar'} <span aria-hidden="true">▶</span>
-            </button>
-          </div>
+          <>
+            {visual}
+            <div className="feedback solved" role="status">
+              <p className="answer-ok">
+                <span aria-hidden="true">✔</span> {exercise.answer}
+              </p>
+              <Mascot size={150} />
+              <p className="bubble">¡Muy bien!</p>
+              <button className="action" onClick={next} autoFocus>
+                {index + 1 < total ? 'Siguiente' : 'Terminar'} <span aria-hidden="true">▶</span>
+              </button>
+            </div>
+          </>
         ) : (
           <>
             <div className="feedback-slot" role="status">
@@ -139,6 +142,7 @@ export function Practice({ topic, onHome, onBack, rng }: PracticeProps) {
                 </>
               )}
             </div>
+            {visual}
             {exercise.type === 'choice' ? (
               <div className="options">
                 {exercise.options.map((option) => (

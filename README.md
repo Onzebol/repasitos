@@ -21,7 +21,7 @@ Web para repasar jugando las materias de 3º de Infantil y 2º de Primaria.
 
 ## Tecnologías
 
-Vite + React + TypeScript. Tests con Vitest y Testing Library (desarrollo guiado por tests). Despliegue automático en GitHub Pages con GitHub Actions.
+Vite + React + TypeScript. Tests con Vitest y Testing Library (desarrollo guiado por tests). Despliegue automático en GitHub Pages con GitHub Actions. Los emojis usan la fuente Noto Color Emoji incluida en la web (sin servidores externos) para verse igual en todos los dispositivos.
 
 ## Estructura
 
