@@ -80,7 +80,11 @@ const SPECS: BlockSpec[] = [
   { kind: 'inverse', mode: 'subtract' },
   { kind: 'inverse', mode: 'missing' },
   { kind: 'inverse', mode: 'operation' },
+  { kind: 'ordinal', mode: 'position' },
+  { kind: 'ordinal', mode: 'name' },
 ]
+
+const ORDINALES = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno', 'décimo']
 
 describe('generate: todo ejercicio generado es válido', () => {
   it.each(SPECS.map((spec) => [JSON.stringify(spec), spec] as const))('%s', (_nombre, spec) => {
@@ -263,6 +267,34 @@ describe('generate: reglas de cada plantilla', () => {
         return signo === '−' && Number(x) === c && (Number(y) === a || Number(y) === b)
       }
       expect(e.options.filter(comprueba), e.question).toEqual([e.answer])
+    }
+  })
+
+  it('ordinales: el dibujo es una fila de 10 distintos y la respuesta es el que ocupa ese lugar', () => {
+    const vistos = new Set<string>()
+    for (const e of muchos({ kind: 'ordinal', mode: 'position' }).map(choice)) {
+      const fila = [...e.visual!]
+      expect(fila, e.question).toHaveLength(10)
+      expect(new Set(fila).size, e.question).toBe(10)
+      const lugar = ORDINALES.findIndex((palabra) => e.question.includes(` ${palabra}?`))
+      expect(lugar, e.question).toBeGreaterThanOrEqual(0)
+      expect(e.answer, e.question).toBe(fila[lugar])
+      for (const opcion of e.options) expect(fila, e.question).toContain(opcion)
+      vistos.add(ORDINALES[lugar])
+    }
+    expect(vistos.size).toBe(10)
+  })
+
+  it('ordinales: el nombre se asocia con su número, con opciones distintas', () => {
+    for (const e of muchos({ kind: 'ordinal', mode: 'name' }).map(choice)) {
+      const lugar = ORDINALES.findIndex((palabra) => e.question.includes(`"${palabra}"`))
+      expect(lugar, e.question).toBeGreaterThanOrEqual(0)
+      expect(e.answer, e.question).toBe(`${lugar + 1}.º`)
+      for (const opcion of e.options) {
+        const n = Number(opcion.replace('.º', ''))
+        expect(n).toBeGreaterThanOrEqual(1)
+        expect(n).toBeLessThanOrEqual(10)
+      }
     }
   })
 

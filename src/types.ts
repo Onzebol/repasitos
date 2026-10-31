@@ -63,6 +63,8 @@ export type BlockSpec =
   // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
   // o qué resta comprueba una suma (elegir)
   | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }
+  // Ordinales hasta el 10.º: qué dibujo ocupa un lugar en una fila, o cómo se escribe un ordinal (elegir)
+  | { kind: 'ordinal'; mode: 'position' | 'name' }
 
 // Un bloque del plan: cuántos ejercicios de esa plantilla entran en cada sesión
 export type PlanBlock = { spec: BlockSpec; count: number }

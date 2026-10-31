@@ -1,4 +1,4 @@
-import { int, pick } from './random'
+import { int, pick, shuffle } from './random'
 import type { Rng } from './random'
 import type { BlockSpec, ChoiceExercise, ColumnExercise, Exercise, NumberExercise } from './types'
 
@@ -16,6 +16,11 @@ const numero = (question: string, answer: number, visual?: string): NumberExerci
   answer,
   visual,
 })
+
+const ORDINALES = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno', 'décimo']
+
+// Un solo carácter cada uno (sin variantes), para poder dibujar una fila de 10 y contarlos
+const ANIMALES = ['🐘', '🐢', '🐰', '🐸', '🐱', '🐶', '🐟', '🐧', '🐮', '🐷', '🦁', '🐵', '🐻', '🦊']
 
 const decenas = (n: number) => `${n} ${n === 1 ? 'decena' : 'decenas'}`
 const unidades = (n: number) => `${n} ${n === 1 ? 'unidad' : 'unidades'}`
@@ -186,6 +191,17 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       while (n % 10 === 0 || n % 10 === 5) n = int(rng, 11, 99)
       const bajo = Math.floor(n / 10) * 10
       return elegir(`¿Cuál es la decena más cercana a ${n}?`, [bajo, bajo + 10], Math.round(n / 10) * 10)
+    }
+
+    case 'ordinal': {
+      const lugar = int(rng, 0, 9)
+      if (spec.mode === 'position') {
+        const fila = shuffle(rng, ANIMALES).slice(0, 10)
+        const otros = shuffle(rng, fila.filter((_, i) => i !== lugar)).slice(0, 2)
+        return elegir(`Desde la izquierda, ¿cuál es el ${ORDINALES[lugar]}?`, [fila[lugar], ...otros], fila[lugar], fila.join(''))
+      }
+      const cerca = shuffle(rng, [lugar - 1, lugar + 1, lugar - 2, lugar + 2].filter((n) => n >= 0 && n <= 9)).slice(0, 2)
+      return elegir(`¿Cómo se escribe "${ORDINALES[lugar]}"?`, [lugar, ...cerca].map((n) => `${n + 1}.º`), `${lugar + 1}.º`)
     }
 
     case 'inverse': {
