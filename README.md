@@ -61,6 +61,8 @@ La web es instalable (PWA) y funciona sin conexión una vez abierta:
 - **Android (Chrome):** menú ⋮ → *Instalar aplicación* (o *Añadir a la pantalla de inicio*).
 - **iPhone y iPad (Safari):** botón Compartir → *Añadir a pantalla de inicio*.
 
+Cuando se publica una versión nueva, la app instalada muestra un botón **🔄 Actualizar**; al pulsarlo se recarga con los cambios.
+
 ## Desarrollo
 
 ```bash

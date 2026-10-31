@@ -715,3 +715,27 @@ body {
 .icon-cell[data-used="avoid"]::after {
   background: #d63b3b;
 }
+
+/* Botón «Actualizar»: aparece sobre cualquier pantalla cuando hay una versión nueva */
+.update-button {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  z-index: 10;
+  min-height: 3.5rem;
+  padding: 0.5rem 1.75rem;
+  border: 3px solid var(--ink);
+  border-radius: 2rem;
+  background: #ffe27a;
+  color: var(--ink);
+  font-size: 1.4rem;
+  font-weight: 700;
+  box-shadow: 0 4px 0 var(--card-shadow);
+  cursor: pointer;
+}
+
+.update-button:focus-visible {
+  outline: 4px solid var(--focus);
+  outline-offset: 3px;
+}
