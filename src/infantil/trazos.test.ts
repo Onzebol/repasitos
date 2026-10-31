@@ -48,6 +48,11 @@ describe('trazos de las cifras', () => {
     }
   })
 
+  it('en el 4 las dos líneas verticales van bien separadas (al menos la mitad del ancho del cuadro)', () => {
+    const [brazo, palo] = TRAZOS[4]
+    expect(palo[0][0] - brazo[0][0]).toBeGreaterThanOrEqual(WIDTH / 2)
+  })
+
   it('el lazo del 6 termina a la izquierda, donde se junta con el palo, sin dar la vuelta entera', () => {
     const seis = TRAZOS[6][0]
     const [x, y] = seis.at(-1)!
@@ -82,14 +87,34 @@ describe('trazos de las cifras', () => {
     expect(Math.max(...cuerpo.map(([, y]) => y))).toBeGreaterThan(100)
   })
 
-  it('el 8 es una sola línea cerrada con dos lazos: sale de arriba hacia la izquierda y vuelve al punto de salida', () => {
+  it('el 8 es una sola línea cerrada de dos lazos redondos (como el 3): sale de arriba hacia la izquierda y vuelve al punto de salida', () => {
     const [ocho] = TRAZOS[8]
     expect(TRAZOS[8]).toHaveLength(1)
     expect(ocho.at(-1)).toEqual(ocho[0])
     expect(ocho[1][0]).toBeLessThan(ocho[0][0])
-    // se cruza en el centro del cuadro: pasa dos veces por el medio
-    const cruces = ocho.filter(([x, y]) => Math.abs(x - WIDTH / 2) < 1 && Math.abs(y - HEIGHT / 2) < 3)
-    expect(cruces).toHaveLength(2)
+    // los dos lazos se tocan en un punto de la línea central, por el que pasa dos veces
+    const medio = ocho.filter(([x, y]) => x === 50 && y === 66)
+    expect(medio).toHaveLength(2)
+  })
+
+  it('en el 8 el lazo de arriba es algo más pequeño que el de abajo y los dos son redondos', () => {
+    const [ocho] = TRAZOS[8]
+    const ancho = (puntos: [number, number][]) => Math.max(...puntos.map(([x]) => x)) - Math.min(...puntos.map(([x]) => x))
+    const arriba = ocho.filter(([, y]) => y <= 66)
+    const abajo = ocho.filter(([, y]) => y >= 66)
+    expect(ancho(arriba)).toBeLessThan(ancho(abajo))
+    expect(Math.min(...ocho.map(([, y]) => y))).toBeLessThan(15)
+    expect(Math.max(...ocho.map(([, y]) => y))).toBeGreaterThan(125)
+  })
+
+  it('el palo del 9 es recto hasta abajo: acaba en vertical, por el lado derecho del círculo', () => {
+    const [nueve] = TRAZOS[9]
+    const [x1, y1] = nueve.at(-2)!
+    const [x2, y2] = nueve.at(-1)!
+    expect(x1).toBe(x2)
+    expect(y2).toBeGreaterThan(y1)
+    expect(y2).toBeGreaterThan(120)
+    expect(x2).toBe(Math.max(...nueve.map(([x]) => x)))
   })
 
   it('el 7 lleva raya cruzada: primero la raya de arriba y la diagonal, luego una raya horizontal que corta la diagonal', () => {
