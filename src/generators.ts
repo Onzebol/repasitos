@@ -211,7 +211,8 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       const max = spec.max ?? 7
       const n = int(rng, min, max)
       const animal = pick(rng, ANIMALES_CON_NOMBRE)
-      return elegir(`¿Cuánt${animal.fem ? 'as' : 'os'} ${animal.plural} hay?`, tresCifras(rng, n, min, max), n, animal.emoji.repeat(n))
+      const ejercicio = elegir(`¿Cuánt${animal.fem ? 'as' : 'os'} ${animal.plural} hay?`, tresCifras(rng, n, min, max), n, animal.emoji.repeat(n))
+      return spec.tap ? { ...ejercicio, tapToCount: true } : ejercicio
     }
 
     case 'digit': {

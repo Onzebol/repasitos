@@ -4,6 +4,7 @@ import type { Rng } from '../random'
 import { buildSession, exerciseKey } from '../session'
 import type { Profile, Topic } from '../types'
 import { ColumnExercise } from './ColumnExercise'
+import { CountTap } from './CountTap'
 import { Hills } from './Hills'
 import { Icon } from './Icon'
 import { Keypad } from './Keypad'
@@ -28,13 +29,16 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
   const [failed, setFailed] = useState(false)
   const [tried, setTried] = useState<string[]>([])
   const [input, setInput] = useState('')
+  const [counted, setCounted] = useState(false) // contar tocando: ya se han contado todos los dibujos
 
   const total = session.length
   const finished = index >= total
   const exercise = session[index]
+  const tapToCount = exercise?.type === 'choice' && exercise.tapToCount === true
 
   const next = () => {
     setIndex(index + 1)
+    setCounted(false)
     setSolved(false)
     setFailed(false)
     setTried([])
@@ -45,6 +49,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
   const restart = () => {
     setSession(buildSession(topic.plan, random, session.map(exerciseKey)))
     setIndex(0)
+    setCounted(false)
     setSolved(false)
     setFailed(false)
     setTried([])
@@ -145,20 +150,30 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
                 </>
               )}
             </div>
-            {visual}
+            {!tapToCount && visual}
             {exercise.type === 'choice' ? (
-              <div className="options">
-                {exercise.options.map((option) => (
-                  <button
-                    key={option}
-                    className="option"
-                    disabled={tried.includes(option)}
-                    onClick={() => answerChoice(option)}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
+              <>
+                {tapToCount && (
+                  <>
+                    {!counted && <p className="count-hint">Cuéntalos tocando cada uno</p>}
+                    <CountTap key={index} emojis={[...(exercise.visual ?? '')]} onDone={() => setCounted(true)} />
+                  </>
+                )}
+                {(!tapToCount || counted) && (
+                  <div className="options">
+                    {exercise.options.map((option) => (
+                      <button
+                        key={option}
+                        className="option"
+                        disabled={tried.includes(option)}
+                        onClick={() => answerChoice(option)}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
             ) : exercise.type === 'trace' ? (
               <TraceExercise key={index} digit={exercise.digit} onDone={() => setSolved(true)} />
             ) : exercise.type === 'column' ? (

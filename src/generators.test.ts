@@ -160,6 +160,14 @@ describe('generate: ¿cuántos hay? (Infantil)', () => {
     expect(new Set(respuestas)).toEqual(new Set([2, 3, 4, 5]))
   })
 
+  it('con tap: true hay que contar tocando cada dibujo antes de elegir la cifra; sin tap, no', () => {
+    for (const e of muchos({ kind: 'how-many', tap: true }).map(choice)) {
+      expect(e.tapToCount).toBe(true)
+      expect([...(e.visual ?? '')].length).toBe(Number(e.answer))
+    }
+    for (const e of ejercicios()) expect(e.tapToCount).toBeFalsy()
+  })
+
   it('usa todos los animales de la lista, para que las sesiones no se repitan', () => {
     const usados = new Set(ejercicios().map((e) => [...(e.visual ?? '')][0]))
     expect(usados.size).toBe(ANIMALES.length)

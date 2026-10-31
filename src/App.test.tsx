@@ -82,7 +82,7 @@ describe('App: navegación', () => {
     await user.click(screen.getByRole('button', { name: /Infantil/ }))
     await user.click(screen.getByRole('button', { name: 'Números' }))
     expect(window.location.hash).toBe('#/infantil/numeros')
-    for (const tema of ['¿Cuántos hay?', 'Las cifras', 'Trazo de las cifras']) {
+    for (const tema of ['Contar tocando', '¿Cuántos hay?', 'Las cifras', 'Trazo de las cifras']) {
       expect(screen.getByRole('button', { name: new RegExp(tema) })).toBeEnabled()
     }
     await user.click(screen.getByRole('button', { name: /Las cifras/ }))

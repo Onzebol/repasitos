@@ -11,7 +11,7 @@ const sesion = (id: string, seed = 3) => buildSession(temasNumeros.find((topic) 
 
 describe('Números de Infantil: contenido', () => {
   it('tiene sus temas y está registrada como la unidad de la materia Números', () => {
-    expect(temasNumeros.map((topic) => topic.id)).toEqual(['cuantos-hay', 'las-cifras', 'trazo'])
+    expect(temasNumeros.map((topic) => topic.id)).toEqual(['contar', 'cuantos-hay', 'las-cifras', 'trazo'])
     expect(unidadNumeros.topics).toBe(temasNumeros)
     expect(unidadesInfantil.numeros).toEqual([unidadNumeros])
   })
@@ -23,6 +23,17 @@ describe('Números de Infantil: contenido', () => {
       expect(tema.tint).toMatch(/^#/)
     }
     expect(new Set(temasNumeros.map((t) => t.icon)).size).toBe(temasNumeros.length)
+  })
+
+  it('«Contar tocando» son diez grupos de animales, hasta el 7, que se cuentan tocando cada uno', () => {
+    for (const e of sesion('contar')) {
+      expect(e.type).toBe('choice')
+      if (e.type === 'choice') {
+        expect(e.tapToCount).toBe(true)
+        expect([...(e.visual ?? '')]).toHaveLength(Number(e.answer))
+        expect(Number(e.answer)).toBeLessThanOrEqual(7)
+      }
+    }
   })
 
   it('«¿Cuántos hay?» son diez dibujos de animales para contar, hasta el 7', () => {

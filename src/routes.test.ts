@@ -56,7 +56,7 @@ describe('routes: dirección ↔ pantalla', () => {
     expect(temas.name).toBe('topics')
     if (temas.name === 'topics') {
       expect(temas.profile).toBe('infantil')
-      expect(temas.unit.topics.map((t) => t.id)).toEqual(['cuantos-hay', 'las-cifras', 'trazo'])
+      expect(temas.unit.topics.map((t) => t.id)).toEqual(['contar', 'cuantos-hay', 'las-cifras', 'trazo'])
     }
     const practica = screenFromHash('#/infantil/numeros/las-cifras')
     expect(practica.name).toBe('practice')

@@ -4,6 +4,13 @@ import type { Topic, Unit } from '../../types'
 // Edelvives). Casi sin texto: dibujos, cifras grandes y la pregunta en voz alta. Ejercicios escritos desde cero.
 export const temasNumeros: Topic[] = [
   {
+    id: 'contar',
+    name: 'Contar tocando',
+    icon: '👆',
+    tint: '#bfe3ff',
+    plan: [{ spec: { kind: 'how-many', min: 1, max: 7, tap: true }, count: 10 }],
+  },
+  {
     id: 'cuantos-hay',
     name: '¿Cuántos hay?',
     icon: '🐶',
