@@ -24,7 +24,17 @@ export type NumberExercise = {
   answer: number
 }
 
-export type Exercise = ChoiceExercise | NumberExercise
+// Suma o resta sin llevar en columna: resultado de dos cifras (decenas y unidades)
+export type ColumnExercise = {
+  type: 'column'
+  question: string
+  operator: '+' | '−'
+  top: number
+  bottom: number
+  answer: number
+}
+
+export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise
 
 // Un tema agrupa ejercicios de un mismo contenido (por ejemplo, "Decenas y unidades")
 export type Topic = {
