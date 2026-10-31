@@ -249,7 +249,21 @@ describe('generate: pairs (pares que se preguntan en los dos sentidos)', () => {
 
   it('los dos sentidos de una misma fila son el mismo hecho', () => {
     const hechos = ejercicios.map((e) => e.fact)
-    expect(new Set(hechos)).toEqual(new Set(['pair:0', 'pair:1', 'pair:2', 'pair:3']))
+    expect(new Set(hechos)).toEqual(new Set(FILAS.map((f) => `pair:${f.ask}`)))
+    for (const e of ejercicios) {
+      const fila = FILAS.find((f) => f.ask === e.question || f.askBack === e.question)!
+      expect(e.fact).toBe(`pair:${fila.ask}`)
+    }
+  })
+
+  it('dos tablas de pares distintas no comparten hechos aunque sus filas estén en la misma posición', () => {
+    const otras: PairRow[] = [
+      { ask: '¿Qué usamos para borrar?', answer: 'la goma', askBack: '¿Para qué sirve la goma?', answerBack: 'para borrar' },
+      { ask: '¿Qué usamos para cortar?', answer: 'las tijeras', askBack: '¿Para qué sirven las tijeras?', answerBack: 'para cortar' },
+      { ask: '¿Qué usamos para pegar?', answer: 'el pegamento', askBack: '¿Para qué sirve el pegamento?', answerBack: 'para pegar' },
+    ]
+    const propios = new Set(ejercicios.map((e) => e.fact))
+    for (const e of muchos({ kind: 'pairs', rows: otras })) expect(propios.has(e.fact), e.fact).toBe(false)
   })
 })
 
