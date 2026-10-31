@@ -30,6 +30,12 @@ Fuente: Decreto 36/2022, anexo V (horas semanales de 5 años) y saberes básicos
 
 Nota: el decreto desarrolla el bloque de lengua (conciencia fonológica, conciencia fonémica, comunicación oral) con ejemplos en inglés, porque el centro puede ser bilingüe. Las partes de lectoescritura en castellano hay que concretarlas con lo que trabajan en el colegio.
 
+### Números de 3º de Infantil (2026-10-31)
+
+Libros: **cuadernos de números de Edelvives** (cuadernos 1 a 3): enseñan a escribir los números, contar objetos y reforzar cada número; no tienen un temario cerrado. Según los cuadernos, **se cuenta hasta el 7** y **se escriben y reconocen los números hasta el 9**.
+
+En el RD 95/2022 lo matemático del segundo ciclo está en el Área 2 («Descubrimiento y exploración del entorno»): orden, correspondencia, clasificación y comparación, cuantificadores básicos, funcionalidad de los números, medir y nociones espaciales. Falta contrastarlo con el Decreto 36/2022 (La Rioja). Ejercicios en `src/infantil/numeros/` (#10).
+
 ## 2º de Primaria (7-8 años)
 
 Fuente: circular 2022-23, anexo 1.3 (la tabla de horas salió desordenada al extraer el texto, por eso **no se recogen las horas**).
@@ -70,5 +76,5 @@ En la web solo entran las materias que tienen sentido como repaso en pantalla.
 - [x] Confirmar qué materias quedan (hecho, ver "Materias de la web").
 - [ ] Editorial de 2º de Primaria: Santillana, Construyendo Mundos (hecho). Índices de unidades de Matemáticas, Lengua y Conocimiento del Medio en `docs/` (hecho). Falta la editorial de 3º de Infantil y los libros de Inglés, Música, Teatro y Educación emocional.
 - [ ] Conseguir el texto del Decreto 41/2022 (Primaria) para detallar los contenidos de cada área de 2º.
-- [ ] Concretar los contenidos de lectoescritura y números de 3º de Infantil.
+- [ ] Concretar los contenidos de lectoescritura de 3º de Infantil (los de números, hechos: ver «Números de 3º de Infantil»).
 - [ ] Después, crear el índice como datos tipados en `src/infantil/` y `src/primaria/` y buscar contenido materia por materia.

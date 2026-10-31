@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { hashFromScreen, screenFromHash } from './routes'
+import { hashFromScreen, hasContent, screenFromHash } from './routes'
 
 describe('routes: dirección ↔ pantalla', () => {
   it('sin dirección o desconocida se muestra el inicio', () => {
@@ -10,6 +10,8 @@ describe('routes: dirección ↔ pantalla', () => {
     expect(screenFromHash('#/primaria/matematicas/u99')).toEqual({ name: 'home' })
     expect(screenFromHash('#/primaria/matematicas/u2/tema')).toEqual({ name: 'home' })
     expect(screenFromHash('#/iconos/otra')).toEqual({ name: 'home' })
+    expect(screenFromHash('#/infantil/numeros/tema-que-no-existe')).toEqual({ name: 'home' })
+    expect(screenFromHash('#/infantil/numeros/cuantos-hay/otra')).toEqual({ name: 'home' })
   })
 
   it('cada pantalla tiene su dirección y se recupera al leerla', () => {
@@ -18,6 +20,8 @@ describe('routes: dirección ↔ pantalla', () => {
       '#/infantil',
       '#/primaria',
       '#/infantil/numeros',
+      '#/infantil/numeros/cuantos-hay',
+      '#/infantil/letras',
       '#/primaria/lengua',
       '#/primaria/matematicas',
       '#/primaria/matematicas/u1',
@@ -45,6 +49,35 @@ describe('routes: dirección ↔ pantalla', () => {
     expect(screenFromHash('#/trazo')).toEqual({ name: 'trace' })
     expect(hashFromScreen({ name: 'trace' })).toBe('#/trazo')
     expect(screenFromHash('#/trazo/otra')).toEqual({ name: 'home' })
+  })
+
+  it('en Infantil Números abre directamente sus temas (sin unidades) y cada pantalla sabe su perfil', () => {
+    const temas = screenFromHash('#/infantil/numeros')
+    expect(temas.name).toBe('topics')
+    if (temas.name === 'topics') {
+      expect(temas.profile).toBe('infantil')
+      expect(temas.unit.topics.map((t) => t.id)).toEqual(['contar', 'cuantos-hay', 'cantidad-numero', 'las-cifras', 'antes-despues', 'mas-menos', 'trazo'])
+    }
+    const practica = screenFromHash('#/infantil/numeros/las-cifras')
+    expect(practica.name).toBe('practice')
+    if (practica.name === 'practice') {
+      expect(practica.profile).toBe('infantil')
+      expect(practica.topic.id).toBe('las-cifras')
+    }
+    const primaria = screenFromHash('#/primaria/matematicas/u1')
+    expect(primaria.name === 'topics' && primaria.profile).toBe('primaria')
+  })
+
+  it('una materia de Infantil sin contenido sigue abriendo «Muy pronto» por dirección', () => {
+    expect(screenFromHash('#/infantil/letras').name).toBe('subject')
+  })
+
+  it('hasContent dice qué materias tienen ejercicios', () => {
+    const materia = (id: string) => ({ id, name: '', icon: '', tint: '' })
+    expect(hasContent('infantil', materia('numeros'))).toBe(true)
+    expect(hasContent('infantil', materia('letras'))).toBe(false)
+    expect(hasContent('primaria', materia('matematicas'))).toBe(true)
+    expect(hasContent('primaria', materia('lengua'))).toBe(false)
   })
 
   it('la dirección de un ejercicio abre ese tema', () => {

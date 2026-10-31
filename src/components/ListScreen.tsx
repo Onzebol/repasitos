@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import type { Profile } from '../types'
 import { Hills } from './Hills'
 import { TopBar } from './TopBar'
 
@@ -12,6 +13,7 @@ export type ListItem = {
 }
 
 type ListScreenProps = {
+  profile: Profile
   title: string
   items: ListItem[]
   onHome: () => void
@@ -20,9 +22,9 @@ type ListScreenProps = {
 }
 
 // Lista de tarjetas grandes (unidades, temas...) con título y botón de volver
-export function ListScreen({ title, items, onHome, onBack, onSelect }: ListScreenProps) {
+export function ListScreen({ profile, title, items, onHome, onBack, onSelect }: ListScreenProps) {
   return (
-    <main className="screen primaria">
+    <main className={`screen ${profile}`}>
       <Hills />
       <TopBar title={title} prompt={title} onHome={onHome} onBack={onBack} />
       <ul className="subjects">

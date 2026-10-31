@@ -54,13 +54,45 @@ describe('App: navegación', () => {
     expect(screen.getByRole('button', { name: 'Números' })).toBeInTheDocument()
   })
 
-  it('una materia sin contenido todavía abre "¡Muy pronto!" y se puede volver', async () => {
+  it('las materias sin contenido todavía están desactivadas, en Primaria y en Infantil', async () => {
     const user = abrir()
     await user.click(screen.getByRole('button', { name: /Primaria/ }))
-    await user.click(screen.getByRole('button', { name: 'Lengua' }))
+    expect(screen.getByRole('button', { name: 'Matemáticas' })).toBeEnabled()
+    for (const materia of ['Lengua', 'Conocimiento del medio', 'Inglés', 'Música']) {
+      expect(screen.getByRole('button', { name: materia })).toBeDisabled()
+    }
+    await user.click(screen.getByRole('button', { name: 'Volver al inicio' }))
+    await user.click(screen.getByRole('button', { name: /Infantil/ }))
+    expect(screen.getByRole('button', { name: 'Números' })).toBeEnabled()
+    for (const materia of ['Crecimiento en armonía', 'Descubrimiento del entorno', 'Letras', 'Inglés', 'Música y plástica']) {
+      expect(screen.getByRole('button', { name: materia })).toBeDisabled()
+    }
+  })
+
+  it('una materia sin contenido abre «¡Muy pronto!» por dirección y se puede volver', async () => {
+    window.location.hash = '#/primaria/lengua'
+    const user = abrir()
     expect(screen.getByText('¡Muy pronto!')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /Volver a las materias/ }))
     expect(screen.getByRole('button', { name: 'Matemáticas' })).toBeInTheDocument()
+  })
+
+  it('Infantil: Números abre sus temas sin unidades y atrás vuelve a las materias de Infantil', async () => {
+    const user = abrir()
+    await user.click(screen.getByRole('button', { name: /Infantil/ }))
+    await user.click(screen.getByRole('button', { name: 'Números' }))
+    expect(window.location.hash).toBe('#/infantil/numeros')
+    for (const tema of ['Contar tocando', '¿Cuántos hay?', 'Las cifras', 'Trazo de las cifras']) {
+      expect(screen.getByRole('button', { name: new RegExp(tema) })).toBeEnabled()
+    }
+    await user.click(screen.getByRole('button', { name: /Las cifras/ }))
+    expect(window.location.hash).toBe('#/infantil/numeros/las-cifras')
+    expect(screen.getByLabelText('Ejercicio 1 de 10')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Volver atrás' }))
+    expect(window.location.hash).toBe('#/infantil/numeros')
+    await user.click(screen.getByRole('button', { name: 'Volver atrás' }))
+    expect(window.location.hash).toBe('#/infantil')
+    expect(screen.getByRole('button', { name: 'Letras' })).toBeDisabled()
   })
 
   it('Matemáticas abre las unidades: las hechas activas y las demás "Muy pronto"', async () => {

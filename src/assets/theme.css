@@ -907,3 +907,90 @@ body {
   justify-items: center;
   gap: 1rem;
 }
+
+/* Infantil: dibujos y botones de respuesta grandes, para dedos pequeños y poco texto */
+.infantil .visual {
+  font-size: clamp(3rem, 14vw, 5rem);
+  letter-spacing: 0;
+  gap: 0.25rem 0.75rem;
+}
+
+.infantil .option {
+  min-width: 7rem;
+  min-height: 6.5rem;
+  font-size: 3rem;
+  border-radius: 2rem;
+}
+
+/* Opciones que son un grupo de dibujos: más pequeños y en varias líneas si hace falta */
+.infantil .option-group {
+  max-width: 16rem;
+  font-size: 2.25rem;
+  line-height: 1.15;
+  word-break: break-all;
+}
+
+/* Contar tocando (CountTap): cada dibujo es un botón grande que se marca con su número */
+.count-hint {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.count-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  max-width: 36rem;
+  padding-top: 0.5rem;
+}
+
+.count-item {
+  position: relative;
+  min-width: 5.5rem;
+  min-height: 5.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 1.5rem;
+  background: var(--card);
+  box-shadow: 0 6px 0 var(--card-shadow);
+  font: inherit;
+  font-size: 3.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.count-item:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 var(--card-shadow);
+}
+
+/* Ya contado: hundido, de otro color y con su número */
+.count-item[data-counted="true"] {
+  background: #8fe39a;
+  box-shadow: 0 2px 0 var(--card-shadow);
+  transform: translateY(4px);
+  cursor: default;
+}
+
+/* Un botón desactivado se ve atenuado: aquí «contado» es un estado bonito, no un botón apagado */
+.count-item:disabled {
+  opacity: 1;
+  color: var(--ink);
+}
+
+.count-badge {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  display: grid;
+  place-items: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--ink);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+}

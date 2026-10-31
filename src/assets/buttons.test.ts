@@ -22,6 +22,7 @@ const BOTONES: [string, string][] = [
   ['.profile', '.profile:active'],
   ['.subject', '.subject:active'],
   ['.trace-try', '.trace-try:active'],
+  ['.count-item', '.count-item:active:not(:disabled)'],
 ]
 
 describe('botones: efecto de pulsar', () => {

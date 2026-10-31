@@ -46,6 +46,78 @@ describe('Practice: ejercicios de elegir', () => {
     expect(screen.queryByText('¡Muy bien!')).not.toBeInTheDocument()
   })
 
+  it('las opciones con dibujos usan su etiqueta como nombre accesible y tienen su propio estilo', () => {
+    const grupos = topicFrom([
+      {
+        type: 'choice',
+        question: '¿Dónde hay 2?',
+        visual: '2',
+        options: ['🐶🐶', '🐶🐶🐶'],
+        answer: '🐶🐶',
+        labels: { '🐶🐶': '2 perros', '🐶🐶🐶': '3 perros' },
+      },
+    ])
+    render(<Practice topic={grupos} profile="infantil" onHome={vi.fn()} onBack={vi.fn()} />)
+    for (const nombre of ['2 perros', '3 perros']) {
+      expect(screen.getByRole('button', { name: nombre })).toHaveClass('option', 'option-group')
+    }
+  })
+
+  it('las opciones normales no llevan el estilo de grupo', () => {
+    renderPractice()
+    expect(screen.getByRole('button', { name: '40' })).not.toHaveClass('option-group')
+  })
+
+  describe('contar tocando', () => {
+    const contar = topicFrom([
+      { type: 'choice', question: '¿Cuántos perros hay?', visual: '🐶🐶🐶', options: ['3', '2', '4'], answer: '3', tapToCount: true },
+    ])
+    const abrirContar = () => {
+      render(<Practice topic={contar} profile="infantil" onHome={vi.fn()} onBack={vi.fn()} />)
+      return userEvent.setup()
+    }
+
+    it('al principio solo están los dibujos para contar: las cifras aparecen al contarlos todos', async () => {
+      const user = abrirContar()
+      expect(screen.getAllByRole('button', { name: 'Contar' })).toHaveLength(3)
+      for (const cifra of ['3', '2', '4']) expect(screen.queryByRole('button', { name: cifra })).not.toBeInTheDocument()
+      await user.click(screen.getAllByRole('button', { name: 'Contar' })[0])
+      await user.click(screen.getAllByRole('button', { name: 'Contar' })[0])
+      expect(screen.queryByRole('button', { name: '3' })).not.toBeInTheDocument()
+      await user.click(screen.getAllByRole('button', { name: 'Contar' })[0])
+      for (const cifra of ['3', '2', '4']) expect(screen.getByRole('button', { name: cifra })).toBeEnabled()
+      expect(screen.getByRole('button', { name: 'Contado 3' })).toBeInTheDocument()
+    })
+
+    it('el dibujo no se repite escrito: solo está el que se cuenta', () => {
+      abrirContar()
+      expect(document.querySelectorAll('.visual')).toHaveLength(0)
+    })
+
+    it('tras contar, elegir la cifra correcta felicita y la equivocada anima a intentarlo otra vez', async () => {
+      const user = abrirContar()
+      for (let i = 0; i < 3; i++) await user.click(screen.getAllByRole('button', { name: 'Contar' })[0])
+      await user.click(screen.getByRole('button', { name: '2' }))
+      expect(screen.getByText('¡Casi! Inténtalo otra vez')).toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: '3' }))
+      expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+    })
+
+    it('al pasar al siguiente ejercicio hay que volver a contar', async () => {
+      const dos = topicFrom([
+        { type: 'choice', question: '¿Cuántos gatos hay?', visual: '🐱🐱', options: ['2', '1', '3'], answer: '2', tapToCount: true },
+        { type: 'choice', question: '¿Cuántos osos hay?', visual: '🐻🐻🐻', options: ['3', '2', '1'], answer: '3', tapToCount: true },
+      ])
+      render(<Practice topic={dos} profile="infantil" onHome={vi.fn()} onBack={vi.fn()} />)
+      const user = userEvent.setup()
+      for (let i = 0; i < 2; i++) await user.click(screen.getAllByRole('button', { name: 'Contar' })[0])
+      await user.click(screen.getByRole('button', { name: '2' }))
+      await user.click(screen.getByRole('button', { name: /Siguiente/ }))
+      expect(screen.getAllByRole('button', { name: 'Contar' })).toHaveLength(3)
+      expect(screen.queryByRole('button', { name: '1' })).not.toBeInTheDocument()
+    })
+  })
+
   it('un ejercicio de trazo ofrece repasar la cifra y, al hacerlo, felicita y ofrece Siguiente', async () => {
     const onBack = vi.fn()
     render(
