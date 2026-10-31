@@ -21,11 +21,14 @@ describe('App: navegación', () => {
     expect(screen.getByText('¡Hola! ¿Quién repasa hoy?')).toBeInTheDocument()
   })
 
-  // TEMPORAL (#50): se quita junto con el botón cuando el trazo esté probado en el móvil
-  it('el inicio tiene un botón temporal que abre la prueba de los trazos', async () => {
-    const user = abrir()
-    await user.click(screen.getByRole('button', { name: /Prueba de trazos/ }))
-    expect(window.location.hash).toBe('#/trazo')
+  it('el inicio no tiene botón para la prueba de los trazos', () => {
+    abrir()
+    expect(screen.queryByRole('button', { name: /trazos/i })).not.toBeInTheDocument()
+  })
+
+  it('#/trazo sigue abriendo la hoja de trazos (solo por dirección)', () => {
+    window.location.hash = '#/trazo'
+    render(<App />)
     expect(screen.getByRole('list', { name: 'Cifras' })).toBeInTheDocument()
   })
 
