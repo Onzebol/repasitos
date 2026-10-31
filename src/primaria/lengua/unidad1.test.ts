@@ -68,8 +68,18 @@ describe('Unidad 1 de Lengua: estructura', () => {
   })
 
   it('tiene los temas previstos, cada uno con icono y color propios', () => {
-    expect(temasUnidad1.map((t) => t.id)).toEqual(['sinonimos'])
-    expect(temasUnidad1[0].name).toBe('Sinónimos y palabras del colegio')
+    expect(temasUnidad1.map((t) => t.id)).toEqual(['sinonimos', 'mayuscula', 'describir', 'lenguas', 'abecedario', 'rimas', 'lectura'])
+    expect(temasUnidad1.map((t) => t.name)).toEqual([
+      'Sinónimos y palabras del colegio',
+      'La mayúscula',
+      'Describir personas',
+      'Lenguas de España',
+      'Abecedario y sílabas',
+      'Palabras que riman',
+      'Comprensión lectora',
+    ])
+    const fuente = new Set(emojisDeLaFuente(emojiCss))
+    for (const t of temasUnidad1) expect(fuente.has(t.icon.replace(/️/g, '')), `${t.icon} no está en la fuente`).toBe(true)
     expect(new Set(temasUnidad1.map((t) => t.icon)).size).toBe(temasUnidad1.length)
     for (const t of temasUnidad1) expect(t.tint).toMatch(/^#/)
   })

@@ -45,6 +45,10 @@ Resumen de los términos de la unidad 1 (hecho a partir de las páginas del libr
 
 Fuera de la web: las tres lecturas (un cuento, un diálogo y un poema) tienen derechos de autor y no se usan ni se parafrasean; los textos para comprensión lectora se escriben propios. Tampoco entran las preguntas personales («¿qué lengua hablas?», «describe a alguien que conozcas», la ficha sobre uno mismo), el rincón de las emociones ni las actividades de hablar, dramatizar o dibujar.
 
+## Unidad 1 en la web
+
+Siete temas: sinónimos y palabras del colegio, la mayúscula, describir personas, lenguas de España, abecedario y sílabas, palabras que riman y comprensión lectora (seis textos propios con cuatro preguntas cada uno).
+
 ## Qué entra primero en la web
 
 Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el bloque 1:

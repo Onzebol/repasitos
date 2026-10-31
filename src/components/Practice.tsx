@@ -114,10 +114,13 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
     </p>
   )
 
+  const texto = exercise.type === 'choice' ? exercise.text : undefined
+  const lectura = texto && <p className="reading-text">{texto}</p>
+
   return (
     <main className={`screen ${profile}`}>
       <Hills />
-      <TopBar title={topic.name} prompt={exercise.question} onHome={onHome} onBack={onBack} />
+      <TopBar title={topic.name} prompt={texto ? `${texto} ${exercise.question}` : exercise.question} onHome={onHome} onBack={onBack} />
       <section className="practice">
         <div className="progress" aria-label={`Ejercicio ${index + 1} de ${total}`}>
           {session.map((_, i) => (
@@ -125,6 +128,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
           ))}
         </div>
 
+        {lectura}
         <h2 className="question">{exercise.question}</h2>
         {solved ? (
           <>

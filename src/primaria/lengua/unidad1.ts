@@ -1,4 +1,5 @@
 import type { FactItem, PairRow, Topic } from '../../types'
+import { temasResto } from './unidad1-resto'
 
 // Unidad 1: «¿Te gusta aprender?» (ver docs/lengua-2-primaria.md). Ejercicios escritos desde cero con el vocabulario de la
 // unidad: las frases y los ejemplos son propios (los textos y las actividades del libro no se copian). Las preguntas se
@@ -120,4 +121,5 @@ export const temasUnidad1: Topic[] = [
       { spec: { kind: 'facts', items: colegio }, count: 3 },
     ],
   },
+  ...temasResto,
 ]

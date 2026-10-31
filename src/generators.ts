@@ -290,7 +290,7 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     case 'facts': {
       const item = pick(rng, spec.items)
       const ejercicio = elegir(item.question, [item.answer, ...dosAlAzar(rng, item.wrong, item.answer, item.question)], item.answer, item.visual)
-      return { ...ejercicio, fact: `fact:${item.question}` }
+      return { ...ejercicio, ...(item.text ? { text: item.text } : {}), fact: `fact:${item.question}` }
     }
 
     case 'group': {

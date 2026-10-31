@@ -334,3 +334,16 @@ describe('gramática de todo lo generado', () => {
     }
   })
 })
+
+describe('generate: facts con texto para leer', () => {
+  it('el ejercicio lleva el texto del hecho, y sin texto no lo lleva', () => {
+    const items: FactItem[] = [
+      { question: '¿Adónde va?', answer: 'al río', wrong: ['al mar', 'al cole', 'a casa'], text: 'La tortuga va al río.' },
+      { question: '¿Cómo es?', answer: 'grande', wrong: ['pequeño', 'alto', 'bajo'] },
+    ]
+    for (const e of muchos({ kind: 'facts', items })) {
+      const item = items.find((i) => i.question === e.question)!
+      expect(e.text).toBe(item.text)
+    }
+  })
+})

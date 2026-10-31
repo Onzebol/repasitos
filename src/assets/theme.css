@@ -430,6 +430,19 @@ body {
   word-break: break-all;
 }
 
+/* Comprensión lectora: el texto va en una tarjeta clara, con letra grande y renglones separados */
+.reading-text {
+  margin: 0;
+  max-width: 40rem;
+  padding: 1rem 1.25rem;
+  border-radius: 1.25rem;
+  background: #fffdf5;
+  box-shadow: 0 0.2rem 0 rgb(0 0 0 / 0.12);
+  font-size: clamp(1.15rem, 3.4vw, 1.5rem);
+  line-height: 1.6;
+  text-align: left;
+}
+
 .options {
   display: flex;
   flex-wrap: wrap;
