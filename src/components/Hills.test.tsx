@@ -21,8 +21,15 @@ describe('Hills: el fondo no cambia con el scroll', () => {
 
   it('su altura es una parte de la ventana (svh) y no un porcentaje del contenido, que crece con el scroll', () => {
     const estilos = regla('.hills')
-    expect(estilos).toMatch(/height:\s*\d+svh/)
+    expect(estilos).toMatch(/height:\s*min\(\d+svh/)
     expect(estilos).not.toMatch(/height:\s*\d+%/)
+  })
+
+  it('y no pasa de la proporción del dibujo respecto al ancho (≈ 27,5 %), para que en el móvil la curva no quede empinada', () => {
+    const [, coeficiente] = /height:\s*min\(\d+svh,\s*(\d+(?:\.\d+)?)vw\)/.exec(regla('.hills')) ?? []
+    // El dibujo mide 800 × 220: su proporción natural es 220 / 800 = 27,5 % del ancho
+    expect(Number(coeficiente)).toBeGreaterThanOrEqual(25)
+    expect(Number(coeficiente)).toBeLessThanOrEqual(35)
   })
 
   it('están pegadas abajo y no tapan los toques sobre el contenido', () => {
