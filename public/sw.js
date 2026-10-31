@@ -1,11 +1,18 @@
 // Service worker: permite instalar la app y abrirla sin conexión.
 // Red primero (siempre la versión publicada) y, si no hay red, la copia guardada.
+// El build sustituye BUILD por un identificador distinto en cada compilación: así este fichero
+// cambia con cada versión y el navegador detecta la actualización (ver vite.config.ts).
+// Versión compilada: __BUILD__
 const CACHE = 'repasitos-v1'
 const SHELL = ['./', 'favicon.svg', 'icon-192.png', 'icon-512.png', 'manifest.webmanifest']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)))
-  self.skipWaiting()
+})
+
+// La versión nueva espera a que la persona pulse «Actualizar» (ver src/swUpdate.ts)
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting()
 })
 
 self.addEventListener('activate', (event) => {
