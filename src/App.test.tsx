@@ -32,6 +32,16 @@ describe('App: navegación', () => {
     expect(screen.getByRole('list', { name: 'Cifras' })).toBeInTheDocument()
   })
 
+  it('#/voces abre la herramienta de voces, sin botón en el inicio', () => {
+    window.location.hash = '#/voces'
+    const { unmount } = render(<App />)
+    expect(screen.getByRole('heading', { level: 2, name: 'Voces del navegador' })).toBeInTheDocument()
+    unmount()
+    window.location.hash = ''
+    render(<App />)
+    expect(screen.queryByRole('button', { name: /voces/i })).not.toBeInTheDocument()
+  })
+
   it('empieza en el inicio con los dos perfiles', () => {
     abrir()
     expect(screen.getByText('¡Hola! ¿Quién repasa hoy?')).toBeInTheDocument()
