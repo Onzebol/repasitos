@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import '@fontsource/noto-color-emoji'
 import './assets/theme.css'
 import App from './App.tsx'
 
