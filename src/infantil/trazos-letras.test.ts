@@ -72,8 +72,8 @@ describe('forma de las mayúsculas', () => {
     expect(TRAZOS_MAYUSCULA[letra][0][0][1]).toBeLessThanOrEqual(45)
   })
 
-  it('las que se hacen de un solo trazo: C, G, J, L, M, S y W', () => {
-    for (const letra of ['C', 'G', 'J', 'L', 'M', 'S', 'W'] as Letra[]) {
+  it('las que se hacen de un solo trazo: C, G, J, L, M, N, S y W', () => {
+    for (const letra of ['C', 'G', 'J', 'L', 'M', 'N', 'S', 'W'] as Letra[]) {
       expect(TRAZOS_MAYUSCULA[letra]).toHaveLength(1)
     }
   })
@@ -87,9 +87,9 @@ describe('forma de las mayúsculas', () => {
   })
 
   it('la Ñ es una N con la tilde encima, en un trazo aparte y al final', () => {
-    const [palo, diagonal, tilde] = TRAZOS_MAYUSCULA.Ñ
-    expect(TRAZOS_MAYUSCULA.Ñ).toHaveLength(3)
-    const altoN = Math.min(...[palo, diagonal].flat().map(([, y]) => y))
+    const [ene, tilde] = TRAZOS_MAYUSCULA.Ñ
+    expect(TRAZOS_MAYUSCULA.Ñ).toHaveLength(2)
+    const altoN = Math.min(...ene.map(([, y]) => y))
     expect(Math.max(...tilde.map(([, y]) => y))).toBeLessThan(altoN)
   })
 
