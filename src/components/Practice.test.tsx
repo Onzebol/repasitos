@@ -66,38 +66,12 @@ describe('Practice: ejercicios de elegir', () => {
     }
   })
 
-  it('solo los dibujos claros de una opción llevan contorno, y no el dibujo grande de la pregunta', () => {
-    const claros = topicFrom([
-      {
-        type: 'choice',
-        question: '¿Cuál es el diente?',
-        visual: '🦷',
-        options: ['🦷', '🐱'],
-        answer: '🦷',
-        labels: { '🦷': 'diente', '🐱': 'gato' },
-      },
-    ])
-    render(<Practice topic={claros} profile="infantil" onHome={vi.fn()} onBack={vi.fn()} />)
-    const diente = screen.getByRole('button', { name: 'diente' })
-    expect(diente.querySelector('.emoji-claro')).toHaveTextContent('🦷')
-    expect(screen.getByRole('button', { name: 'gato' }).querySelector('.emoji-claro')).toBeNull()
-    expect(document.querySelector('.visual .emoji-claro')).toBeNull()
-  })
-
-  it('en un grupo de dibujos solo se marcan los claros', () => {
-    const grupo = topicFrom([
-      { type: 'choice', question: '¿Dónde hay 2?', visual: '2', options: ['🦷🐱', '🐱🐱'], answer: '🐱🐱', labels: { '🦷🐱': 'mezcla', '🐱🐱': 'gatos' } },
-    ])
-    render(<Practice topic={grupo} profile="infantil" onHome={vi.fn()} onBack={vi.fn()} />)
-    const marcados = screen.getByRole('button', { name: 'mezcla' }).querySelectorAll('.emoji-claro')
-    expect(marcados).toHaveLength(1)
-    expect(marcados[0]).toHaveTextContent('🦷')
-    expect(screen.getByRole('button', { name: 'mezcla' })).toHaveTextContent('🦷🐱')
-  })
-
-  it('el contorno se aplica solo dentro de las opciones (fondo blanco), no en el dibujo de la pregunta', () => {
-    expect(css).toMatch(/\.option \.emoji-claro\s*\{[^}]*text-shadow/)
-    expect(css).not.toMatch(/\.visual[^{]*\{[^}]*text-shadow/)
+  it('el resplandor de los dibujos va en las opciones de dibujos, en los de contar y en el dibujo de la pregunta de Infantil, no en las opciones de texto', () => {
+    expect(css).toMatch(/\.infantil \.visual,\s*\.option-group,\s*\.count-item\s*\{[^}]*text-shadow/)
+    expect(css).toMatch(/\.count-badge\s*\{[^}]*text-shadow:\s*none/)
+    expect(css).toMatch(/--resplandor:\s*#575757/)
+    expect(css).toMatch(/--opacidad:\s*0\.4/)
+    expect(css).not.toMatch(/\n\.option\s*\{[^}]*text-shadow/)
   })
 
   it('las opciones normales no llevan el estilo de grupo', () => {

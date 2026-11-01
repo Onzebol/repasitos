@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { randomRng } from '../random'
 import type { Rng } from '../random'
-import { EMOJIS_CLAROS } from '../emojiClaros'
 import { buildSession, exerciseKey } from '../session'
 import type { Profile, Topic } from '../types'
 import { ColumnExercise } from './ColumnExercise'
@@ -12,13 +11,6 @@ import { Keypad } from './Keypad'
 import { Mascot } from './Mascot'
 import { TopBar } from './TopBar'
 import { TraceExercise } from './TraceExercise'
-
-// Texto de una opción; los dibujos claros (diente, sal…) van en un span con contorno para que se vean sobre el botón blanco
-function Dibujos({ texto }: { texto: string }) {
-  const caracteres = [...texto]
-  if (!caracteres.some((c) => EMOJIS_CLAROS.includes(c))) return texto
-  return caracteres.map((c, i) => (EMOJIS_CLAROS.includes(c) ? <span key={i} className="emoji-claro">{c}</span> : c))
-}
 
 type PracticeProps = {
   profile?: Profile
@@ -181,7 +173,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
                         disabled={tried.includes(option)}
                         onClick={() => answerChoice(option)}
                       >
-                        <Dibujos texto={option} />
+                        {option}
                       </button>
                     ))}
                   </div>
