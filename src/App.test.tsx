@@ -76,7 +76,8 @@ describe('App: navegación', () => {
     await user.click(screen.getByRole('button', { name: 'Volver al inicio' }))
     await user.click(screen.getByRole('button', { name: /Infantil/ }))
     expect(screen.getByRole('button', { name: 'Números' })).toBeEnabled()
-    for (const materia of ['Crecimiento en armonía', 'Descubrimiento del entorno', 'Letras', 'Inglés', 'Música y plástica']) {
+    expect(screen.getByRole('button', { name: 'Letras' })).toBeEnabled()
+    for (const materia of ['Crecimiento en armonía', 'Descubrimiento del entorno', 'Inglés', 'Música y plástica']) {
       expect(screen.getByRole('button', { name: materia })).toBeDisabled()
     }
   })
@@ -132,7 +133,7 @@ describe('App: navegación', () => {
     expect(window.location.hash).toBe('#/infantil/numeros')
     await user.click(screen.getByRole('button', { name: 'Volver atrás' }))
     expect(window.location.hash).toBe('#/infantil')
-    expect(screen.getByRole('button', { name: 'Letras' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Inglés' })).toBeDisabled()
   })
 
   it('Matemáticas abre las unidades: las hechas activas y las demás "Muy pronto"', async () => {

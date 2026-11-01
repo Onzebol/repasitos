@@ -120,6 +120,10 @@ export type BlockSpec =
   | { kind: 'digit'; min?: number; max?: number }
   // Trazo guiado: repasar con el dedo una cifra de min a max (por defecto, del 0 al 9)
   | { kind: 'trace'; min?: Digit; max?: Digit }
+  // Rimas (Infantil): «¿Qué rima con gato?» entre tres dibujos (uno de la misma familia de rima y dos de otras)
+  | { kind: 'rhyme' }
+  // Sonido inicial (Infantil): «¿Cuál empieza igual que mono?» entre tres dibujos (uno con el mismo sonido y dos con otros distintos)
+  | { kind: 'initial-sound' }
   // Ordinales hasta el 10.º: qué dibujo ocupa un lugar en una fila, o cómo se escribe un ordinal (elegir)
   | { kind: 'ordinal'; mode: 'position' | 'name' }
 
