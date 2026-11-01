@@ -17,14 +17,18 @@ const LABELS: Record<Box, string> = { hundreds: 'Centenas', tens: 'Decenas', uni
 const HEADS: Record<Place, string> = { hundreds: 'C', tens: 'D', units: 'U' }
 
 // Suma o resta en columna: un número encima del otro y el resultado en un cuadro por cifra.
-// Se empieza por las unidades; el teclado pasa solo al siguiente cuadro. Con un resultado de 100 o más
-// aparece el cuadro de las centenas. En las sumas llevando hay un cuadro de llevada opcional que no se comprueba.
+// Se empieza por las unidades; el teclado pasa solo al siguiente cuadro. Las sumas tienen siempre el cuadro
+// de las centenas (obligatorio solo si el resultado llega a 100). En las sumas llevando hay un cuadro de
+// llevada opcional que no se comprueba.
 export function ColumnExercise({ exercise, onCheck }: ColumnExerciseProps) {
   const [digits, setDigits] = useState<Record<Box, string>>(EMPTY)
   const [active, setActive] = useState<Box>('units')
 
-  const places: Place[] = exercise.answer >= 100 ? ['hundreds', 'tens', 'units'] : ['tens', 'units']
-  const ready = places.every((place) => digits[place] !== '')
+  // Las sumas llevan siempre el cuadro de centenas (para que su presencia no dé pistas); las restas, nunca
+  const places: Place[] = exercise.operator === '+' ? ['hundreds', 'tens', 'units'] : ['tens', 'units']
+  // Si el resultado no llega a 100, la centena puede quedar vacía (o con 0)
+  const required = places.filter((place) => place !== 'hundreds' || exercise.answer >= 100)
+  const ready = required.every((place) => digits[place] !== '')
 
   const write = (digit: string) => {
     setDigits({ ...digits, [active]: digit })
@@ -32,10 +36,11 @@ export function ColumnExercise({ exercise, onCheck }: ColumnExerciseProps) {
     if (active === 'units') setActive('tens')
     else if (active === 'carry') setActive('tens')
     else if (active === 'tens' && places.includes('hundreds')) setActive('hundreds')
+    // (en las restas no hay centenas y el foco se queda en las decenas)
   }
 
   const check = () => {
-    if (onCheck(Number(places.map((place) => digits[place]).join('')))) return
+    if (onCheck(Number(places.map((place) => digits[place]).join('')))) return // '' + '3' + '7' → 37
     setDigits(EMPTY)
     setActive('units')
   }

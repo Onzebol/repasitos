@@ -41,8 +41,8 @@ export type NumberExercise = {
   answer: number
 }
 
-// Suma o resta en columna: el resultado se escribe cifra a cifra (unidades, decenas y, si llega a 100,
-// centenas). Con `carry` las unidades llevan y se muestra un cuadro de llevada opcional (no se comprueba).
+// Suma o resta en columna: el resultado se escribe cifra a cifra (unidades, decenas y, en las sumas,
+// centenas: siempre visible, obligatoria solo si el resultado llega a 100). Con `carry` las unidades llevan y se muestra un cuadro de llevada opcional (no se comprueba).
 export type ColumnExercise = {
   type: 'column'
   question: string

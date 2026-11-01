@@ -18,11 +18,13 @@ const tecla = (user: ReturnType<typeof userEvent.setup>, cifras: string) =>
 
 const unidades = () => screen.getByRole('button', { name: /Unidades/ })
 const decenas = () => screen.getByRole('button', { name: /Decenas/ })
+const centenas = () => screen.getByRole('button', { name: /Centenas/ })
 
 describe('Ejercicio en columna: aspecto', () => {
   it('pone un número encima del otro, con el signo y las columnas D y U', () => {
     abrir(suma)
     const columna = screen.getByRole('group', { name: '23 + 14' })
+    expect(within(columna).getByText('C')).toBeInTheDocument()
     expect(within(columna).getByText('D')).toBeInTheDocument()
     expect(within(columna).getByText('U')).toBeInTheDocument()
     expect(within(columna).getByText('+')).toBeInTheDocument()
@@ -127,7 +129,6 @@ describe('Ejercicio en columna: sumas llevando', () => {
   const llevando: Exercise = { type: 'column', question: 'Suma en columna', operator: '+', top: 28, bottom: 17, answer: 45, carry: true }
   const conCentenas: Exercise = { type: 'column', question: 'Suma en columna', operator: '+', top: 85, bottom: 47, answer: 132, carry: true }
   const llevada = () => screen.getByRole('button', { name: /Llevada/ })
-  const centenas = () => screen.getByRole('button', { name: /Centenas/ })
   const comprobar = () => screen.getByRole('button', { name: 'Comprobar' })
 
   it('muestra el cuadro de llevada solo en las sumas llevando', () => {
@@ -184,10 +185,44 @@ describe('Ejercicio en columna: sumas llevando', () => {
     expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
   })
 
-  it('con un resultado menor de 100 no hay cuadro de centenas', () => {
+  it('las sumas muestran siempre el cuadro de centenas, también con un resultado menor de 100', () => {
     abrir(llevando)
+    expect(centenas()).toBeInTheDocument()
+    expect(screen.getByText('C')).toBeInTheDocument()
+  })
+
+  it('las sumas sin llevar también lo muestran', () => {
+    abrir(suma)
+    expect(centenas()).toBeInTheDocument()
+  })
+
+  it('con un resultado menor de 100 la centena puede quedar vacía', async () => {
+    const user = abrir(llevando)
+    await tecla(user, '54')
+    expect(centenas()).toHaveTextContent('?')
+    expect(comprobar()).toBeEnabled()
+    await user.click(comprobar())
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+
+  it('con un resultado menor de 100 también vale un 0 en la centena', async () => {
+    const user = abrir(llevando)
+    await tecla(user, '540')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+
+  it('con un resultado menor de 100, una centena distinta de 0 es un error', async () => {
+    const user = abrir(llevando)
+    await tecla(user, '541')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Casi! Inténtalo otra vez')).toBeInTheDocument()
+    expect(centenas()).toHaveTextContent('?')
+  })
+
+  it('las restas no tienen cuadro de centenas', () => {
+    abrir(resta)
     expect(screen.queryByRole('button', { name: /Centenas/ })).not.toBeInTheDocument()
-    expect(screen.queryByText('C')).not.toBeInTheDocument()
   })
 
   it('un resultado de tres cifras con una cifra mal anima y deja reintentar', async () => {
