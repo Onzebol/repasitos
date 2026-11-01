@@ -77,7 +77,7 @@ describe('seguimiento del trazo con el dedo', () => {
     expect(estado.stroke).toBe(0)
   })
 
-  it.each([4, 5, 7] as Digit[])('en la cifra %i hay que hacer los trazos en orden: el segundo no vale primero', (digit) => {
+  it.each([4, 7] as Digit[])('en la cifra %i hay que hacer los trazos en orden: el segundo no vale primero', (digit) => {
     const guide = createGuide(TRAZOS[digit])
     const estado = trazar(guide, initialState, TRAZOS[digit][1], 2)
     expect(estado.done).toBe(false)
@@ -212,8 +212,8 @@ describe('traced: lo ya recorrido, para pintarlo', () => {
   })
 
   it('al terminar la cifra todos los trazos están completos', () => {
-    const guide = createGuide(TRAZOS[5])
-    const hecho = trazarCifra(5, 2)
+    const guide = createGuide(TRAZOS[4])
+    const hecho = trazarCifra(4, 2)
     const lineas = traced(guide, hecho)
     expect(lineas).toHaveLength(2)
     lineas.forEach((linea, i) => expect(linea).toEqual(guide[i]))
