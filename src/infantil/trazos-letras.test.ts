@@ -141,7 +141,9 @@ describe('orden de las mayúsculas según Garabatos flechas', () => {
     expect(TRAZOS_MAYUSCULA.H[2][0][1]).toBeCloseTo(TRAZOS_MAYUSCULA.H[2][1][1], 0) // la raya horizontal es el tercer trazo
     expect(TRAZOS_MAYUSCULA.H[1][0][0]).toBeGreaterThan(TRAZOS_MAYUSCULA.H[0][0][0]) // el segundo es el palo derecho
         const [y1, y2] = TRAZOS_MAYUSCULA.Y
-    expect(y1.at(-1)).toEqual(y2.at(-1))
+    expect(TRAZOS_MAYUSCULA.Y).toHaveLength(2) // la diagonal derecha y el palo son un solo trazo
+    expect(y1.at(-1)).toEqual(y2[1])
+    expect(y2.at(-1)![1]).toBeGreaterThan(y2[1][1])
   })
 })
 
