@@ -46,7 +46,7 @@ Vite + React + TypeScript. Publicado en GitHub Pages desde un repositorio públi
 
 ## Notas de trabajo
 
-- Antes de añadir una materia nueva, confirmar con el usuario el temario del curso. Investigación y estado actual del temario en `docs/temario.md` e índices de unidades de 2º de Primaria en `docs/`. Mantener `README.md` y `CLAUDE.md` al día en la misma PR que cambie algo que los deje desfasados.
+- Antes de añadir una materia nueva, confirmar con el usuario el temario del curso. Investigación y estado actual del temario en `docs/temario.md` (resumen del Decreto 41/2022 en `docs/curriculo-primaria-la-rioja.md`) e índices de unidades de 2º de Primaria en `docs/`. Mantener `README.md` y `CLAUDE.md` al día en la misma PR que cambie algo que los deje desfasados.
 - Mantener los cambios pequeños y verificarlos con `npm run dev` en el navegador.
 
 ## Desarrollo guiado por tests (TDD)
