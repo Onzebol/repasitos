@@ -21,18 +21,20 @@ Los bocetos son orientativos: iconos (emojis), colores y tipografías del sistem
 | B. Cuaderno y rotuladores | Papel cuadriculado, trazos de rotulador y tipografía manuscrita | `estilo-B.png`, `estilo-B-ejercicios.png` |
 | C. Mundo de cuento | Cielo y colinas, tarjetas redondeadas con iconos en círculos de colores | `estilo-C.png`, `estilo-C-ejercicios.png` |
 
-## Para decidir después de elegir el estilo
+## Decisiones cerradas (revisadas el 2026-11-01, issue #8)
 
-- Paleta final con contraste alto (revisar WCAG 2.2) y tipografía legible para primeros lectores, autoalojada (sin cargar fuentes de terceros).
-- Ilustraciones definitivas de Repi (expresiones: contento, animando, celebrando) y de los iconos de cada materia.
-- Componentes comunes: botón grande, tarjeta de materia, pantalla de ejercicio, feedback de acierto y de error.
-- Audio: cuándo se usa y cómo se activa (sin reproducción automática molesta).
-- Navegación por dirección con almohadilla (`#/...`, solución propia en `src/routes.ts`; Pages no hace fallback a `index.html`).
+- **Paleta y contraste:** texto `#14405a` sobre tarjetas blancas 10,99 : 1, sobre el cielo 10,04 : 1 (abajo) y 7,50 : 1 (arriba), y sobre el verde de «contado» 7,13 : 1. El texto secundario (`#3d6f8a`: cabeceras de la columna, subtítulos de la pantalla de iconos) da 5,0 a 5,5 : 1 sobre cielo claro y blanco. Todo cumple AA (4,5 : 1) de WCAG 2.2. Foco visible con `:focus-visible` y `prefers-reduced-motion` respetado.
+- **Estilo Infantil:** dibujos de `clamp(3rem, 14vw, 5rem)`, opciones de al menos 7 × 6,5 rem, casi sin texto, apoyo de voz (contar tocando, trazo guiado, botón de escuchar), colores vivos, sin tiempos límite ni penalizaciones.
+- **Audio:** solo con una acción del niño, nunca automático. Hay tres sitios: el botón «Escuchar» de la barra superior (lee el enunciado), `CountTap` (dice cada número al tocarlo) y `TraceExercise` (dice la cifra). Usa la síntesis de voz del navegador (`src/speak.ts`); la herramienta `#/voces` sirve para elegir la voz. Audios pregrabados con voz de IA: issue #70.
+- **Tamaños de toque:** los botones de uso normal miden al menos 3,25 rem (52 px): barra superior 4,5 rem, teclado, opciones y tarjetas mucho más grandes. Excepciones pequeñas: el cuadro opcional de llevada (2 rem, 32 px, supera el mínimo de 24 px de WCAG 2.2 AA pero no los 44 px recomendados) y las herramientas para adultos (`#/voces`, `#/iconos`).
+- **Componentes comunes:** `TopBar` (inicio, volver y escuchar, botones redondos), `SubjectsScreen`, `ListScreen`, `Practice` (pregunta, opciones, feedback «¡Muy bien!» / «¡Casi! Inténtalo otra vez»), `Keypad`, `Mascot` (Repi) y `Hills`.
+- **Navegación:** por dirección con almohadilla (`#/...`, solución propia en `src/routes.ts`; Pages no hace fallback a `index.html`).
+- **Emojis:** Noto Color Emoji incluida en la web (sin terceros), mismo aspecto en todos los sistemas.
+- **Tipografía:** Trebuchet MS con respaldo del sistema (`system-ui`), sin fuentes de terceros. Aceptada por ahora; si se quisiera una fuente pensada para primeros lectores habría que alojarla en el repositorio (issue nueva).
+- **Pruebas en tablet real:** se hacen al revisar cada PR (capturas en el navegador y revisión del usuario en su tablet); no hay una pasada formal.
 
 ## Implementado
 
-- Tema del estilo C en `src/assets/theme.css` (variables de color, tarjetas redondeadas, foco visible, `prefers-reduced-motion`).
-- Componentes compartidos en `src/components/`: `Mascot` (Repi) y `Hills` (colinas del fondo).
-- Pantalla de inicio con la elección de perfil (`docs/diseno/inicio-implementado.png`, y versión móvil).
-- Tipografía provisional: Trebuchet MS con respaldo del sistema. Pendiente elegir una fuente legible para primeros lectores y alojarla en el repo.
-- Pendiente: pantallas de materias, ejercicios y feedback (dependen de confirmar las materias, issue #2).
+- Tema del estilo C en `src/assets/theme.css` (variables de color, tarjetas redondeadas, foco visible, `prefers-reduced-motion`); un test vigila que sus llaves estén equilibradas.
+- Inicio con la elección de perfil, materias de cada perfil, unidades, temas y ejercicios de Primaria e Infantil (capturas de la primera versión en `docs/diseno/`).
+- Ilustraciones de Repi: una sola versión por ahora; las expresiones (contento, animando, celebrando) quedan como mejora futura.
