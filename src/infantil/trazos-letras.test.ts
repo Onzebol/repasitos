@@ -72,8 +72,8 @@ describe('forma de las mayúsculas', () => {
     expect(TRAZOS_MAYUSCULA[letra][0][0][1]).toBeLessThanOrEqual(45)
   })
 
-  it('las que se hacen de un solo trazo: C, G, J, L, S y W', () => {
-    for (const letra of ['C', 'G', 'J', 'L', 'S', 'W'] as Letra[]) {
+  it('las que se hacen de un solo trazo: C, G, J, L, M, S y W', () => {
+    for (const letra of ['C', 'G', 'J', 'L', 'M', 'S', 'W'] as Letra[]) {
       expect(TRAZOS_MAYUSCULA[letra]).toHaveLength(1)
     }
   })
@@ -167,7 +167,7 @@ describe('minúsculas: trazos continuos', () => {
     for (const letra of ['A', 'D', 'G', 'K'] as Letra[]) expect(TRAZOS_MINUSCULA[letra]).toHaveLength(2)
   })
 
-  it('la b, la c, la e, la f, la l, la o, la s y la u se escriben sin levantar el dedo: un solo trazo', () => {
-    for (const letra of ['B', 'C', 'E', 'F', 'L', 'O', 'S', 'U'] as Letra[]) expect(TRAZOS_MINUSCULA[letra]).toHaveLength(1)
+  it('la b, la c, la e, la f, la l, la o, la s, la u, la v y la w se escriben sin levantar el dedo: un solo trazo', () => {
+    for (const letra of ['B', 'C', 'E', 'F', 'L', 'O', 'S', 'U', 'V', 'W'] as Letra[]) expect(TRAZOS_MINUSCULA[letra]).toHaveLength(1)
   })
 })

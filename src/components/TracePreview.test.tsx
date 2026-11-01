@@ -61,3 +61,15 @@ describe('TracePreview: letras', () => {
     expect(screen.getByRole('img', { name: /^Letra ñ minúscula: 3 trazos$/ })).toBeInTheDocument()
   })
 })
+
+describe('TracePreview: colores de los trazos', () => {
+  it('cada trazo de una letra lleva su propio color (también del tercero en adelante)', () => {
+    render(<TracePreview onHome={vi.fn()} />)
+    for (const [nombre, trazos] of [['Letra B mayúscula', 3], ['Letra k minúscula', 2], ['Letra x minúscula', 4]] as const) {
+      const letra = screen.getByRole('img', { name: new RegExp(`^${nombre}:`) })
+      const colores = [...letra.querySelectorAll('g[stroke]')].map((g) => g.getAttribute('stroke'))
+      expect(colores).toHaveLength(trazos)
+      expect(new Set(colores).size).toBe(trazos)
+    }
+  })
+})

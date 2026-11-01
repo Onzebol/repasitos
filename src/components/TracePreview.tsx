@@ -62,8 +62,8 @@ type TracePreviewProps = {
   onHome: () => void
 }
 
-// Colores de cada trazo (el primero en azul, el segundo en naranja)
-const COLORES = ['#1f7ac4', '#e8832a']
+// Colores de cada trazo, por orden: azul, naranja, verde, morado y rojo (cada trazo de una letra, uno distinto)
+const COLORES = ['#1f7ac4', '#e8832a', '#2e9e57', '#8e44ad', '#d6342f']
 
 // Hoja para adultos (#/trazo, sin botón en el inicio): el recorrido de cada cifra con el punto de salida (círculo con su
 // número de orden) y una flecha con el sentido. Sirve para contrastar el orden y la dirección con los cuadernos.
