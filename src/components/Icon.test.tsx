@@ -18,6 +18,18 @@ describe('Icon', () => {
     expect(span).toHaveTextContent(iconosInterfaz.home.glyph!)
   })
 
+  it('todo icono lleva la clase ui-icon (el resplandor) además de la suya', () => {
+    const { container } = render(
+      <>
+        <Icon name="home" />
+        <Icon name="infantil" className="profile-icon" />
+      </>,
+    )
+    const [sinClase, conClase] = [...container.querySelectorAll('span')]
+    expect(sinClase).toHaveClass('ui-icon')
+    expect(conClase).toHaveClass('ui-icon', 'profile-icon')
+  })
+
   it('las flechas son un dibujo SVG, no un carácter', () => {
     const { container } = render(
       <>

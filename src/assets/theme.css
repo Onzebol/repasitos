@@ -1074,4 +1074,23 @@ body {
   font-size: 1.4rem;
   font-weight: 700;
   color: #fff;
+  text-shadow: none; /* sin el resplandor de los dibujos del botón */
+}
+
+/* Resplandor exterior gris oscuro en los iconos y dibujos de la aplicación (el de la pregunta de Infantil, sobre el cielo; los de
+   las opciones y los de contar; los de materias y temas y los de la interfaz, que son `.ui-icon`), para que se vean también los
+   claros o blancos (diente, sal, fantasma…). Tres capas de sombra sin desplazar, del color --resplandor y con la opacidad
+   --opacidad (de 0 a 1). Las flechas y Repi son SVG: no les afecta. */
+.infantil .visual,
+.option-group,
+.count-item,
+.subject-icon,
+.ui-icon,
+.icon-sample {
+  --resplandor: #575757;
+  --opacidad: 0.4;
+  text-shadow:
+    0 0 0.06em color-mix(in srgb, var(--resplandor) calc(var(--opacidad) * 100%), transparent),
+    0 0 0.14em color-mix(in srgb, var(--resplandor) calc(var(--opacidad) * 85%), transparent),
+    0 0 0.3em color-mix(in srgb, var(--resplandor) calc(var(--opacidad) * 45%), transparent);
 }

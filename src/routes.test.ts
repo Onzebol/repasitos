@@ -81,13 +81,14 @@ describe('routes: dirección ↔ pantalla', () => {
   })
 
   it('una materia de Infantil sin contenido sigue abriendo «Muy pronto» por dirección', () => {
-    expect(screenFromHash('#/infantil/letras').name).toBe('subject')
+    expect(screenFromHash('#/infantil/ingles').name).toBe('subject')
   })
 
   it('hasContent dice qué materias tienen ejercicios', () => {
     const materia = (id: string) => ({ id, name: '', icon: '', tint: '' })
     expect(hasContent('infantil', materia('numeros'))).toBe(true)
-    expect(hasContent('infantil', materia('letras'))).toBe(false)
+    expect(hasContent('infantil', materia('letras'))).toBe(true)
+    expect(hasContent('infantil', materia('ingles'))).toBe(false)
     expect(hasContent('primaria', materia('matematicas'))).toBe(true)
     expect(hasContent('primaria', materia('lengua'))).toBe(true)
     expect(hasContent('primaria', materia('medio'))).toBe(true)
