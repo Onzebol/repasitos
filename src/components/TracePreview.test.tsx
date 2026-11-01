@@ -57,7 +57,7 @@ describe('TracePreview: letras', () => {
       const lista = screen.getByRole('list', { name: nombre })
       expect(within(lista).getAllByRole('listitem')).toHaveLength(27)
     }
-    expect(screen.getByRole('img', { name: /^Letra B mayúscula: 3 trazos$/ })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /^Letra B mayúscula: 2 trazos$/ })).toBeInTheDocument()
     expect(screen.getByRole('img', { name: /^Letra ñ minúscula: 3 trazos$/ })).toBeInTheDocument()
   })
 })
@@ -65,7 +65,7 @@ describe('TracePreview: letras', () => {
 describe('TracePreview: colores de los trazos', () => {
   it('cada trazo de una letra lleva su propio color (también del tercero en adelante)', () => {
     render(<TracePreview onHome={vi.fn()} />)
-    for (const [nombre, trazos] of [['Letra B mayúscula', 3], ['Letra k minúscula', 2], ['Letra x minúscula', 4]] as const) {
+    for (const [nombre, trazos] of [['Letra H mayúscula', 3], ['Letra k minúscula', 2], ['Letra E mayúscula', 4]] as const) {
       const letra = screen.getByRole('img', { name: new RegExp(`^${nombre}:`) })
       const colores = [...letra.querySelectorAll('g[stroke]')].map((g) => g.getAttribute('stroke'))
       expect(colores).toHaveLength(trazos)

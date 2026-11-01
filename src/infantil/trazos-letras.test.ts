@@ -67,13 +67,13 @@ describe.each(JUEGOS)('trazos de las letras en %s', (_nombre, trazos) => {
 })
 
 describe('forma de las mayúsculas', () => {
-  // M, N y Ñ son la excepción: su primer palo sube desde abajo
-  it.each(LETRAS.filter(([letra]) => !'MNÑ'.includes(letra)))('la %s empieza por arriba (como se escribe)', (letra) => {
+  // A, M, N y Ñ son la excepción: su primer trazo sube desde abajo
+  it.each(LETRAS.filter(([letra]) => !'AMNÑ'.includes(letra)))('la %s empieza por arriba (como se escribe)', (letra) => {
     expect(TRAZOS_MAYUSCULA[letra][0][0][1]).toBeLessThanOrEqual(45)
   })
 
-  it('las que se hacen de un solo trazo: C, G, J, L, M, N, S y W', () => {
-    for (const letra of ['C', 'G', 'J', 'L', 'M', 'N', 'S', 'W'] as Letra[]) {
+  it('las que se hacen de un solo trazo: C, G, L, M, N, S, V y W', () => {
+    for (const letra of ['C', 'G', 'L', 'M', 'N', 'S', 'V', 'W'] as Letra[]) {
       expect(TRAZOS_MAYUSCULA[letra]).toHaveLength(1)
     }
   })
@@ -137,12 +137,11 @@ describe('orden de las mayúsculas según Garabatos flechas', () => {
     }
   })
 
-  it('la H lleva la raya antes del segundo palo; la Z, tres rayas; la V y la Y, las diagonales hacia el vértice', () => {
-    expect(TRAZOS_MAYUSCULA.H[1][0][1]).toBeCloseTo(TRAZOS_MAYUSCULA.H[1][1][1], 0) // raya horizontal
+  it('la H lleva la raya al final, después de los dos palos; la Z, tres rayas; la Y, las diagonales hacia el vértice', () => {
+    expect(TRAZOS_MAYUSCULA.H[2][0][1]).toBeCloseTo(TRAZOS_MAYUSCULA.H[2][1][1], 0) // la raya horizontal es el tercer trazo
+    expect(TRAZOS_MAYUSCULA.H[1][0][0]).toBeGreaterThan(TRAZOS_MAYUSCULA.H[0][0][0]) // el segundo es el palo derecho
     expect(TRAZOS_MAYUSCULA.Z).toHaveLength(3)
-    const [v1, v2] = TRAZOS_MAYUSCULA.V
-    expect(v1.at(-1)).toEqual(v2.at(-1))
-    const [y1, y2] = TRAZOS_MAYUSCULA.Y
+        const [y1, y2] = TRAZOS_MAYUSCULA.Y
     expect(y1.at(-1)).toEqual(y2.at(-1))
   })
 })
@@ -169,5 +168,76 @@ describe('minúsculas: trazos continuos', () => {
 
   it('la b, la c, la e, la f, la l, la o, la s, la u, la v y la w se escriben sin levantar el dedo: un solo trazo', () => {
     for (const letra of ['B', 'C', 'E', 'F', 'L', 'O', 'S', 'U', 'V', 'W'] as Letra[]) expect(TRAZOS_MINUSCULA[letra]).toHaveLength(1)
+  })
+})
+
+describe('la A mayúscula', () => {
+  it('son dos trazos: el primero empieza abajo a la izquierda, sube hacia la derecha hasta la punta y baja hasta abajo a la derecha; el segundo es la raya', () => {
+    const [punta, raya] = TRAZOS_MAYUSCULA.A
+    expect(TRAZOS_MAYUSCULA.A).toHaveLength(2)
+    const [inicio, vertice, fin] = punta
+    expect(punta).toHaveLength(3)
+    expect(inicio[1]).toBeGreaterThan(100)
+    expect(vertice[1]).toBeLessThan(25)
+    expect(vertice[0]).toBeGreaterThan(inicio[0])
+    expect(fin[0]).toBeGreaterThan(vertice[0])
+    expect(fin[1]).toBeGreaterThan(100)
+    expect(raya[0][1]).toBeCloseTo(raya[1][1], 0)
+  })
+})
+
+describe('palitos de la I y la J, y la B', () => {
+  it('la I: primero el palito de arriba, luego el palo y el palito de abajo, bien anchos', () => {
+    const [arriba, palo, abajo] = TRAZOS_MAYUSCULA.I
+    expect(TRAZOS_MAYUSCULA.I).toHaveLength(3)
+    expect(palo[0][1]).toBeLessThan(palo[1][1])
+    for (const raya of [arriba, abajo]) {
+      expect(raya[0][1]).toBeCloseTo(raya[1][1], 0)
+      expect(raya[1][0] - raya[0][0]).toBeGreaterThanOrEqual(40) // unas 4 veces el palito de la fuente (11)
+      expect((raya[0][0] + raya[1][0]) / 2).toBeCloseTo(palo[0][0], 0) // centrada en el palo
+    }
+    expect(arriba[0][1]).toBeLessThan(abajo[0][1])
+  })
+
+  it('la J: primero el palito de arriba, ancho y centrado en el palo, después el palo con su gancho', () => {
+    const [palito, resto] = TRAZOS_MAYUSCULA.J
+    expect(TRAZOS_MAYUSCULA.J).toHaveLength(2)
+    expect(resto[0][1]).toBeLessThan(25)
+    expect(palito[0][1]).toBeCloseTo(palito[1][1], 0)
+    expect(palito[1][0] - palito[0][0]).toBeGreaterThanOrEqual(40)
+    expect((palito[0][0] + palito[1][0]) / 2).toBeCloseTo(resto[0][0], 0)
+  })
+
+  it('la B son dos trazos: el palo y los dos arcos seguidos (los trazos 2 y 3 son uno)', () => {
+    expect(TRAZOS_MAYUSCULA.B).toHaveLength(2)
+  })
+})
+
+describe('la Q mayúscula', () => {
+  it('la cola (trazo 2) es grande: cruza el círculo hacia abajo a la derecha y mide al menos 35 unidades', () => {
+    const [, cola] = TRAZOS_MAYUSCULA.Q
+    const [[x0, y0], [x1, y1]] = [cola[0], cola.at(-1)!]
+    expect(Math.hypot(x1 - x0, y1 - y0)).toBeGreaterThanOrEqual(35)
+    expect(x1).toBeGreaterThan(x0)
+    expect(y1).toBeGreaterThan(y0)
+  })
+})
+
+describe('la R y la V mayúsculas', () => {
+  it('la R son dos trazos: el palo y el arco con la pierna seguidos (donde acaba el arco empieza la pierna)', () => {
+    expect(TRAZOS_MAYUSCULA.R).toHaveLength(2)
+    const [, arcoYPierna] = TRAZOS_MAYUSCULA.R
+    const [x, y] = arcoYPierna.at(-1)!
+    expect(x).toBeGreaterThan(60) // acaba abajo a la derecha, al final de la pierna
+    expect(y).toBeGreaterThan(110)
+  })
+
+  it('la V es un solo trazo: baja a la punta y sube sin levantar el dedo', () => {
+    expect(TRAZOS_MAYUSCULA.V).toHaveLength(1)
+    const [izq, punta, der] = TRAZOS_MAYUSCULA.V[0]
+    expect(TRAZOS_MAYUSCULA.V[0]).toHaveLength(3)
+    expect(punta[1]).toBeGreaterThan(izq[1])
+    expect(der[1]).toBeLessThan(punta[1])
+    expect(der[0]).toBeGreaterThan(punta[0])
   })
 })
