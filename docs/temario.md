@@ -10,7 +10,7 @@ Perfiles:
 
 - Decreto 36/2022, de 29 de junio (BOR núm. 125, 1-7-2022): currículo de Educación Infantil en La Rioja. <https://www.larioja.org/edu-orden-academica/en/ensenanzas-regimen-general/educacion-infantil>
 - Real Decreto 95/2022, de 1 de febrero: enseñanzas mínimas de Infantil (estatal).
-- Decreto 41/2022, de 13 de julio: currículo de Educación Primaria en La Rioja. **No se ha podido leer su texto**; el número procede de una lista de normativa de CSIF.
+- Decreto 41/2022, de 13 de julio (BOR núm. 135, 15-7-2022): currículo de Educación Primaria en La Rioja. Texto completo: <https://www.larioja.org/larioja-client/cm/edu-orden-academica/images?idMmedia=1417812>. Leído el 2026-11-01; resumen de los saberes básicos del primer ciclo en `docs/curriculo-primaria-la-rioja.md`.
 - Real Decreto 157/2022, de 1 de marzo: enseñanzas mínimas de Primaria (estatal).
 - Circular de orientaciones Infantil y Primaria 2022-23 (Consejería de Educación): <https://www.larioja.org/edu-orden-academica/en/repositorio-curriculo-lomloe.files/1409631-ORIENTACIONES%20INF-PRIM%2022-23.pdf>
 - Repositorio del currículo LOMLOE de La Rioja: <https://www.larioja.org/edu-orden-academica/es/accesos-directos/repositorio-curriculo-lomloe>
@@ -38,7 +38,7 @@ En el RD 95/2022 lo matemático del segundo ciclo está en el Área 2 («Descubr
 
 ## 2º de Primaria (7-8 años)
 
-Fuente: circular 2022-23, anexo 1.3 (la tabla de horas salió desordenada al extraer el texto, por eso **no se recogen las horas**).
+Fuente: Decreto 41/2022 (anexo IV: horas semanales; 1º y 2º tienen las mismas) y circular 2022-23, anexo 1.3. Horas por semana en `docs/curriculo-primaria-la-rioja.md`.
 
 Áreas:
 1. Lengua Castellana y Literatura
@@ -75,6 +75,6 @@ En la web solo entran las materias que tienen sentido como repaso en pantalla.
 
 - [x] Confirmar qué materias quedan (hecho, ver "Materias de la web").
 - [ ] Editorial de 2º de Primaria: Santillana, Construyendo Mundos (hecho). Índices de unidades de Matemáticas, Lengua y Conocimiento del Medio en `docs/` (hecho). Falta la editorial de 3º de Infantil y los libros de Inglés, Música, Teatro y Educación emocional.
-- [ ] Conseguir el texto del Decreto 41/2022 (Primaria) para detallar los contenidos de cada área de 2º.
+- [x] Conseguir el texto del Decreto 41/2022 (Primaria) y detallar los contenidos de cada área de 2º (hecho, ver `docs/curriculo-primaria-la-rioja.md`).
 - [ ] Concretar los contenidos de lectoescritura de 3º de Infantil (los de números, hechos: ver «Números de 3º de Infantil»).
 - [ ] Después, crear el índice como datos tipados en `src/infantil/` y `src/primaria/` y buscar contenido materia por materia.

@@ -85,6 +85,7 @@ Las tareas se anotan como issues (con imagen aclaratoria cuando haga falta). Cad
 ## Documentación
 
 - `docs/temario.md`: temario de los dos cursos, fuentes y tareas pendientes.
+- `docs/curriculo-primaria-la-rioja.md`: resumen del Decreto 41/2022 (saberes básicos y horas del primer ciclo de Primaria) y qué cubre ya la web.
 - `docs/matematicas-2-primaria.md`, `docs/lengua-2-primaria.md`, `docs/conocimiento-del-medio-2-primaria.md`: índices de unidades de 2º de Primaria.
 - `docs/diseno.md`: decisiones de diseño y bocetos (`docs/diseno/`).
 
@@ -101,5 +102,4 @@ Las tareas se anotan como issues (con imagen aclaratoria cuando haga falta). Cad
 - Matemáticas de 2º, unidades 4 a 9 (una issue por unidad); la siguiente es la unidad 4. Las demás unidades salen como "Muy pronto".
 - El resto de materias de 2º de Primaria (Lengua, Conocimiento del medio, Inglés, Música): abren "¡Muy pronto!".
 - Todo el perfil de Infantil, empezando por Números: antes hay que concretar el temario (lectoescritura y números de 3º de Infantil).
-- Averiguar el método del colegio y conseguir el texto del Decreto 41/2022.
 - Diseño: estilo propio de Infantil, audio y pruebas en tablet real.
