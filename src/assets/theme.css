@@ -1075,3 +1075,19 @@ body {
   font-weight: 700;
   color: #fff;
 }
+
+/* Dibujos claros o blancos (diente, sal, fantasma…): sobre el botón blanco casi no se verían. Un contorno fino y suave del
+   color del texto sigue la silueta del emoji (text-shadow en 8 direcciones) sin el borde negro de Windows. */
+.infantil .visual,
+.infantil .option-group {
+  --contorno: 0.025em;
+  text-shadow:
+    var(--contorno) 0 0 #5a86a0,
+    calc(-1 * var(--contorno)) 0 0 #5a86a0,
+    0 var(--contorno) 0 #5a86a0,
+    0 calc(-1 * var(--contorno)) 0 #5a86a0,
+    var(--contorno) var(--contorno) 0 #5a86a0,
+    calc(-1 * var(--contorno)) var(--contorno) 0 #5a86a0,
+    var(--contorno) calc(-1 * var(--contorno)) 0 #5a86a0,
+    calc(-1 * var(--contorno)) calc(-1 * var(--contorno)) 0 #5a86a0;
+}
