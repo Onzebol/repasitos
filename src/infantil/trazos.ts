@@ -1,6 +1,6 @@
 // Recorrido de cada cifra para el trazo guiado (#50): lista de trazos (cada vez que se levanta el dedo es uno nuevo),
 // cada trazo es una línea de puntos [x, y] en un cuadro de WIDTH × HEIGHT, con el origen arriba a la izquierda.
-// Dibujados desde cero, contrastados con los cuadernos de Edelvives (cifras 1 a 7: la flecha marca la salida y el punto verde la llegada): todas empiezan por arriba; el 4 es el cerrado, con el brazo recto («silla invertida») que llega hasta el palo; el 7 lleva raya cruzada; el 0, el 6 y el 9 giran
+// Dibujados desde cero, contrastados con los cuadernos de Edelvives (cifras 1 a 7: la flecha marca la salida y el punto verde la llegada): todas empiezan por arriba (el 5, por la esquina de la derecha y de un solo trazo); el 4 es el cerrado, con el brazo recto («silla invertida») que llega hasta el palo; el 7 lleva raya cruzada; el 0, el 6 y el 9 giran
 // en sentido contrario a las agujas del reloj. El orden y la dirección hay que contrastarlos con los cuadernos.
 
 export type Point = [number, number]
@@ -43,10 +43,8 @@ export const TRAZOS: Record<Digit, Stroke[]> = {
     [[20, 12], [20, 78], [70, 78]],
     [[70, 12], [70, 132]],
   ],
-  5: [
-    join([[28, 12], [26, 66]], arc(46, 98, 32, 34, -120, 150)),
-    [[28, 12], [78, 12]],
-  ],
+  // De un solo trazo: sale arriba a la derecha, va por la raya hacia la izquierda, baja y hace la barriga
+  5: [join([[78, 12], [28, 12], [26, 66]], arc(46, 98, 32, 34, -120, 150))],
   6: [join(arc(60, 70, 38, 60, -70, -270), arc(60, 98, 30, 32, 90, -180))],
   7: [
     [[20, 12], [80, 12], [42, 132]],

@@ -5,7 +5,7 @@ import type { Digit } from './trazos'
 const CIFRAS = DIGITS.map((digit) => [digit] as [Digit])
 
 // Cuántos trazos (levantando el dedo) tiene cada cifra en el diseño
-const TRAZOS_POR_CIFRA = [1, 1, 1, 1, 2, 2, 1, 2, 1, 1]
+const TRAZOS_POR_CIFRA = [1, 1, 1, 1, 2, 1, 1, 2, 1, 1]
 
 describe('trazos de las cifras', () => {
   it('hay un recorrido para cada cifra del 0 al 9', () => {
@@ -79,12 +79,24 @@ describe('trazos de las cifras', () => {
     expect(palo[1][1]).toBeGreaterThan(brazo[1][1])
   })
 
-  it('el 5 se hace en dos trazos: primero el cuerpo, al final la raya de arriba', () => {
-    const [cuerpo, raya] = TRAZOS[5]
-    expect(raya).toHaveLength(2)
-    expect(raya[0][1]).toBe(raya[1][1])
-    expect(raya[1][0]).toBeGreaterThan(raya[0][0])
-    expect(Math.max(...cuerpo.map(([, y]) => y))).toBeGreaterThan(100)
+  it('el 5 se hace de un solo trazo: sale arriba a la derecha, va por la raya hacia la izquierda, baja y hace la barriga', () => {
+    expect(TRAZOS[5]).toHaveLength(1)
+    const [cinco] = TRAZOS[5]
+    const [x0, y0] = cinco[0]
+    // sale de la esquina superior derecha
+    expect(y0).toBeLessThanOrEqual(20)
+    expect(x0).toBeGreaterThanOrEqual(65)
+    // primero la raya de arriba, hacia la izquierda y sin bajar
+    const [x1, y1] = cinco[1]
+    expect(y1).toBe(y0)
+    expect(x1).toBeLessThan(x0)
+    // después baja por la izquierda y acaba en la barriga, en la parte baja y abierta por la izquierda
+    const palo = cinco.findIndex(([, y]) => y > 50)
+    expect(palo).toBeGreaterThan(1)
+    expect(cinco[palo][0]).toBeLessThan(x0)
+    expect(Math.max(...cinco.map(([, y]) => y))).toBeGreaterThan(100)
+    expect(cinco.at(-1)![1]).toBeGreaterThan(80)
+    expect(cinco.at(-1)![0]).toBeLessThan(cinco.slice(1).reduce((m, [x]) => Math.max(m, x), 0))
   })
 
   it('el 8 es una sola línea cerrada de dos lazos redondos (como el 3): sale de arriba hacia la izquierda y vuelve al punto de salida', () => {
