@@ -79,14 +79,18 @@ export type BlockSpec =
   | { kind: 'compare'; mode: 'sign' | 'statement' | 'order'; min?: number; max?: number }
   // Centenas (de 100 a 199): leer un número con centena, decenas y unidades (elegir) o componerlo (escribir)
   | { kind: 'hundreds'; ask: 'read' | 'compose' }
-  // Suma o resta en columna: sin llevar, o con `carry` (solo sumas) llevando en las unidades
+  // Suma o resta en columna: sin llevar, o con `carry` (sumas: las unidades pasan de 9; restas: se pide una decena)
   | { kind: 'column'; operator: '+' | '−'; carry?: boolean }
-  // Problema de suma o resta con un enunciado corto (escribir): sin llevar, o con `carry` (solo sumas)
+  // Problema de suma o resta con un enunciado corto (escribir): sin llevar, o con `carry` (como en `column`)
   | { kind: 'word-problem'; operator: '+' | '−'; carry?: boolean }
+  // Centenas, decenas y unidades de números de 3 cifras: leer (elegir), componer, contar con piezas 🟥🟦🟨 o contar un lugar (escribir)
+  | { kind: 'cdu'; ask: 'read' | 'compose' | 'blocks' | 'count' }
+  // El litro: qué recipiente tiene más o menos capacidad de tres (elegir)
+  | { kind: 'capacity'; mode: 'more' | 'less' }
   // Decena más cercana a un número (elegir)
   | { kind: 'nearest-ten' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir)
-  | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' }
+  | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' }
   // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
   // o qué resta comprueba una suma (elegir)
   | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }

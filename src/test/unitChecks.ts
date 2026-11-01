@@ -44,9 +44,13 @@ export function describeUnit(name: string, topics: Topic[]) {
             const nombre = `${exercise.top} ${exercise.operator} ${exercise.bottom}`
             expect(exercise.answer, nombre).toBe(exercise.operator === '+' ? exercise.top + exercise.bottom : exercise.top - exercise.bottom)
             const unidades = (exercise.top % 10) + (exercise.bottom % 10)
-            // con llevada las unidades suman 10 o más; sin ella, cada columna se resuelve por separado
-            if (exercise.carry) expect(unidades, nombre).toBeGreaterThanOrEqual(10)
-            else if (exercise.operator === '+') expect(unidades, nombre).toBeLessThan(10)
+            // sumas: con llevada las unidades suman 10 o más, sin ella cada columna se resuelve por separado
+            // restas: con llevada las unidades del minuendo son menores que las del sustraendo
+            if (exercise.operator === '+') {
+              if (exercise.carry) expect(unidades, nombre).toBeGreaterThanOrEqual(10)
+              else expect(unidades, nombre).toBeLessThan(10)
+            } else if (exercise.carry) expect(exercise.top % 10, nombre).toBeLessThan(exercise.bottom % 10)
+            else expect(exercise.top % 10, nombre).toBeGreaterThanOrEqual(exercise.bottom % 10)
           }
         }
       }

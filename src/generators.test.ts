@@ -343,10 +343,6 @@ describe('generate: reglas de cada plantilla', () => {
     expect(resultados.some((r) => r >= 100)).toBe(true)
   })
 
-  it('un problema de resta no puede llevar en esta plantilla', () => {
-    expect(() => generate({ kind: 'word-problem', operator: '−', carry: true }, mulberry32(1))).toThrow()
-  })
-
   it('la resta que comprueba una suma da el otro sumando', () => {
     for (const e of muchos({ kind: 'inverse', mode: 'subtract' }).map(number)) {
       const [a, b, c, c2, b2] = e.question.match(/\d+/g)!.map(Number)

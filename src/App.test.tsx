@@ -141,8 +141,9 @@ describe('App: navegación', () => {
     await user.click(screen.getByRole('button', { name: 'Matemáticas' }))
     expect(screen.getByRole('button', { name: /Unidad 1/ })).toBeEnabled()
     expect(screen.getByRole('button', { name: /Unidad 2/ })).toBeEnabled()
-    expect(screen.getByRole('button', { name: /Unidad 3/ })).toBeDisabled()
-    expect(screen.getAllByText('Muy pronto')).toHaveLength(7)
+    expect(screen.getByRole('button', { name: /Unidad 3/ })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /Unidad 4/ })).toBeDisabled()
+    expect(screen.getAllByText('Muy pronto')).toHaveLength(6)
   })
 
   it('de la unidad 1 se llega a los ejercicios de un tema y el botón de inicio vuelve al principio', async () => {

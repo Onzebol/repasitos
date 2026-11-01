@@ -234,6 +234,34 @@ describe('Ejercicio en columna: sumas llevando', () => {
   })
 })
 
+describe('Ejercicio en columna: restas llevando', () => {
+  const llevando: Exercise = { type: 'column', question: 'Resta en columna', operator: '−', top: 72, bottom: 28, answer: 44, carry: true }
+  const comprobar = () => screen.getByRole('button', { name: 'Comprobar' })
+
+  it('muestra el cuadro de llevada pero no el de centenas', () => {
+    abrir(llevando)
+    expect(screen.getByRole('button', { name: /Llevada/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Centenas/ })).not.toBeInTheDocument()
+  })
+
+  it('la llevada es opcional: se comprueba solo el resultado', async () => {
+    const user = abrir(llevando)
+    await tecla(user, '44')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+
+  it('se puede escribir la llevada y no cuenta como respuesta', async () => {
+    const user = abrir(llevando)
+    await tecla(user, '4')
+    await user.click(screen.getByRole('button', { name: /Llevada/ }))
+    await tecla(user, '1')
+    await tecla(user, '4')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+})
+
 describe('Ejercicio en columna: estilos', () => {
   it('las cifras se alinean en una cuadrícula de 3 columnas y el cuadro activo se resalta', async () => {
     const { default: css } = await import('../assets/theme.css?raw')
