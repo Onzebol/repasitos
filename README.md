@@ -95,10 +95,10 @@ Las tareas se anotan como issues (con imagen aclaratoria cuando haga falta). Cad
 - Pantalla de inicio y pantallas de materias con el estilo elegido (mundo de cuento); emojis con la fuente Noto Color Emoji incluida en la web, iguales en todos los dispositivos; flechas de volver y siguiente dibujadas en SVG; página `#/iconos` (solo por dirección) con los iconos que usa la aplicación, para qué sirven y los que se pueden usar; Infantil: materia Números (temas: Contar tocando, ¿Cuántos hay?, ¿Dónde hay…?, Las cifras, Antes y después, Más y menos y trazo guiado de las cifras 0-9 con el dedo; la hoja de trazos sigue en `#/trazo`, solo por dirección); las materias sin contenido se ven desactivadas (#10); Primaria: Conocimiento del medio, unidad 1 completa con sus cinco temas, con preguntas generadas al azar desde tablas (#72); Lengua, unidad 1 completa con sus siete temas (sinónimos y palabras del colegio, la mayúscula, describir personas, lenguas de España, abecedario y sílabas, palabras que riman y comprensión lectora con textos propios) (#71); página `#/voces` (solo por dirección) para oír las voces en español del dispositivo con distinta velocidad y tono y elegir la de la lectura en voz alta (#66).
 - Navegación con el botón atrás del navegador y del móvil (la pantalla vive en la dirección `#/…`).
 - Materias confirmadas y temario de 2º de Primaria.
-- Matemáticas de 2º, unidades 1 y 2: ejercicios aleatorios, cada sesión trae 10 distintos y "Repetir" empieza otra. Tipos de ejercicio: elegir, escribir un número y sumar o restar en columna (con llevada opcional).
+- Matemáticas de 2º, unidades 1, 2 y 3: ejercicios aleatorios, cada sesión trae 10 distintos y "Repetir" empieza otra. Tipos de ejercicio: elegir, escribir un número y sumar o restar en columna (con llevada opcional; las sumas llevan siempre cuadro de centenas).
 
 **Pendiente**
-- Matemáticas de 2º, unidades 3 a 9 (una issue por unidad); la siguiente es la unidad 3. Las demás unidades salen como "Muy pronto".
+- Matemáticas de 2º, unidades 4 a 9 (una issue por unidad); la siguiente es la unidad 4. Las demás unidades salen como "Muy pronto".
 - El resto de materias de 2º de Primaria (Lengua, Conocimiento del medio, Inglés, Música): abren "¡Muy pronto!".
 - Todo el perfil de Infantil, empezando por Números: antes hay que concretar el temario (lectoescritura y números de 3º de Infantil).
 - Averiguar el método del colegio y conseguir el texto del Decreto 41/2022.
