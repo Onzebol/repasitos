@@ -49,3 +49,15 @@ describe('TracePreview: hoja con el recorrido de cada cifra', () => {
     expect(cuatro.textContent).toContain('2')
   })
 })
+
+describe('TracePreview: letras', () => {
+  it('muestra las 27 letras en mayúscula y en minúscula con su recorrido', () => {
+    render(<TracePreview onHome={vi.fn()} />)
+    for (const nombre of ['Letras en mayúscula', 'Letras en minúscula']) {
+      const lista = screen.getByRole('list', { name: nombre })
+      expect(within(lista).getAllByRole('listitem')).toHaveLength(27)
+    }
+    expect(screen.getByRole('img', { name: /^Letra B mayúscula: 3 trazos$/ })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /^Letra ñ minúscula: 4 trazos$/ })).toBeInTheDocument()
+  })
+})
