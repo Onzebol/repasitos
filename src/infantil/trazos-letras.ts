@@ -1,21 +1,23 @@
-// Recorrido de cada consonante para el trazo guiado (#87), con el mismo formato que las cifras (`trazos.ts`): lista de
+// Recorrido de cada letra para el trazo guiado (#87), con el mismo formato que las cifras (`trazos.ts`): lista de
 // trazos (cada vez que se levanta el dedo es uno nuevo), cada trazo una línea de puntos [x, y] en un cuadro de WIDTH ×
 // HEIGHT con el origen arriba a la izquierda.
 // Dibujados desde cero. Las mayúsculas siguen el orden y el sentido de la muestra «Garabatos flechas» (manual de las
-// fuentes Garabatos, basadas en los cuadernos Rubio, Everest y Edelvives): palos de arriba abajo (en M y N el primero sube) y curvas en sentido contrario a las agujas del reloj. Minúsculas con tres alturas: palo alto en y = 12, cuerpo entre y = 56 y la
-// línea y = 100, rabo hasta y = 132. PENDIENTE de contrastar el orden y el sentido con el cuaderno, y de añadir los
-// enlaces de la letra ligada (la salida y la entrada de cada letra).
-
+// fuentes Garabatos, basadas en los cuadernos Rubio, Everest y Edelvives): palos de arriba abajo (en M y N el primero sube) y curvas en sentido contrario a las agujas del reloj. 
 import { arc, join } from './trazos'
 import type { Stroke } from './trazos'
 
-export const CONSONANTES = [
-  'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z',
+export const ABECEDARIO = [
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ] as const
-export type Consonante = (typeof CONSONANTES)[number]
+export type Letra = (typeof ABECEDARIO)[number]
 
 // Mayúsculas
-export const TRAZOS_MAYUSCULA: Record<Consonante, Stroke[]> = {
+export const TRAZOS_MAYUSCULA: Record<Letra, Stroke[]> = {
+  A: [
+    [[50, 12], [16, 132]],
+    [[50, 12], [84, 132]],
+    [[28, 92], [72, 92]],
+  ],
   B: [
     [[20, 12], [20, 132]],
     join([[20, 12], [50, 12]], arc(50, 42, 30, 30, -90, 90), [[20, 72]]),
@@ -25,6 +27,12 @@ export const TRAZOS_MAYUSCULA: Record<Consonante, Stroke[]> = {
   D: [
     [[20, 12], [20, 132]],
     join([[20, 12], [44, 12]], arc(44, 72, 40, 60, -90, 90), [[20, 132]]),
+  ],
+  E: [
+    [[20, 12], [20, 132]],
+    [[20, 12], [80, 12]],
+    [[20, 72], [70, 72]],
+    [[20, 132], [80, 132]],
   ],
   F: [
     [[20, 12], [20, 132]],
@@ -37,6 +45,7 @@ export const TRAZOS_MAYUSCULA: Record<Consonante, Stroke[]> = {
     [[20, 72], [80, 72]],
     [[80, 12], [80, 132]],
   ],
+  I: [[[50, 12], [50, 132]]],
   J: [join([[64, 12], [64, 100]], arc(40, 100, 24, 32, 0, 150))],
   K: [
     [[20, 12], [20, 132]],
@@ -59,6 +68,7 @@ export const TRAZOS_MAYUSCULA: Record<Consonante, Stroke[]> = {
     [[20, 28], [80, 132], [80, 28]],
     [[26, 14], [38, 4], [58, 14], [72, 4]],
   ],
+  O: [arc(50, 72, 38, 60, -90, -450)],
   P: [
     [[20, 12], [20, 132]],
     join([[20, 12], [50, 12]], arc(50, 42, 30, 30, -90, 90), [[20, 72]]),
@@ -77,6 +87,7 @@ export const TRAZOS_MAYUSCULA: Record<Consonante, Stroke[]> = {
     [[18, 12], [82, 12]],
     [[50, 12], [50, 132]],
   ],
+  U: [join([[20, 12], [20, 92]], arc(50, 92, 30, 40, 180, 0), [[80, 12]])],
   V: [
     [[18, 12], [50, 132]],
     [[82, 12], [50, 132]],
@@ -98,76 +109,88 @@ export const TRAZOS_MAYUSCULA: Record<Consonante, Stroke[]> = {
   ],
 }
 
-// Minúsculas
-export const TRAZOS_MINUSCULA: Record<Consonante, Stroke[]> = {
-  B: [
-    [[30, 12], [30, 100]],
-    arc(52, 78, 22, 22, -180, -540),
-  ],
-  C: [arc(52, 78, 24, 22, -40, -320)],
-  D: [
-    arc(50, 78, 22, 22, -20, -360),
-    [[72, 12], [72, 100]],
+// Minúsculas ligadas, con la forma de la muestra «Garabatos flechas»: cuerpo entre y = 58 y la línea y = 100, palo alto
+// hasta y = 12 y rabo hasta y = 132. Cada letra lleva su trazo de salida (la cola que sube hacia la derecha y la une con
+// la siguiente). Las letras de palo alto (b, f, h, k, l) empiezan subiendo y bajan después por el palo.
+
+// Subida curva que abre el palo alto, y cola de enlace desde un punto de la línea
+const subida = (x: number): Stroke => [[x - 10, 88], [x - 2, 58], [x + 6, 12]]
+const cola = (x: number): Stroke => [[x, 100], [x + 9, 103], [x + 17, 94], [x + 21, 86]]
+const palo = (x: number): Stroke => [[x, 12], [x, 100]]
+const punto = (x: number, y: number): Stroke => [[x, y], [x, y + 3]]
+
+export const TRAZOS_MINUSCULA: Record<Letra, Stroke[]> = {
+  A: [arc(44, 78, 20, 22, -25, -385), [[64, 58], [64, 100]], cola(58)],
+  B: [subida(34), palo(34), arc(52, 79, 18, 21, 120, -240), cola(54)],
+  C: [arc(46, 78, 20, 22, -45, -290), cola(46)],
+  D: [arc(44, 78, 20, 22, -25, -385), palo(64), cola(58)],
+  E: [
+    [[24, 80], [56, 80], [58, 70]],
+    arc(40, 78, 18, 20, -20, -200),
+    [[24, 86], [34, 100], [50, 102], [62, 94], [66, 88]],
   ],
   F: [
-    join(arc(62, 30, 20, 18, -20, -180), [[42, 132]]),
-    [[24, 60], [62, 60]],
+    [[44, 84], [50, 48], [48, 12]],
+    [[44, 12], [40, 70], [36, 116]],
+    [[36, 116], [28, 130], [22, 124], [30, 110], [44, 100], [54, 98]],
   ],
-  G: [join(arc(50, 78, 22, 22, -20, -360), [[72, 118]], arc(50, 118, 22, 14, 0, 160))],
-  H: [
-    [[30, 12], [30, 100]],
-    join(arc(52, 78, 22, 22, 180, 360), [[74, 100]]),
+  G: [
+    arc(44, 78, 20, 22, -25, -385),
+    join([[64, 58], [64, 116]], arc(46, 116, 18, 16, 0, 125)),
+    [[38, 129], [40, 120], [52, 104], [62, 100]],
   ],
+  H: [subida(34), palo(34), join(arc(52, 80, 18, 22, 180, 360), [[70, 98]]), cola(64)],
+  I: [[[30, 64], [36, 72], [36, 98], [40, 100]], cola(38), punto(36, 42)],
   J: [
-    join([[56, 56], [56, 118]], arc(36, 118, 20, 14, 0, 150)),
-    [[56, 38], [56, 42]], // el punto
+    [[36, 62], [36, 116]],
+    [[36, 116], [30, 130], [22, 128], [24, 116], [40, 102], [52, 100]],
+    punto(36, 42),
   ],
-  K: [
-    [[30, 12], [30, 100]],
-    [[70, 56], [30, 84]],
-    [[44, 76], [72, 100]],
-  ],
-  L: [[[30, 12], [30, 100]]],
+  K: [subida(34), palo(34), [[34, 78], [48, 92], [58, 100]], cola(58), [[34, 90], [50, 74]]],
+  L: [subida(34), palo(34), cola(34)],
   M: [
-    [[18, 56], [18, 100]],
-    join(arc(34, 78, 16, 22, 180, 360), [[50, 100]]),
-    join(arc(66, 78, 16, 22, 180, 360), [[82, 100]]),
+    [[16, 60], [16, 100]],
+    join(arc(31, 80, 15, 20, 180, 360), [[46, 100]]),
+    join(arc(61, 80, 15, 20, 180, 360), [[76, 100]]),
+    cola(76),
   ],
-  N: [
-    [[22, 56], [22, 100]],
-    join(arc(46, 78, 24, 22, 180, 360), [[70, 100]]),
-  ],
+  N: [[[22, 60], [22, 100]], join(arc(46, 80, 24, 20, 180, 360), [[70, 100]]), cola(70)],
   Ñ: [
-    [[22, 56], [22, 100]],
-    join(arc(46, 78, 24, 22, 180, 360), [[70, 100]]),
-    [[26, 38], [38, 28], [50, 38], [62, 28]], // la tilde
+    [[22, 60], [22, 100]],
+    join(arc(46, 80, 24, 20, 180, 360), [[70, 100]]),
+    cola(70),
+    [[26, 40], [38, 32], [50, 40], [62, 32]], // la tilde
   ],
-  P: [
-    [[24, 56], [24, 132]],
-    arc(48, 78, 24, 22, -180, -540),
+  O: [arc(44, 78, 20, 22, -80, -440), cola(44)],
+  P: [[[24, 58], [24, 132]], join(arc(46, 80, 22, 20, 180, 360), [[68, 98]]), cola(62)],
+  Q: [arc(44, 78, 20, 22, -25, -385), [[64, 58], [64, 132]], [[56, 102], [66, 100], [74, 90], [78, 84]]],
+  R: [[[22, 76], [32, 62], [44, 62], [48, 72], [48, 94], [52, 100]], cola(50)],
+  S: [
+    [[28, 80], [34, 66], [46, 59]],
+    [[46, 59], [58, 64], [56, 76], [44, 84], [40, 94], [50, 100]],
+    cola(48),
   ],
-  Q: [
-    arc(50, 78, 22, 22, -20, -360),
-    [[72, 56], [72, 132]],
+  T: [[[36, 34], [36, 98], [40, 100]], cola(38), [[22, 58], [52, 58]]],
+  U: [
+    [[22, 62], [24, 92], [34, 100], [44, 94], [50, 82]],
+    [[52, 62], [52, 98], [56, 100]],
+    cola(54),
   ],
-  R: [
-    [[24, 56], [24, 100]],
-    arc(46, 76, 22, 20, 180, 320),
+  V: [
+    [[26, 64], [30, 92], [40, 100]],
+    [[40, 100], [52, 98], [58, 80], [60, 62]],
+    [[60, 62], [72, 64], [78, 70]],
   ],
-  S: [join(arc(50, 67, 20, 11, -30, -270), arc(50, 89, 22, 11, -90, 150))],
-  T: [
-    [[36, 30], [36, 100]],
-    [[20, 56], [54, 56]],
+  W: [
+    [[14, 64], [18, 92], [28, 100], [38, 98], [44, 80], [44, 62]],
+    [[44, 62], [48, 92], [58, 100], [70, 98], [76, 80], [78, 62]],
+    [[78, 62], [88, 64], [92, 70]],
   ],
-  V: [[[18, 56], [44, 100], [70, 56]]],
-  W: [[[10, 56], [26, 100], [42, 66], [58, 100], [74, 56]]],
-  X: [
-    [[22, 56], [70, 100]],
-    [[70, 56], [22, 100]],
-  ],
+  X: [[[26, 64], [50, 98]], [[52, 62], [24, 98]], [[50, 98], [58, 102], [66, 92], [70, 84]]],
   Y: [
-    [[22, 56], [44, 100]],
-    [[70, 56], [46, 100], [30, 132]],
+    [[22, 62], [24, 94], [34, 100], [46, 96]],
+    [[56, 62], [56, 118], [50, 128]],
+    [[50, 128], [40, 132], [36, 124], [44, 112]],
   ],
-  Z: [[[20, 56], [70, 56], [20, 100], [70, 100]]],
+  Z: [[[24, 72], [32, 60], [56, 60]], [[56, 60], [30, 98]], [[30, 98], [52, 100], [62, 92]]],
 }

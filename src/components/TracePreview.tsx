@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { arrowAt, DIGITS, HEIGHT, pathData, TRAZOS, WIDTH } from '../infantil/trazos'
 import type { Digit, Stroke } from '../infantil/trazos'
-import { CONSONANTES, TRAZOS_MAYUSCULA, TRAZOS_MINUSCULA } from '../infantil/trazos-letras'
-import type { Consonante } from '../infantil/trazos-letras'
+import { ABECEDARIO, TRAZOS_MAYUSCULA, TRAZOS_MINUSCULA } from '../infantil/trazos-letras'
+import type { Letra } from '../infantil/trazos-letras'
 import { Hills } from './Hills'
 import { Icon } from './Icon'
 import { Mascot } from './Mascot'
@@ -40,11 +40,11 @@ function StrokeSvg({ strokes, description }: { strokes: Stroke[]; description: s
   )
 }
 
-// Hoja de consonantes (solo para ver los recorridos): sin ejercicio todavía
-function LetterSheet({ title, kind, strokes }: { title: string; kind: string; strokes: Record<Consonante, Stroke[]> }) {
+// Hoja de letras (solo para ver los recorridos): sin ejercicio todavía
+function LetterSheet({ title, kind, strokes }: { title: string; kind: string; strokes: Record<Letra, Stroke[]> }) {
   return (
     <ul className="trace-grid" aria-label={title}>
-      {CONSONANTES.map((letter) => {
+      {ABECEDARIO.map((letter) => {
         const shown = kind === 'minúscula' ? letter.toLowerCase() : letter
         const n = strokes[letter].length
         return (
@@ -122,9 +122,9 @@ export function TracePreview({ onHome }: TracePreviewProps) {
             )
           })}
         </ul>
-        <h2 className="trace-note">Consonantes (recorridos por contrastar con el cuaderno)</h2>
-        <LetterSheet title="Consonantes en mayúscula" kind="mayúscula" strokes={TRAZOS_MAYUSCULA} />
-        <LetterSheet title="Consonantes en minúscula" kind="minúscula" strokes={TRAZOS_MINUSCULA} />
+        <h2 className="trace-note">Letras (recorridos por contrastar con el cuaderno)</h2>
+        <LetterSheet title="Letras en mayúscula" kind="mayúscula" strokes={TRAZOS_MAYUSCULA} />
+        <LetterSheet title="Letras en minúscula" kind="minúscula" strokes={TRAZOS_MINUSCULA} />
       </div>
     </main>
   )
