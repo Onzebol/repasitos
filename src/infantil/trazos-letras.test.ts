@@ -161,3 +161,13 @@ describe('enlaces de la letra ligada', () => {
     }
   })
 })
+
+describe('minúsculas: trazos continuos', () => {
+  it('la a, la d, la g y la k son dos trazos (el óvalo o el lazo, y el palo o el arco con su salida)', () => {
+    for (const letra of ['A', 'D', 'G', 'K'] as Letra[]) expect(TRAZOS_MINUSCULA[letra]).toHaveLength(2)
+  })
+
+  it('la b, la c, la e, la f, la l, la o, la s y la u se escriben sin levantar el dedo: un solo trazo', () => {
+    for (const letra of ['B', 'C', 'E', 'F', 'L', 'O', 'S', 'U'] as Letra[]) expect(TRAZOS_MINUSCULA[letra]).toHaveLength(1)
+  })
+})
