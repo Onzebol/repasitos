@@ -1076,10 +1076,10 @@ body {
   color: #fff;
 }
 
-/* Dibujos claros o blancos (diente, sal, fantasma…): sobre el botón blanco casi no se verían. Un contorno fino y suave del
-   color del texto sigue la silueta del emoji (text-shadow en 8 direcciones) sin el borde negro de Windows. */
-.infantil .visual,
-.infantil .option-group {
+/* Dibujos claros o blancos (diente, sal, fantasma…; lista en src/emojiClaros.ts): sobre el botón blanco de una opción casi no
+   se verían. Solo ellos, y solo dentro de las opciones, llevan un contorno fino y suave que sigue la silueta del emoji
+   (text-shadow en 8 direcciones), sin el borde negro de Windows. */
+.option .emoji-claro {
   --contorno: 0.025em;
   text-shadow:
     var(--contorno) 0 0 #5a86a0,
