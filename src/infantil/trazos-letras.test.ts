@@ -67,18 +67,19 @@ describe.each(JUEGOS)('trazos de las consonantes en %s', (_nombre, trazos) => {
 })
 
 describe('forma de las mayúsculas', () => {
-  it.each(LETRAS)('la %s empieza por arriba (como se escribe)', (letra) => {
+  // M, N y Ñ son la excepción: su primer palo sube desde abajo
+  it.each(LETRAS.filter(([letra]) => !'MNÑ'.includes(letra)))('la %s empieza por arriba (como se escribe)', (letra) => {
     expect(TRAZOS_MAYUSCULA[letra][0][0][1]).toBeLessThanOrEqual(45)
   })
 
-  it('las que se hacen de un solo trazo: C, G, J, L, S, V, W y Z', () => {
-    for (const letra of ['C', 'G', 'J', 'L', 'S', 'V', 'W', 'Z'] as Consonante[]) {
+  it('las que se hacen de un solo trazo: C, G, J, L, S y W', () => {
+    for (const letra of ['C', 'G', 'J', 'L', 'S', 'W'] as Consonante[]) {
       expect(TRAZOS_MAYUSCULA[letra]).toHaveLength(1)
     }
   })
 
-  it('las letras con palo (B, D, F, H, K, N, P, R) empiezan por el palo: de arriba abajo y en vertical', () => {
-    for (const letra of ['B', 'D', 'F', 'H', 'K', 'N', 'P', 'R'] as Consonante[]) {
+  it('las letras con palo (B, D, F, H, K, P, R) empiezan por el palo: de arriba abajo y en vertical', () => {
+    for (const letra of ['B', 'D', 'F', 'H', 'K', 'P', 'R'] as Consonante[]) {
       const [arriba, abajo] = TRAZOS_MAYUSCULA[letra][0]
       expect(abajo[0]).toBe(arriba[0])
       expect(abajo[1]).toBeGreaterThan(arriba[1])
@@ -125,5 +126,21 @@ describe('forma de las minúsculas', () => {
     for (const letra of ['C', 'M', 'N', 'R', 'S', 'V', 'W', 'X'] as Consonante[]) {
       expect(Math.min(...TRAZOS_MINUSCULA[letra].flat().map(([, y]) => y))).toBeGreaterThanOrEqual(50)
     }
+  })
+})
+
+describe('orden de las mayúsculas según Garabatos flechas', () => {
+  it('en M y N el primer palo se hace de abajo arriba', () => {
+    for (const letra of ['M', 'N', 'Ñ'] as Consonante[]) {
+      const [abajo, arriba] = TRAZOS_MAYUSCULA[letra][0]
+      expect(arriba[1]).toBeLessThan(abajo[1])
+    }
+  })
+
+  it('la H lleva la raya antes del segundo palo; la Z, tres rayas; la V y la Y, las diagonales hacia el vértice', () => {
+    expect(TRAZOS_MAYUSCULA.H[1][0][1]).toBe(TRAZOS_MAYUSCULA.H[1][1][1]) // raya horizontal
+    expect(TRAZOS_MAYUSCULA.Z).toHaveLength(3)
+    expect(TRAZOS_MAYUSCULA.V.map((t) => t.at(-1))).toEqual([[50, 132], [50, 132]])
+    expect(TRAZOS_MAYUSCULA.Y.map((t) => t.at(-1)).slice(0, 2)).toEqual([[50, 72], [50, 72]])
   })
 })

@@ -1,8 +1,8 @@
 // Recorrido de cada consonante para el trazo guiado (#87), con el mismo formato que las cifras (`trazos.ts`): lista de
 // trazos (cada vez que se levanta el dedo es uno nuevo), cada trazo una línea de puntos [x, y] en un cuadro de WIDTH ×
 // HEIGHT con el origen arriba a la izquierda.
-// Dibujados desde cero. Mayúsculas de palo: de arriba abajo y de izquierda a derecha, con el palo primero y las curvas en
-// sentido contrario a las agujas del reloj. Minúsculas con tres alturas: palo alto en y = 12, cuerpo entre y = 56 y la
+// Dibujados desde cero. Las mayúsculas siguen el orden y el sentido de la muestra «Garabatos flechas» (manual de las
+// fuentes Garabatos, basadas en los cuadernos Rubio, Everest y Edelvives): palos de arriba abajo (en M y N el primero sube) y curvas en sentido contrario a las agujas del reloj. Minúsculas con tres alturas: palo alto en y = 12, cuerpo entre y = 56 y la
 // línea y = 100, rabo hasta y = 132. PENDIENTE de contrastar el orden y el sentido con el cuaderno, y de añadir los
 // enlaces de la letra ligada (la salida y la entrada de cada letra).
 
@@ -34,28 +34,28 @@ export const TRAZOS_MAYUSCULA: Record<Consonante, Stroke[]> = {
   G: [join(arc(52, 72, 34, 60, -40, -360), [[52, 72]])],
   H: [
     [[20, 12], [20, 132]],
-    [[80, 12], [80, 132]],
     [[20, 72], [80, 72]],
+    [[80, 12], [80, 132]],
   ],
   J: [join([[64, 12], [64, 100]], arc(40, 100, 24, 32, 0, 150))],
   K: [
     [[20, 12], [20, 132]],
-    [[80, 12], [20, 78]],
-    [[44, 52], [82, 132]],
+    [[20, 78], [80, 12]],
+    [[20, 78], [82, 132]],
   ],
   L: [[[20, 12], [20, 132], [78, 132]]],
   M: [
-    [[18, 12], [18, 132]],
-    [[18, 12], [50, 108], [82, 12]],
+    [[18, 132], [18, 12]],
+    [[18, 12], [50, 120], [82, 12]],
     [[82, 12], [82, 132]],
   ],
   N: [
-    [[20, 12], [20, 132]],
+    [[20, 132], [20, 12]],
     [[20, 12], [80, 132], [80, 12]],
   ],
   // La N más baja, para que quepa la tilde encima
   Ñ: [
-    [[20, 28], [20, 132]],
+    [[20, 132], [20, 28]],
     [[20, 28], [80, 132], [80, 28]],
     [[26, 14], [38, 4], [58, 14], [72, 4]],
   ],
@@ -77,17 +77,25 @@ export const TRAZOS_MAYUSCULA: Record<Consonante, Stroke[]> = {
     [[18, 12], [82, 12]],
     [[50, 12], [50, 132]],
   ],
-  V: [[[18, 12], [50, 132], [82, 12]]],
+  V: [
+    [[18, 12], [50, 132]],
+    [[82, 12], [50, 132]],
+  ],
   W: [[[10, 12], [30, 132], [50, 40], [70, 132], [90, 12]]],
   X: [
     [[20, 12], [80, 132]],
     [[80, 12], [20, 132]],
   ],
   Y: [
-    [[20, 12], [50, 76]],
-    [[80, 12], [50, 76], [50, 132]],
+    [[20, 12], [50, 72]],
+    [[80, 12], [50, 72]],
+    [[50, 72], [50, 132]],
   ],
-  Z: [[[20, 12], [80, 12], [20, 132], [80, 132]]],
+  Z: [
+    [[20, 12], [80, 12]],
+    [[80, 12], [20, 132]],
+    [[20, 132], [80, 132]],
+  ],
 }
 
 // Minúsculas
