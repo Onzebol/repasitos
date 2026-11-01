@@ -1,5 +1,5 @@
 // Tablas de palabras con dibujo para Letras de Infantil (#86). Cada dibujo es un solo carácter y representa sin ambigüedad
-// a su palabra (por eso faltan «lana», «gallina» o «zapatilla»: el dibujo podría ser otra cosa) y se ve sobre el botón blanco (por eso faltan «diente» y «sal»: en Noto son blancos y casi no se ven). Escritas desde cero.
+// a su palabra (por eso faltan «lana», «gallina» o «zapatilla»: el dibujo podría ser otra cosa). Escritas desde cero.
 export type Palabra = { emoji: string; palabra: string }
 
 // Rimas (consonantes): las palabras de una familia acaban igual desde la vocal tónica. Ninguna familia comparte rima
@@ -45,6 +45,7 @@ export const RIMAS: Rima[] = [
     terminacion: 'ente',
     palabras: [
       { emoji: '🐍', palabra: 'serpiente' },
+      { emoji: '🦷', palabra: 'diente' },
       { emoji: '🌉', palabra: 'puente' },
       { emoji: '⛲', palabra: 'fuente' },
     ],
@@ -92,6 +93,7 @@ export const SONIDOS: PalabraSonido[] = [
   { emoji: '🐍', palabra: 'serpiente', sonido: 's' },
   { emoji: '🍉', palabra: 'sandía', sonido: 's' },
   { emoji: '👒', palabra: 'sombrero', sonido: 's' },
+  { emoji: '🧂', palabra: 'sal', sonido: 's' },
 
   { emoji: '🦁', palabra: 'león', sonido: 'l' },
   { emoji: '🌙', palabra: 'luna', sonido: 'l' },
@@ -108,7 +110,7 @@ export const SONIDOS: PalabraSonido[] = [
   { emoji: '🍅', palabra: 'tomate', sonido: 't' },
   { emoji: '🚂', palabra: 'tren', sonido: 't' },
 
-  { emoji: '💰', palabra: 'dinero', sonido: 'd' },
+  { emoji: '🦷', palabra: 'diente', sonido: 'd' },
   { emoji: '🎲', palabra: 'dado', sonido: 'd' },
   { emoji: '🐬', palabra: 'delfín', sonido: 'd' },
 
