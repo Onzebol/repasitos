@@ -619,11 +619,16 @@ body {
   color: #3d6f8a;
 }
 
-/* Flechas dibujadas en SVG (ArrowIcon): del tamaño del texto y del color del botón */
+/* Flechas dibujadas en SVG (ArrowIcon): del tamaño del texto y del color del botón, con el mismo resplandor que el resto de
+   iconos (en SVG, con drop-shadow en vez de text-shadow; --resplandor y --opacidad se definen más abajo) */
 .arrow-icon {
   width: 1em;
   height: 1em;
   vertical-align: -0.125em;
+  filter:
+    drop-shadow(0 0 0.06em color-mix(in srgb, var(--resplandor) calc(var(--opacidad) * 100%), transparent))
+    drop-shadow(0 0 0.14em color-mix(in srgb, var(--resplandor) calc(var(--opacidad) * 85%), transparent))
+    drop-shadow(0 0 0.3em color-mix(in srgb, var(--resplandor) calc(var(--opacidad) * 45%), transparent));
 }
 
 .round-button .arrow-icon {
@@ -1078,9 +1083,10 @@ body {
 }
 
 /* Resplandor exterior gris oscuro en los iconos y dibujos de la aplicación (el de la pregunta de Infantil, sobre el cielo; los de
-   las opciones y los de contar; los de materias y temas y los de la interfaz, que son `.ui-icon`), para que se vean también los
-   claros o blancos (diente, sal, fantasma…). Tres capas de sombra sin desplazar, del color --resplandor y con la opacidad
-   --opacidad (de 0 a 1). Las flechas y Repi son SVG: no les afecta. */
+   las opciones y los de contar; los de materias y temas y los de la interfaz, que son `.ui-icon`; las flechas, con drop-shadow),
+   para que se vean también los claros o blancos (diente, sal, fantasma…). Tres capas de sombra sin desplazar, del color
+   --resplandor y con la opacidad --opacidad (de 0 a 1). Repi es un SVG con sus propios colores: no lleva resplandor. */
+.arrow-icon,
 .infantil .visual,
 .option-group,
 .count-item,
