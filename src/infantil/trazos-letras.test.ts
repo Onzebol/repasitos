@@ -72,8 +72,8 @@ describe('forma de las mayúsculas', () => {
     expect(TRAZOS_MAYUSCULA[letra][0][0][1]).toBeLessThanOrEqual(45)
   })
 
-  it('las que se hacen de un solo trazo: C, G, L, M, N, S, V y W', () => {
-    for (const letra of ['C', 'G', 'L', 'M', 'N', 'S', 'V', 'W'] as Letra[]) {
+  it('las que se hacen de un solo trazo: C, G, L, M, N, S, V, W y Z', () => {
+    for (const letra of ['C', 'G', 'L', 'M', 'N', 'S', 'V', 'W', 'Z'] as Letra[]) {
       expect(TRAZOS_MAYUSCULA[letra]).toHaveLength(1)
     }
   })
@@ -137,10 +137,9 @@ describe('orden de las mayúsculas según Garabatos flechas', () => {
     }
   })
 
-  it('la H lleva la raya al final, después de los dos palos; la Z, tres rayas; la Y, las diagonales hacia el vértice', () => {
+  it('la H lleva la raya al final, después de los dos palos; la Y, las diagonales hacia el vértice', () => {
     expect(TRAZOS_MAYUSCULA.H[2][0][1]).toBeCloseTo(TRAZOS_MAYUSCULA.H[2][1][1], 0) // la raya horizontal es el tercer trazo
     expect(TRAZOS_MAYUSCULA.H[1][0][0]).toBeGreaterThan(TRAZOS_MAYUSCULA.H[0][0][0]) // el segundo es el palo derecho
-    expect(TRAZOS_MAYUSCULA.Z).toHaveLength(3)
         const [y1, y2] = TRAZOS_MAYUSCULA.Y
     expect(y1.at(-1)).toEqual(y2.at(-1))
   })
