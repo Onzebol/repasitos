@@ -18,7 +18,7 @@ const round = (n: number) => Math.round(n * 10) / 10
 
 // Arco de elipse: 0° es la derecha y 90° es abajo (el eje y baja), así que los grados que suben van en el sentido
 // de las agujas del reloj y los que bajan, en el contrario.
-export function arc(cx: number, cy: number, rx: number, ry: number, from: number, to: number): Stroke {
+function arc(cx: number, cy: number, rx: number, ry: number, from: number, to: number): Stroke {
   const steps = Math.max(2, Math.ceil(Math.abs(to - from) / 15))
   return Array.from({ length: steps + 1 }, (_, i) => {
     const t = ((from + ((to - from) * i) / steps) * Math.PI) / 180
@@ -27,7 +27,7 @@ export function arc(cx: number, cy: number, rx: number, ry: number, from: number
 }
 
 // Une tramos en un solo trazo sin repetir los puntos de unión
-export const join = (...parts: Stroke[]): Stroke =>
+const join = (...parts: Stroke[]): Stroke =>
   parts.flatMap((part, i) => {
     const [x, y] = part[0]
     const last = i > 0 ? parts[i - 1].at(-1) : undefined

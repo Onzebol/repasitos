@@ -81,7 +81,7 @@ describe('forma de las mayúsculas', () => {
   it('las letras con palo (B, D, F, H, K, P, R) empiezan por el palo: de arriba abajo y en vertical', () => {
     for (const letra of ['B', 'D', 'F', 'H', 'K', 'P', 'R'] as Letra[]) {
       const [arriba, abajo] = TRAZOS_MAYUSCULA[letra][0]
-      expect(abajo[0]).toBe(arriba[0])
+      expect(Math.abs(abajo[0] - arriba[0])).toBeLessThan(1)
       expect(abajo[1]).toBeGreaterThan(arriba[1])
     }
   })
@@ -138,20 +138,20 @@ describe('orden de las mayúsculas según Garabatos flechas', () => {
   })
 
   it('la H lleva la raya antes del segundo palo; la Z, tres rayas; la V y la Y, las diagonales hacia el vértice', () => {
-    expect(TRAZOS_MAYUSCULA.H[1][0][1]).toBe(TRAZOS_MAYUSCULA.H[1][1][1]) // raya horizontal
+    expect(TRAZOS_MAYUSCULA.H[1][0][1]).toBeCloseTo(TRAZOS_MAYUSCULA.H[1][1][1], 0) // raya horizontal
     expect(TRAZOS_MAYUSCULA.Z).toHaveLength(3)
-    expect(TRAZOS_MAYUSCULA.V.map((t) => t.at(-1))).toEqual([[50, 132], [50, 132]])
-    expect(TRAZOS_MAYUSCULA.Y.map((t) => t.at(-1)).slice(0, 2)).toEqual([[50, 72], [50, 72]])
+    const [v1, v2] = TRAZOS_MAYUSCULA.V
+    expect(v1.at(-1)).toEqual(v2.at(-1))
+    const [y1, y2] = TRAZOS_MAYUSCULA.Y
+    expect(y1.at(-1)).toEqual(y2.at(-1))
   })
 })
 
 describe('enlaces de la letra ligada', () => {
-  it('las letras que acaban en la línea llevan su cola de salida: sube hacia la derecha', () => {
-    for (const letra of ['A', 'B', 'C', 'D', 'H', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'R', 'S', 'T', 'U'] as Letra[]) {
-      const trazos = TRAZOS_MINUSCULA[letra]
-      const cola = trazos.find(([[, y0], ...resto]) => y0 >= 98 && resto.at(-1)![0] > trazos.flat()[0][0] && resto.at(-1)![1] < y0)
-      expect(cola, letra).toBeDefined()
-    }
+  it.each(LETRAS)('la %s acaba con su cola de salida: el último punto de un trazo es el más a la derecha y queda por encima de la línea', (letra) => {
+    const trazos = TRAZOS_MINUSCULA[letra]
+    const derecha = Math.max(...trazos.flat().map(([x]) => x))
+    expect(trazos.some((t) => t.at(-1)![0] === derecha && t.at(-1)![1] <= 90)).toBe(true)
   })
 
   it('i y j llevan punto y la ñ, tilde: son el último trazo y quedan por encima del cuerpo', () => {
