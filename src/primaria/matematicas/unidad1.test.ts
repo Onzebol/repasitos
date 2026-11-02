@@ -61,14 +61,19 @@ describe('Unidad 1 de Matemáticas: contenido', () => {
     }
   })
 
-  it('"Números hasta el 99" lee y escribe números y pregunta por las decenas y las unidades', () => {
+  it('"Números hasta el 99" lee y escribe números, pregunta por las decenas y usa la tabla del 0 al 99', () => {
     const tema = temasUnidad1.find((topic) => topic.id === 'numeros-99')!
     for (let seed = 0; seed < 30; seed++) {
-      const preguntas = buildSession(tema.plan, mulberry32(seed)).map((e) => e.question)
+      const session = buildSession(tema.plan, mulberry32(seed))
+      const preguntas = session.map((e) => e.question)
       expect(preguntas.filter((q) => /¿Cómo se lee el número/.test(q))).toHaveLength(1)
       expect(preguntas.filter((q) => /Escribe con cifras/.test(q))).toHaveLength(1)
       expect(preguntas.filter((q) => /¿Qué número tiene \d+ decenas?\?/.test(q))).toHaveLength(1)
-      expect(preguntas.filter((q) => /¿Qué número tiene \d+ unidad(es)?\?/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /fila amarilla/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /columna naranja/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => q === '¿Qué número falta?')).toHaveLength(1)
+      // los tres de la tabla llevan su tabla dibujada
+      expect(session.filter((e) => e.type === 'choice' && e.table !== undefined)).toHaveLength(3)
     }
   })
 

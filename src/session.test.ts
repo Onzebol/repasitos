@@ -103,6 +103,13 @@ describe('exerciseKey: identifica un ejercicio por sus datos, no por el enunciad
     expect(exerciseKey(a)).not.toBe(exerciseKey(b))
   })
 
+  it('la misma pregunta con otra tabla del 0 al 99 es otro ejercicio', () => {
+    const conTabla = (table: { row?: number; col?: number; hole?: number }): Exercise => ({ ...eleccion('¿Qué número falta?', '47', '74'), table })
+    expect(exerciseKey(conTabla({ hole: 47 }))).not.toBe(exerciseKey(conTabla({ hole: 48 })))
+    expect(exerciseKey(conTabla({ row: 4 }))).not.toBe(exerciseKey(conTabla({ row: 5 })))
+    expect(exerciseKey(conTabla({ hole: 47, row: 4 }))).toBe(exerciseKey(conTabla({ hole: 47, row: 4 })))
+  })
+
   it('dos preguntas iguales con distinto texto de lectura tienen claves distintas', () => {
     const conTexto = (text: string): Exercise => ({ ...eleccion('¿Hay que sumar o restar?', 'sumar', 'restar'), text })
     expect(exerciseKey(conTexto('Tengo 23 pegatinas y me regalan 14.'))).not.toBe(exerciseKey(conTexto('En el parque hay 41 niños y llegan 25 más.')))

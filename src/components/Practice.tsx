@@ -6,6 +6,7 @@ import type { Profile, Topic } from '../types'
 import { ColumnExercise } from './ColumnExercise'
 import { CountTap } from './CountTap'
 import { Hills } from './Hills'
+import { HundredTable } from './HundredTable'
 import { Icon } from './Icon'
 import { Keypad } from './Keypad'
 import { Mascot } from './Mascot'
@@ -116,6 +117,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
 
   const texto = exercise.type === 'choice' ? exercise.text : undefined
   const lectura = texto && <p className="reading-text">{texto}</p>
+  const marcas = exercise.type === 'choice' ? exercise.table : undefined
 
   return (
     <main className={`screen ${profile}`}>
@@ -133,6 +135,8 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
         {solved ? (
           <>
             {visual}
+            {/* Al acertar, el hueco de la tabla se rellena con su número */}
+            {marcas && <HundredTable {...marcas} hole={undefined} />}
             <div className="feedback solved" role="status">
               <p className="answer-ok">
                 <Icon name="check" /> {exercise.answer}
@@ -155,6 +159,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
               )}
             </div>
             {!tapToCount && visual}
+            {marcas && <HundredTable {...marcas} />}
             {exercise.type === 'choice' ? (
               <>
                 {tapToCount && (

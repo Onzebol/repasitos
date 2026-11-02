@@ -9,6 +9,10 @@ export type Subject = {
   tint: string
 }
 
+// Qué se marca en la tabla del 0 al 99: la fila de una decena (0 a 9), la columna de una unidad (0 a 9) y/o el número
+// que falta (se dibuja como ❓)
+export type TableMarks = { row?: number; col?: number; hole?: number }
+
 // Elegir una respuesta entre varias
 export type ChoiceExercise = {
   type: 'choice'
@@ -16,6 +20,8 @@ export type ChoiceExercise = {
   visual?: string
   // Texto para leer antes de contestar (comprensión lectora): se ve sobre las opciones y el botón de escuchar lo lee con la pregunta
   text?: string
+  // Tabla del 0 al 99 dibujada entre la pregunta y las opciones, con una fila o columna marcadas y/o un número que falta
+  table?: TableMarks
   options: string[]
   answer: string
   // Contar tocando (Infantil): primero hay que tocar uno a uno los dibujos de `visual`; las opciones salen al contarlos todos
@@ -109,6 +115,9 @@ export type BlockSpec =
   | { kind: 'nearest-ten'; ask?: 'nearest' | 'between' | 'rule' | 'approx' }
   // ¿Qué signo (+ o −) va en «a ❓ b = c»? Sumas y restas sin llevar de dos cifras (elegir)
   | { kind: 'operation-sign' }
+  // La tabla del 0 al 99 dibujada (elegir): la cifra con la que empiezan los números de una fila amarilla (`row`), con la
+  // que acaban los de una columna naranja (`column`) o qué número falta en un hueco (`missing`)
+  | { kind: 'table-99'; ask: 'row' | 'column' | 'missing' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
   // sumas que no pasan de 10 y restas de números hasta el 10
   | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' | 'add-small' | 'sub-small' }
