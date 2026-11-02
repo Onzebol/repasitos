@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import emojiFont from './assets/emoji-font.css?raw'
+import { emojisDeLaFuente } from './emojiFont'
 import { generate } from './generators'
 import { ANIMALES } from './infantil/animales'
 import { nombreNumero } from './numberNames'
@@ -95,6 +97,7 @@ const SPECS: BlockSpec[] = [
   { kind: 'table-paint', ask: 'units' },
   { kind: 'table-paint', ask: 'tens' },
   { kind: 'table-paint', ask: 'both' },
+  { kind: 'hidden-info' },
   { kind: 'number-name', ask: 'read' },
   { kind: 'number-name', ask: 'write' },
   { kind: 'decompose', ask: 'sum' },
@@ -515,6 +518,64 @@ describe('generate: reglas de cada plantilla', () => {
     }
     expect(columnas.size).toBe(10)
     expect(huecos.size, 'salen todas las posiciones del 1 al 9').toBe(9)
+  })
+
+  it('la información oculta: la resta sin llevar da el número del deporte que practica, y la suma es una trampa', () => {
+    // tabla de referencia escrita a mano, independiente del código: dibujo de cada deporte y su nombre
+    const DEPORTES: Record<string, string> = {
+      '🏀': 'baloncesto',
+      '⚽': 'fútbol',
+      '🎾': 'tenis',
+      '🏊': 'natación',
+      '🏐': 'voleibol',
+      '🚴': 'ciclismo',
+      '🏓': 'tenis de mesa',
+      '🏸': 'bádminton',
+    }
+    const fuente = new Set(emojisDeLaFuente(emojiFont))
+    for (const emoji of Object.keys(DEPORTES)) expect(fuente.has(emoji), emoji).toBe(true)
+    const trampas = new Set<boolean>()
+    const deportes = new Set<string>()
+    for (const e of muchos({ kind: 'hidden-info' }).map(choice)) {
+      const [, a, b] = e.visual!.match(/^(\d+)\s+−\s+(\d+)\s+=\s+❓$/)!.map(Number)
+      const resultado = a - b
+      // resta sin llevar de dos cifras con resultado de dos cifras
+      expect(a % 10, e.visual).toBeGreaterThanOrEqual(b % 10)
+      expect(Math.floor(a / 10), e.visual).toBeGreaterThanOrEqual(Math.floor(b / 10))
+      expect(resultado, e.visual).toBeGreaterThanOrEqual(10)
+      expect(e.question).toMatch(/^¿Qué deporte practica (Lucía|Pablo|Marta|Hugo|Sara|Iván)\? Resta y averígualo\.$/)
+
+      // la tabla, escrita en el texto: cuatro deportes con números de dos cifras distintos
+      const tabla = [...e.text!.matchAll(/(\p{Extended_Pictographic}) ([a-záéíóúñ ]+?) (\d+)/gu)].map(([, emoji, nombre, numero]) => ({ emoji, nombre, numero: Number(numero) }))
+      expect(tabla, e.text).toHaveLength(4)
+      expect(new Set(tabla.map((t) => t.numero)).size, e.text).toBe(4)
+      expect(new Set(tabla.map((t) => t.emoji)).size, e.text).toBe(4)
+      for (const t of tabla) {
+        expect(DEPORTES[t.emoji], e.text).toBe(t.nombre)
+        expect(t.numero, e.text).toBeGreaterThanOrEqual(10)
+        expect(t.numero, e.text).toBeLessThanOrEqual(99)
+        deportes.add(t.emoji)
+      }
+
+      // la respuesta es el deporte cuyo número es el resultado de la resta
+      expect(tabla.find((t) => t.numero === resultado)?.emoji, e.visual).toBe(e.answer)
+      expect(e.options, e.visual).toHaveLength(3)
+      expect(e.options).toContain(e.answer)
+      for (const opcion of e.options) {
+        expect(tabla.some((t) => t.emoji === opcion), `${opcion} está en la tabla`).toBe(true)
+        expect(e.labels![opcion], opcion).toBe(DEPORTES[opcion])
+      }
+      // si la suma cabe en la tabla (≤ 99), hay un deporte con ese número y es una opción equivocada
+      const hayTrampa = a + b <= 99
+      trampas.add(hayTrampa)
+      if (hayTrampa) {
+        const trampa = tabla.find((t) => t.numero === a + b)
+        expect(trampa, `${e.visual}: falta el deporte de la suma`).toBeDefined()
+        expect(e.options, e.visual).toContain(trampa!.emoji)
+      }
+    }
+    expect(trampas, 'salen restas con y sin trampa de suma').toEqual(new Set([true, false]))
+    expect(deportes.size, 'salen los ocho deportes').toBe(8)
   })
 
   it('colorear en la tabla, unidades: los diez números que acaban en la cifra, y nada más', () => {

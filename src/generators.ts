@@ -60,6 +60,19 @@ function tresCifras(rng: Rng, answer: number, min: number, max: number): number[
 // «3 perros», «1 perro»: nombre accesible de un grupo de dibujos
 const etiqueta = (animal: Animal, k: number) => `${k} ${k === 1 ? animal.singular : animal.plural}`
 
+// Los deportes de «la información oculta» (dibujo y nombre) y los nombres de quienes los practican (sin datos de nadie real)
+const DEPORTES = [
+  { emoji: '🏀', nombre: 'baloncesto' },
+  { emoji: '⚽', nombre: 'fútbol' },
+  { emoji: '🎾', nombre: 'tenis' },
+  { emoji: '🏊', nombre: 'natación' },
+  { emoji: '🏐', nombre: 'voleibol' },
+  { emoji: '🚴', nombre: 'ciclismo' },
+  { emoji: '🏓', nombre: 'tenis de mesa' },
+  { emoji: '🏸', nombre: 'bádminton' },
+]
+const DEPORTISTAS = ['Lucía', 'Pablo', 'Marta', 'Hugo', 'Sara', 'Iván']
+
 const decenas = (n: number) => `${n} ${n === 1 ? 'decena' : 'decenas'}`
 const unidades = (n: number) => `${n} ${n === 1 ? 'unidad' : 'unidades'}`
 
@@ -325,6 +338,30 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
 
     case 'route-program':
       return generarProgramacion(rng)
+
+    case 'hidden-info': {
+      // Resta sin llevar con un resultado de dos cifras, que es el número de un deporte de la tabla
+      let [a, b] = restandos(rng)
+      while (a - b < 10) [a, b] = restandos(rng)
+      const resultado = a - b
+      // Los números de la tabla: el resultado, la suma si cabe en dos cifras (la trampa de sumar en vez de restar) y otros al
+      // azar, todos distintos; cada uno con un deporte distinto
+      const numeros = [resultado, ...(a + b <= 99 ? [a + b] : [])]
+      while (numeros.length < 4) {
+        const n = int(rng, 10, 99)
+        if (!numeros.includes(n)) numeros.push(n)
+      }
+      const [respuesta, ...resto] = shuffle(rng, DEPORTES).slice(0, 4).map((d, i) => ({ ...d, numero: numeros[i] }))
+      // opciones equivocadas: la trampa (si la hay) y otro de los deportes de la tabla
+      const equivocadas = a + b <= 99 ? [resto[0], pick(rng, resto.slice(1))] : shuffle(rng, resto).slice(0, 2)
+      const opciones = [respuesta, ...equivocadas]
+      const tabla = shuffle(rng, [respuesta, ...resto]).map((d) => `${d.emoji} ${d.nombre} ${d.numero}`)
+      return {
+        ...elegir(`¿Qué deporte practica ${pick(rng, DEPORTISTAS)}? Resta y averígualo.`, opciones.map((o) => o.emoji), respuesta.emoji, `${a}  −  ${b}  =  ❓`),
+        labels: Object.fromEntries(opciones.map((o) => [o.emoji, o.nombre])),
+        text: `Cada deporte tiene un número: ${tabla.join(' · ')}.`,
+      }
+    }
 
     case 'table-paint': {
       // De 1 a 9: con 0 unidades o 0 decenas saldrían los números de una cifra con un 0 delante, que confunden
