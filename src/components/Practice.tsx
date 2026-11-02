@@ -15,6 +15,7 @@ import { RouteMap } from './RouteMap'
 import { RouteProgram } from './RouteProgram'
 import { Steps } from './Steps'
 import { TableFill } from './TableFill'
+import { TablePaint } from './TablePaint'
 import { TopBar } from './TopBar'
 import { TraceExercise } from './TraceExercise'
 
@@ -94,7 +95,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
     setFailed(!correct)
   }
 
-  // Completar una fila o columna de la tabla: TableFill ya ha comprobado los números y vacía los equivocados
+  // Completar una fila o columna (TableFill) o colorear la tabla (TablePaint): el componente ya ha comprobado la respuesta
   const checkTableFill = (correct: boolean) => {
     setSolved(correct)
     setFailed(!correct)
@@ -176,6 +177,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
             {marcas && <HundredTable {...marcas} hole={undefined} />}
             {itinerario(true)}
             {exercise.type === 'table-fill' && <TableFill exercise={exercise} solved />}
+            {exercise.type === 'table-paint' && <TablePaint exercise={exercise} solved />}
             {/* Al llegar a la meta, el mapa dibuja el camino que ha hecho Repi, que está en la meta */}
             {exercise.type === 'route-program' && (
               <RouteMap map={{ cells: exercise.route.cells, start: exercise.goal, path: followSteps(exercise.route.start, parseSteps(program)), arrows: true }} />
@@ -249,6 +251,8 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
               <TableFill key={index} exercise={exercise} onCheck={checkTableFill} />
             ) : exercise.type === 'route-program' ? (
               <RouteProgram key={index} exercise={exercise} onResult={checkProgram} />
+            ) : exercise.type === 'table-paint' ? (
+              <TablePaint key={index} exercise={exercise} onCheck={checkTableFill} />
             ) : (
               <>
                 <output className="answer-box" aria-label="Tu respuesta">{input || '?'}</output>

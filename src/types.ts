@@ -104,7 +104,16 @@ export type RouteProgramExercise = {
   answer: string
 }
 
-export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise | TraceExercise | TableFillExercise | RouteProgramExercise
+// Colorear tocando en la tabla del 0 al 99 (TablePaint): se ve la tabla entera y se tocan las casillas que cumplen la condición
+// de la pregunta («los números que tienen 2 unidades»); acierta si las marcadas son exactamente `targets`
+export type TablePaintExercise = {
+  type: 'table-paint'
+  question: string
+  targets: number[] // los números que hay que marcar, de menor a mayor
+  answer: string // «Acaban en 2», para mostrarlo al acertar
+}
+
+export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise | TraceExercise | TableFillExercise | RouteProgramExercise | TablePaintExercise
 
 // Plantilla de un bloque de ejercicios: describe qué se quiere y src/generators.ts crea uno nuevo cada vez
 export type BlockSpec =
@@ -162,6 +171,9 @@ export type BlockSpec =
   | { kind: 'table-fill'; ask: 'row' | 'column' }
   // Programar a Repi con flechas para que llegue a un lugar del mapa de 4 × 5 (itinerarios)
   | { kind: 'route-program' }
+  // Colorear tocando en la tabla del 0 al 99: los números con N unidades (`units`), con N decenas (`tens`) o el que tiene
+  // N decenas y M unidades (`both`, una sola casilla)
+  | { kind: 'table-paint'; ask: 'units' | 'tens' | 'both' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
   // sumas que no pasan de 10 y restas de números hasta el 10
   | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' | 'add-small' | 'sub-small' }

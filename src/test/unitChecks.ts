@@ -40,6 +40,9 @@ export function describeUnit(name: string, topics: Topic[]) {
           } else if (exercise.type === 'trace') {
             expect(exercise.answer, exercise.question).toBe(exercise.digit)
             expect(exercise.question, exercise.question).toContain(String(exercise.digit))
+          } else if (exercise.type === 'table-paint') {
+            expect(exercise.question.trim()).not.toBe('')
+            expect(exercise.targets.length, exercise.question).toBeGreaterThanOrEqual(1)
           } else if (exercise.type === 'route-program') {
             expect(exercise.question.trim()).not.toBe('')
             expect(exercise.answer, exercise.question).toMatch(/^(\d+[<>^v] ?)+$/)
