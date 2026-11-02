@@ -2,9 +2,9 @@ import { describe, expect, it, vi } from 'vitest'
 import emojiFont from './assets/emoji-font.css?raw'
 import { emojisDeLaFuente } from './emojiFont'
 import { generate } from './generators'
-import { ADORNOS, LUGARES, MAPA_COLUMNAS, MAPA_FILAS, REPI } from './itinerarios'
+import { ADORNOS, LUGARES, MAPA_COLUMNAS, MAPA_FILAS, OBSTACULOS, REPI } from './itinerarios'
 import { mulberry32 } from './random'
-import { describeSteps, followSteps, formatSteps, parseSteps } from './route'
+import { describeSteps, followSteps, formatSteps, parseSteps, runProgram } from './route'
 import type { BlockSpec, ChoiceExercise } from './types'
 
 const SEMILLAS = 300
@@ -152,5 +152,49 @@ describe('itinerarios: por qué sitio pasa Repi', () => {
       const porElCamino = lugares.filter((l) => camino.some((c) => mismo(c, l.casilla)))
       expect(porElCamino.map((l) => l.dibujo)).toEqual([e.answer])
     }
+  })
+})
+
+describe('itinerarios: programar a Repi', () => {
+  const programas = Array.from({ length: SEMILLAS }, (_, seed) => generate({ kind: 'route-program' }, mulberry32(seed)))
+
+  it('los árboles son los dos de los adornos y bloquean', () => {
+    expect([...OBSTACULOS].sort()).toEqual(['🌲', '🌳'])
+    for (const arbol of OBSTACULOS) expect(ADORNOS).toContain(arbol)
+  })
+
+  it('el ejercicio pide llegar a un lugar del mapa, sin dibujar el camino ni dar el itinerario', () => {
+    const lugares = new Set<string>()
+    for (const e of programas) {
+      if (e.type !== 'route-program') throw new Error('se esperaba programar a Repi')
+      const destino = e.question.replace('Programa a Repi para que llegue ', '')
+      const dibujo = { 'al colegio': '🏫', 'a la tienda': '🏪', 'a la fuente': '⛲', 'al hospital': '🏥', 'a la noria': '🎡', 'al castillo': '🏰' }[destino]!
+      expect(dibujo, e.question).toBeDefined()
+      expect(e.route.path, e.question).toBeUndefined()
+      expect(e.route.arrows, e.question).toBeFalsy()
+      expect(e.route.cells).toHaveLength(4)
+      for (const fila of e.route.cells) expect(fila).toHaveLength(5)
+      expect(e.route.cells[e.route.start[0]][e.route.start[1]], 'Repi sale de una casilla libre').toBe('')
+      expect(e.route.cells[e.goal[0]][e.goal[1]], e.question).toBe(dibujo)
+      expect(e.goal, 'la salida y la meta son distintas').not.toEqual(e.route.start)
+      lugares.add(dibujo)
+    }
+    expect(lugares.size, 'salen todos los lugares').toBe(6)
+  })
+
+  it('hay solución: el itinerario de referencia lleva a Repi a la meta sin chocar con árboles', () => {
+    for (const e of programas) {
+      if (e.type !== 'route-program') throw new Error('se esperaba programar a Repi')
+      const pasos = parseSteps(e.answer)
+      expect(formatSteps(pasos), e.question).toBe(e.answer)
+      const resultado = runProgram(e.route.cells, e.route.start, e.goal, pasos, ['🌳', '🌲'])
+      expect(resultado.outcome, `${e.question}: ${e.answer}`).toBe('goal')
+      expect(followSteps(e.route.start, pasos).at(-1), e.question).toEqual(e.goal)
+    }
+  })
+
+  it('en la mayoría de los mapas hay árboles (si no, no habría con qué chocar)', () => {
+    const conArboles = programas.filter((e) => e.type === 'route-program' && e.route.cells.flat().some((c) => OBSTACULOS.includes(c)))
+    expect(conArboles.length).toBeGreaterThan(SEMILLAS / 2)
   })
 })

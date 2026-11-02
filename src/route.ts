@@ -48,6 +48,28 @@ export function stepsFromPath(path: Cell[]): Step[] {
   return pasos
 }
 
+// Lo que hace Repi al seguir un programa por el mapa. Se mueve casilla a casilla hasta que termina el programa o algo lo
+// para: el borde del mapa (`edge`) o un obstáculo, un árbol (`blocked`). Si termina el programa, acierta (`goal`) cuando está
+// en la meta (por cualquier camino) y si no se ha quedado corto (`short`). `positions` incluye la casilla de salida.
+export type RunResult = { positions: Cell[]; outcome: 'goal' | 'short' | 'blocked' | 'edge' }
+
+export function runProgram(cells: string[][], start: Cell, goal: Cell, steps: Step[], obstacles: string[]): RunResult {
+  const positions: Cell[] = [start]
+  let [fila, columna] = start
+  for (const { n, dir } of steps) {
+    for (let i = 0; i < n; i++) {
+      const [siguienteFila, siguienteColumna] = [fila + DELTA[dir][0], columna + DELTA[dir][1]]
+      if (siguienteFila < 0 || siguienteFila >= cells.length || siguienteColumna < 0 || siguienteColumna >= cells[0].length) {
+        return { positions, outcome: 'edge' }
+      }
+      if (obstacles.includes(cells[siguienteFila][siguienteColumna])) return { positions, outcome: 'blocked' }
+      ;[fila, columna] = [siguienteFila, siguienteColumna]
+      positions.push([fila, columna])
+    }
+  }
+  return { positions, outcome: fila === goal[0] && columna === goal[1] ? 'goal' : 'short' }
+}
+
 // El itinerario dicho con palabras, para lectores de pantalla y para la lectura en voz alta
 export function describeSteps(steps: Step[]): string {
   const frases = steps.map(({ n, dir }) => `${n} ${n === 1 ? 'paso' : 'pasos'} ${HACIA[dir]}`)

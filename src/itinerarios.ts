@@ -2,7 +2,7 @@ import { int, pick, shuffle } from './random'
 import type { Rng } from './random'
 import { describeSteps, followSteps, formatSteps, parseSteps, stepsFromPath } from './route'
 import type { Cell, Dir } from './route'
-import type { ChoiceExercise } from './types'
+import type { ChoiceExercise, RouteProgramExercise } from './types'
 
 // Mapas de los itinerarios con flechas (Planos e itinerarios, unidad 1): una cuadrícula de 4 filas × 5 columnas con un
 // camino de 2 o 3 tramos rectos, lugares (el colegio, la tienda…) y adornos. Los dibujos son propios, no los del libro.
@@ -22,6 +22,9 @@ export const LUGARES: Record<string, { nombre: string }> = {
 
 // Casillas de hierba: algunas llevan un adorno (nunca el camino ni los lugares)
 export const ADORNOS = ['🌳', '🌲', '🌷', '🌻']
+
+// Al programar a Repi, los árboles no se pueden cruzar (los lugares y las flores sí)
+export const OBSTACULOS = ['🌳', '🌲']
 
 const claveDe = ([fila, columna]: Cell) => `${fila},${columna}`
 
@@ -64,6 +67,24 @@ const etiquetasDeLugares = (lugares: string[]) => Object.fromEntries(lugares.map
 
 // Tres lugares distintos: el de la respuesta y dos más
 const tresLugares = (rng: Rng) => shuffle(rng, Object.keys(LUGARES)).slice(0, 3)
+
+// Programar a Repi: hay que escribir un programa de flechas que lo lleve a un lugar. El mapa no dibuja el camino; siempre hay
+// al menos uno libre de árboles (el de referencia, que va en `answer`), pero vale cualquiera que llegue a la meta
+export function generarProgramacion(rng: Rng): RouteProgramExercise {
+  const camino = caminoAleatorio(rng)
+  const meta = camino.at(-1)!
+  const llegada = pick(rng, Object.keys(LUGARES))
+  const cells = mapaConAdornos(new Set(camino.map(claveDe)), rng)
+  cells[meta[0]][meta[1]] = llegada
+  const nombre = LUGARES[llegada].nombre
+  return {
+    type: 'route-program',
+    question: `Programa a Repi para que llegue ${nombre.startsWith('el ') ? `al ${nombre.slice(3)}` : `a ${nombre}`}`,
+    route: { cells, start: camino[0] },
+    goal: meta,
+    answer: formatSteps(stepsFromPath(camino)),
+  }
+}
 
 export function generarItinerario(ask: 'where' | 'which' | 'passes', rng: Rng): ChoiceExercise {
   const camino = caminoAleatorio(rng)

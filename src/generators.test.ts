@@ -37,6 +37,9 @@ function esValido(e: Exercise, spec?: BlockSpec) {
     expect(e.digit, e.question).toBeLessThanOrEqual(9)
     expect(e.answer, e.question).toBe(e.digit)
     expect(e.question, e.question).toContain(String(e.digit))
+  } else if (e.type === 'route-program') {
+    expect(e.route.cells, e.question).toHaveLength(4)
+    expect(e.answer, e.question).toMatch(/^(\d+[<>^v] ?)+$/)
   } else if (e.type === 'table-fill') {
     expect(e.blanks, e.question).toHaveLength(5)
     expect(new Set(e.blanks).size, e.question).toBe(5)
@@ -83,6 +86,7 @@ const SPECS: BlockSpec[] = [
   { kind: 'route', ask: 'passes' },
   { kind: 'table-fill', ask: 'row' },
   { kind: 'table-fill', ask: 'column' },
+  { kind: 'route-program' },
   { kind: 'number-name', ask: 'read' },
   { kind: 'number-name', ask: 'write' },
   { kind: 'decompose', ask: 'sum' },

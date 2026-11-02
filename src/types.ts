@@ -93,7 +93,18 @@ export type TableFillExercise = {
   answer: string // «40 a 49», para mostrarlo al acertar
 }
 
-export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise | TraceExercise | TableFillExercise
+// Programar a Repi (RouteProgram): con las flechas ↑ ↓ ← → se escribe un programa y Repi lo sigue por el mapa. Acierta si
+// acaba en la meta (`goal`, por cualquier camino); los árboles y el borde del mapa lo paran. `answer` es un itinerario de
+// referencia que llega («3> 1^ 1>», ver src/route.ts); no se enseña
+export type RouteProgramExercise = {
+  type: 'route-program'
+  question: string
+  route: RouteMapData
+  goal: [number, number]
+  answer: string
+}
+
+export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise | TraceExercise | TableFillExercise | RouteProgramExercise
 
 // Plantilla de un bloque de ejercicios: describe qué se quiere y src/generators.ts crea uno nuevo cada vez
 export type BlockSpec =
@@ -149,6 +160,8 @@ export type BlockSpec =
   | { kind: 'route'; ask: 'where' | 'which' | 'passes' }
   // Completar con el teclado una fila (`row`, de la decena 1 a la 9) o una columna (`column`) de la tabla del 0 al 99
   | { kind: 'table-fill'; ask: 'row' | 'column' }
+  // Programar a Repi con flechas para que llegue a un lugar del mapa de 4 × 5 (itinerarios)
+  | { kind: 'route-program' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
   // sumas que no pasan de 10 y restas de números hasta el 10
   | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' | 'add-small' | 'sub-small' }

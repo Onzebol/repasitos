@@ -136,9 +136,10 @@ export const temasUnidad1: Topic[] = [
     icon: '🧭',
     tint: '#c9f0e0',
     plan: [
-      { spec: { kind: 'route', ask: 'where' }, count: 4 },
-      { spec: { kind: 'route', ask: 'which' }, count: 3 },
-      { spec: { kind: 'route', ask: 'passes' }, count: 3 },
+      { spec: { kind: 'route', ask: 'where' }, count: 3 },
+      { spec: { kind: 'route', ask: 'which' }, count: 2 },
+      { spec: { kind: 'route', ask: 'passes' }, count: 2 },
+      { spec: { kind: 'route-program' }, count: 3 },
     ],
   },
 ]

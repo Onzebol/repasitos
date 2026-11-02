@@ -1,6 +1,6 @@
-import { render, screen, within } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import css from '../assets/theme.css?raw'
 import { mulberry32 } from '../random'
 import { speak } from '../speak'
@@ -519,5 +519,60 @@ describe('Practice: itinerarios con flechas', () => {
     render(<Practice topic={tema} onHome={vi.fn()} onBack={vi.fn()} />)
     expect(screen.queryByRole('img', { name: /Itinerario/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('img', { name: /Mapa/ })).not.toBeInTheDocument()
+  })
+})
+
+describe('Practice: programar a Repi', () => {
+  const celdas = [
+    ['🌳', '', '🌲', '🌳', ''],
+    ['', '🌷', '', '🏪', '🏫'],
+    ['', '', '', '⛲', ''],
+    ['', '', '', '', ''],
+  ]
+  const temaProgramar = topicFrom([
+    { type: 'route-program', question: 'Programa a Repi para que llegue al colegio', route: { cells: celdas, start: [2, 0] }, goal: [1, 4], answer: '3> 1^ 1>' },
+  ])
+
+  beforeEach(() => vi.useFakeTimers({ shouldAdvanceTime: true }))
+  afterEach(() => vi.useRealTimers())
+
+  const abrir = () => {
+    render(<Practice topic={temaProgramar} onHome={vi.fn()} onBack={vi.fn()} />)
+    return userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+  }
+  const flecha = (hacia: string) => screen.getByRole('button', { name: `Flecha ${hacia}` })
+  const esperar = (ms: number) => act(async () => { await vi.advanceTimersByTimeAsync(ms) })
+
+  it('muestra la pregunta, el mapa y la paleta de flechas', () => {
+    abrir()
+    expect(screen.getByRole('heading', { name: 'Programa a Repi para que llegue al colegio' })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Mapa con Repi' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '¡Ir!' })).toBeDisabled()
+  })
+
+  it('al llegar a la meta anima, enseña el programa con flechas y el camino que ha hecho Repi', async () => {
+    const user = abrir()
+    for (const d of ['derecha', 'derecha', 'derecha', 'arriba', 'derecha']) await user.click(flecha(d))
+    await user.click(screen.getByRole('button', { name: '¡Ir!' }))
+    await esperar(4000)
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+    const programa = screen.getByRole('img', { name: '3 pasos a la derecha, 1 paso hacia arriba y 1 paso a la derecha' })
+    expect(programa.querySelectorAll('svg')).toHaveLength(3)
+    expect(screen.getByRole('status')).not.toHaveTextContent(/[<>^]/)
+    expect(screen.getByRole('img', { name: 'Mapa con Repi y un camino' })).toBeInTheDocument()
+  })
+
+  it('si no llega, ánimo, sin borrar el programa, y se puede cambiar y volver a intentar', async () => {
+    const user = abrir()
+    await user.click(flecha('derecha'))
+    await user.click(screen.getByRole('button', { name: '¡Ir!' }))
+    await esperar(3000)
+    expect(screen.getByText('¡Casi! Inténtalo otra vez')).toBeInTheDocument()
+    expect(screen.queryByText('¡Muy bien!')).not.toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Programa: 1 paso a la derecha' })).toBeInTheDocument()
+    for (const d of ['derecha', 'derecha', 'arriba', 'derecha']) await user.click(flecha(d))
+    await user.click(screen.getByRole('button', { name: '¡Ir!' }))
+    await esperar(4000)
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
   })
 })
