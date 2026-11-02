@@ -619,6 +619,68 @@ body {
   color: #3d6f8a;
 }
 
+/* Tabla del 0 al 99 (HundredTable): fila amarilla, columna naranja y hueco punteado. Además del color, la cabecera
+   de la fila o la columna también se marca, para que no dependa solo del color */
+.t99 {
+  width: 100%;
+  max-width: 34rem;
+  display: grid;
+  grid-template-columns: 1.75rem repeat(10, minmax(0, 1fr));
+  gap: 3px;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  background: var(--card);
+  box-shadow: 0 6px 0 var(--card-shadow);
+}
+
+.t99 .h {
+  padding: 0.1rem 0;
+  border-radius: 0.4rem;
+  font-size: clamp(0.6rem, 2.2vw, 0.85rem);
+  font-weight: 700;
+  color: #3d6f8a;
+  text-align: center;
+}
+
+.t99 .h.fila {
+  background: #ffe27a;
+  color: var(--ink);
+}
+
+.t99 .h.col {
+  background: #ffb27a;
+  color: var(--ink);
+}
+
+.t99 .c {
+  height: clamp(1.55rem, 6.4vw, 2.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #cfe6f3;
+  border-radius: 0.45rem;
+  background: var(--card);
+  font-size: clamp(0.75rem, 3vw, 1.05rem);
+  font-weight: 700;
+}
+
+.t99 .c.fila {
+  background: #ffe27a;
+  border-color: #e3b800;
+}
+
+.t99 .c.col {
+  background: #ffb27a;
+  border-color: #e0782b;
+}
+
+/* El hueco va después de la fila y la columna: en el cruce, su borde punteado oscuro gana */
+.t99 .c.hueco {
+  border: 3px dashed var(--ink);
+  background: var(--card);
+}
+
 /* Flechas dibujadas en SVG (ArrowIcon): del tamaño del texto y del color del botón */
 .arrow-icon {
   width: 1em;

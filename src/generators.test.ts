@@ -71,6 +71,9 @@ const SPECS: BlockSpec[] = [
   { kind: 'series', step: 4, min: 0, max: 20 },
   { kind: 'series', step: 3, min: 0, max: 20, down: true },
   { kind: 'operation-sign' },
+  { kind: 'table-99', ask: 'row' },
+  { kind: 'table-99', ask: 'column' },
+  { kind: 'table-99', ask: 'missing' },
   { kind: 'number-name', ask: 'read' },
   { kind: 'number-name', ask: 'write' },
   { kind: 'decompose', ask: 'sum' },
@@ -456,6 +459,62 @@ describe('generate: reglas de cada plantilla', () => {
       expect(b, e.question).toBeGreaterThanOrEqual(1)
       expect(b, e.question).toBeLessThan(a)
       expect(e.answer, e.question).toBe(a - b)
+    }
+  })
+
+  it('tabla del 99, fila: todos los números de la fila empiezan por la cifra de las decenas', () => {
+    const filas = new Set<number>()
+    for (const e of muchos({ kind: 'table-99', ask: 'row' }).map(choice)) {
+      expect(e.question).toBe('Todos los números de la fila amarilla empiezan por…')
+      const fila = e.table!.row!
+      expect(e.table, e.question).toEqual({ row: fila })
+      expect(fila, e.question).toBeGreaterThanOrEqual(1)
+      expect(fila, e.question).toBeLessThanOrEqual(9)
+      expect(e.answer).toBe(String(fila))
+      expect(e.options).toHaveLength(3)
+      for (const opcion of e.options) expect(Number(opcion)).toBeGreaterThanOrEqual(1)
+      filas.add(fila)
+    }
+    expect(filas.size).toBe(9)
+  })
+
+  it('tabla del 99, columna: todos los números de la columna acaban en la cifra de las unidades', () => {
+    const columnas = new Set<number>()
+    for (const e of muchos({ kind: 'table-99', ask: 'column' }).map(choice)) {
+      expect(e.question).toBe('Todos los números de la columna naranja acaban en…')
+      const col = e.table!.col!
+      expect(e.table, e.question).toEqual({ col })
+      expect(col, e.question).toBeGreaterThanOrEqual(0)
+      expect(col, e.question).toBeLessThanOrEqual(9)
+      expect(e.answer).toBe(String(col))
+      expect(e.options).toHaveLength(3)
+      for (const opcion of e.options) {
+        expect(Number(opcion)).toBeGreaterThanOrEqual(0)
+        expect(Number(opcion)).toBeLessThanOrEqual(9)
+      }
+      columnas.add(col)
+    }
+    expect(columnas.size).toBe(10)
+  })
+
+  it('tabla del 99, número que falta: el hueco está en su fila y columna y las otras opciones son números parecidos', () => {
+    for (const e of muchos({ kind: 'table-99', ask: 'missing' }).map(choice)) {
+      expect(e.question).toBe('¿Qué número falta?')
+      const { row, col, hole } = e.table!
+      expect(hole, e.question).toBeGreaterThanOrEqual(10)
+      expect(hole, e.question).toBeLessThanOrEqual(99)
+      expect(row, e.question).toBe(Math.floor(hole! / 10))
+      expect(col, e.question).toBe(hole! % 10)
+      expect(e.answer).toBe(String(hole))
+      expect(e.options).toHaveLength(3)
+      for (const opcion of e.options) {
+        expect(Number(opcion)).toBeGreaterThanOrEqual(10)
+        expect(Number(opcion)).toBeLessThanOrEqual(99)
+      }
+      // si las cifras son distintas y la de las unidades no es 0, una opción es el número con las cifras cambiadas (47 y 74)
+      if (hole! % 10 !== 0 && hole! % 10 !== row) {
+        expect(e.options, e.question).toContain(String((hole! % 10) * 10 + row!))
+      }
     }
   })
 

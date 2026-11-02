@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import css from '../assets/theme.css?raw'
@@ -385,5 +385,42 @@ describe('Practice: ejercicios con un texto para leer', () => {
 
   it('la tarjeta de lectura tiene su propio estilo', () => {
     expect(css).toMatch(/\.reading-text\s*\{/)
+  })
+})
+
+describe('Practice: ejercicios sobre la tabla del 0 al 99', () => {
+  const conTabla = topicFrom([
+    { type: 'choice', question: '¿Qué número falta?', options: ['46', '47', '74'], answer: '47', table: { row: 4, col: 7, hole: 47 } },
+    { type: 'choice', question: 'Todos los números de la fila amarilla empiezan por…', options: ['2', '3', '4'], answer: '4', table: { row: 4 } },
+    { type: 'choice', question: '¿Cuánto es 2 + 2?', options: ['3', '4', '5'], answer: '4' },
+  ])
+
+  it('muestra la tabla con el hueco entre la pregunta y las opciones', () => {
+    render(<Practice topic={conTabla} onHome={vi.fn()} onBack={vi.fn()} />)
+    const tabla = screen.getByRole('img', { name: /Tabla del 0 al 99/ })
+    expect(within(tabla).getByText('❓')).toBeInTheDocument()
+    const pregunta = screen.getByRole('heading', { name: '¿Qué número falta?' })
+    const opcion = screen.getByRole('button', { name: '47' })
+    expect(pregunta.compareDocumentPosition(tabla) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(tabla.compareDocumentPosition(opcion) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('al acertar se ve el número que faltaba en su sitio', async () => {
+    render(<Practice topic={conTabla} onHome={vi.fn()} onBack={vi.fn()} />)
+    await userEvent.setup().click(screen.getByRole('button', { name: '47' }))
+    const tabla = screen.getByRole('img', { name: /Tabla del 0 al 99/ })
+    expect(within(tabla).queryByText('❓')).not.toBeInTheDocument()
+    expect(within(tabla).getByText('47')).toBeInTheDocument()
+  })
+
+  it('un ejercicio sin tabla no la muestra', async () => {
+    const user = userEvent.setup()
+    render(<Practice topic={conTabla} onHome={vi.fn()} onBack={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: '47' }))
+    await user.click(screen.getByRole('button', { name: /Siguiente/ }))
+    await user.click(screen.getByRole('button', { name: '4' }))
+    await user.click(screen.getByRole('button', { name: /Siguiente/ }))
+    expect(screen.getByRole('heading', { name: '¿Cuánto es 2 + 2?' })).toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: /Tabla del 0 al 99/ })).not.toBeInTheDocument()
   })
 })

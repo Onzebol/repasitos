@@ -319,6 +319,31 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       return elegir('¿Qué signo va en el recuadro?', ['+', '−'], operador, `${a}  ❓  ${b}  =  ${resultado}`)
     }
 
+    case 'table-99': {
+      if (spec.ask === 'row' || spec.ask === 'column') {
+        // Fila: las decenas, de 1 a 9 (la 0 empieza por «0»); columna: las unidades, de 0 a 9
+        const fila = spec.ask === 'row'
+        const minimo = fila ? 1 : 0
+        const cifra = int(rng, minimo, 9)
+        const otras = shuffle(rng, Array.from({ length: 10 - minimo }, (_, i) => i + minimo).filter((x) => x !== cifra)).slice(0, 2)
+        return {
+          ...elegir(
+            fila ? 'Todos los números de la fila amarilla empiezan por…' : 'Todos los números de la columna naranja acaban en…',
+            [cifra, ...otras],
+            cifra,
+          ),
+          table: fila ? { row: cifra } : { col: cifra },
+        }
+      }
+      // El que falta, con su fila y su columna marcadas. Opciones: el de las cifras cambiadas (47 y 74) y un vecino
+      const n = int(rng, 10, 99)
+      const [d, u] = [Math.floor(n / 10), n % 10]
+      const cambiado = u * 10 + d
+      const vecinos = shuffle(rng, [n - 10, n - 1, n + 1, n + 10].filter((m) => m >= 10 && m <= 99))
+      const otros = u !== 0 && u !== d ? [cambiado, vecinos[0]] : vecinos.slice(0, 2)
+      return { ...elegir('¿Qué número falta?', [n, ...otros], n), table: { row: d, col: u, hole: n } }
+    }
+
     case 'place-value': {
       const d = int(rng, 1, 9)
       if (spec.ask === 'read') {
