@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import css from '../assets/theme.css?raw'
 import { TracePreview } from './TracePreview'
 
 vi.mock('../speak', () => ({ speak: vi.fn() }))
@@ -71,5 +72,33 @@ describe('TracePreview: colores de los trazos', () => {
       expect(colores).toHaveLength(trazos)
       expect(new Set(colores).size).toBe(trazos)
     }
+  })
+})
+
+describe('TracePreview: probar el trazo de una mayúscula', () => {
+  it('cada mayúscula tiene su botón «Probar», las minúsculas todavía no', () => {
+    render(<TracePreview onHome={vi.fn()} />)
+    const lista = screen.getByRole('list', { name: 'Letras en mayúscula' })
+    expect(within(lista).getAllByRole('button', { name: /^Probar la letra / })).toHaveLength(27)
+    const minusculas = screen.getByRole('list', { name: 'Letras en minúscula' })
+    expect(within(minusculas).queryAllByRole('button')).toHaveLength(0)
+  })
+
+  it('abre el ejercicio de trazo de la letra y, al terminar, vuelve a la hoja', async () => {
+    const user = userEvent.setup()
+    render(<TracePreview onHome={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: 'Probar la letra Ñ' }))
+    expect(screen.getByRole('img', { name: 'Repasa la letra Ñ con el dedo' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Ya lo he hecho' }))
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Volver a la hoja/ }))
+    expect(screen.getByRole('list', { name: 'Letras en mayúscula' })).toBeInTheDocument()
+  })
+})
+
+describe('TracePreview: separación entre bloques de la hoja', () => {
+  it('hay espacio por encima del título de las letras y entre las listas de mayúsculas y minúsculas', () => {
+    expect(css).toMatch(/[.]trace-grid [+] [.]trace-note[^{]*[{][^}]*margin-top: [1-9]/)
+    expect(css).toMatch(/[.]trace-grid [+] [.]trace-grid[^{]*[{][^}]*margin-top: [1-9]/)
   })
 })

@@ -41,7 +41,7 @@ function StrokeSvg({ strokes, description }: { strokes: Stroke[]; description: s
 }
 
 // Hoja de letras (solo para ver los recorridos): sin ejercicio todavía
-function LetterSheet({ title, kind, strokes }: { title: string; kind: string; strokes: Record<Letra, Stroke[]> }) {
+function LetterSheet({ title, kind, strokes, onTry }: { title: string; kind: string; strokes: Record<Letra, Stroke[]>; onTry?: (letter: Letra) => void }) {
   return (
     <ul className="trace-grid" aria-label={title}>
       {ABECEDARIO.map((letter) => {
@@ -51,6 +51,11 @@ function LetterSheet({ title, kind, strokes }: { title: string; kind: string; st
           <li key={letter}>
             <StrokeSvg strokes={strokes[letter]} description={`Letra ${shown} ${kind}: ${n} ${n === 1 ? 'trazo' : 'trazos'}`} />
             <span className="trace-label" aria-hidden="true">{shown}</span>
+            {onTry && (
+              <button className="trace-try" onClick={() => onTry(letter)} aria-label={`Probar la letra ${shown}`}>
+                Probar
+              </button>
+            )}
           </li>
         )
       })}
@@ -69,18 +74,21 @@ const COLORES = ['#1f7ac4', '#e8832a', '#2e9e57', '#8e44ad', '#d6342f']
 // número de orden) y una flecha con el sentido. Sirve para contrastar el orden y la dirección con los cuadernos.
 export function TracePreview({ onHome }: TracePreviewProps) {
   const [selected, setSelected] = useState<Digit | null>(null)
+  const [selectedLetter, setSelectedLetter] = useState<Letra | null>(null)
   const [done, setDone] = useState(false)
   const close = () => {
     setSelected(null)
+    setSelectedLetter(null)
     setDone(false)
   }
 
   // Probar una cifra: el mismo ejercicio que verán en Infantil
-  if (selected !== null) {
+  if (selected !== null || selectedLetter !== null) {
+    const what = selectedLetter !== null ? `la letra ${selectedLetter}` : `el número ${selected}`
     return (
       <main className="screen trace-page">
         <Hills />
-        <TopBar title={`Trazo del ${selected}`} prompt={`Repasa el número ${selected}`} onHome={onHome} onBack={close} />
+        <TopBar title={`Trazo de ${what}`} prompt={`Repasa ${what}`} onHome={onHome} onBack={close} />
         <div className="trace-content trace-try-screen">
           {done ? (
             <>
@@ -91,7 +99,7 @@ export function TracePreview({ onHome }: TracePreviewProps) {
               </button>
             </>
           ) : (
-            <TraceExercise digit={selected} onDone={() => setDone(true)} />
+            <TraceExercise digit={selected ?? undefined} letter={selectedLetter ?? undefined} onDone={() => setDone(true)} />
           )}
         </div>
       </main>
@@ -123,7 +131,7 @@ export function TracePreview({ onHome }: TracePreviewProps) {
           })}
         </ul>
         <h2 className="trace-note">Letras (recorridos por contrastar con el cuaderno)</h2>
-        <LetterSheet title="Letras en mayúscula" kind="mayúscula" strokes={TRAZOS_MAYUSCULA} />
+        <LetterSheet title="Letras en mayúscula" kind="mayúscula" strokes={TRAZOS_MAYUSCULA} onTry={setSelectedLetter} />
         <LetterSheet title="Letras en minúscula" kind="minúscula" strokes={TRAZOS_MINUSCULA} />
       </div>
     </main>

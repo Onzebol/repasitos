@@ -2,21 +2,25 @@ import { useMemo, useRef, useState } from 'react'
 import type { PointerEvent } from 'react'
 import { arrowAt, pathData, TRAZOS, VIEWBOX } from '../infantil/trazos'
 import type { Digit } from '../infantil/trazos'
+import { TRAZOS_MAYUSCULA } from '../infantil/trazos-letras'
+import type { Letra } from '../infantil/trazos-letras'
 import { speak } from '../speak'
 import { advance, createGuide, initialState, lift, toSvgPoint, traced } from '../trace'
 import type { TraceState } from '../trace'
 import { Mascot } from './Mascot'
 
 type TraceExerciseProps = {
-  digit: Digit
+  digit?: Digit
+  letter?: Letra // mayúscula en lugar de cifra (hoja de adultos)
   onDone: () => void // la cifra está repasada (con el dedo o con «Ya lo he hecho»)
 }
 
 // Repasar una cifra con el dedo, siguiendo la guía de punteado y empezando por el círculo amarillo. Sin tiempo ni
 // penalizaciones: si el dedo se sale, el trazo en curso vuelve a empezar con un «¡Casi!» amable. La lógica de
 // seguimiento está en src/trace.ts; aquí solo los eventos de puntero (táctil y ratón) y el dibujo.
-export function TraceExercise({ digit, onDone }: TraceExerciseProps) {
-  const strokes = TRAZOS[digit]
+export function TraceExercise({ digit, letter, onDone }: TraceExerciseProps) {
+  const strokes = letter ? TRAZOS_MAYUSCULA[letter] : TRAZOS[digit ?? 0]
+  const name = letter ?? String(digit)
   const guide = useMemo(() => createGuide(strokes), [strokes])
   const [state, setState] = useState<TraceState>(initialState)
   const current = useRef<TraceState>(initialState) // siempre al día, aunque lleguen varios movimientos seguidos
@@ -32,7 +36,7 @@ export function TraceExercise({ digit, onDone }: TraceExerciseProps) {
   const finish = () => {
     if (finished.current) return
     finished.current = true
-    speak(String(digit))
+    speak(name)
     onDone()
   }
 
@@ -74,7 +78,7 @@ export function TraceExercise({ digit, onDone }: TraceExerciseProps) {
         className="trace-surface"
         viewBox={`${VIEWBOX.x} ${VIEWBOX.y} ${VIEWBOX.width} ${VIEWBOX.height}`}
         role="img"
-        aria-label={`Repasa el número ${digit} con el dedo`}
+        aria-label={letter ? `Repasa la letra ${letter} con el dedo` : `Repasa el número ${digit} con el dedo`}
         onPointerDown={press}
         onPointerMove={move}
         onPointerUp={release}

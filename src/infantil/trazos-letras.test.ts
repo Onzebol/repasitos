@@ -86,6 +86,18 @@ describe('forma de las mayúsculas', () => {
     }
   })
 
+  it('el trazo 1 de la K es el palo recto de arriba a abajo, sin quiebros', () => {
+    const palo = TRAZOS_MAYUSCULA.K[0]
+    for (const [x] of palo) expect(Math.abs(x - palo[0][0])).toBeLessThan(0.5)
+    for (let i = 1; i < palo.length; i++) expect(palo[i][1]).toBeGreaterThan(palo[i - 1][1])
+  })
+
+  it('los dos palos de la X son diagonales rectas, sin curvas en el cruce', () => {
+    const [primero, segundo] = TRAZOS_MAYUSCULA.X
+    expect(primero).toHaveLength(2)
+    expect(segundo).toHaveLength(2)
+  })
+
   it('la Ñ es una N con la tilde encima, en un trazo aparte y al final', () => {
     const [ene, tilde] = TRAZOS_MAYUSCULA.Ñ
     expect(TRAZOS_MAYUSCULA.Ñ).toHaveLength(2)
