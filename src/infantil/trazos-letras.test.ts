@@ -175,8 +175,126 @@ describe('enlaces de la letra ligada', () => {
 })
 
 describe('minúsculas: trazos continuos', () => {
-  it('la a, la d, la g y la k son dos trazos (el óvalo o el lazo, y el palo o el arco con su salida)', () => {
-    for (const letra of ['A', 'D', 'G', 'K'] as Letra[]) expect(TRAZOS_MINUSCULA[letra]).toHaveLength(2)
+  it('la a es un solo trazo: el óvalo, subir hasta el inicio del palo y bajar por él', () => {
+    const [trazo, ...resto] = TRAZOS_MINUSCULA.A
+    expect(resto).toHaveLength(0)
+    const inicioPalo = trazo.findIndex(([x, y]) => x === 54.7 && y === 56)
+    expect(inicioPalo).toBeGreaterThan(0)
+    // tras el óvalo sube hasta el inicio del palo (y menor) y desde ahí solo baja
+    expect(trazo[inicioPalo][1]).toBeLessThan(trazo[inicioPalo - 1][1])
+    expect(trazo[inicioPalo + 1][1]).toBeGreaterThan(trazo[inicioPalo][1])
+  })
+
+  it('la d es un solo trazo: el óvalo, subir hasta lo alto del palo y bajar por él', () => {
+    const [trazo, ...resto] = TRAZOS_MINUSCULA.D
+    expect(resto).toHaveLength(0)
+    const inicioPalo = trazo.findIndex(([x, y]) => x === 54.7 && y === 13)
+    expect(inicioPalo).toBeGreaterThan(0)
+    expect(trazo[inicioPalo][1]).toBeLessThan(trazo[inicioPalo - 1][1])
+    expect(trazo[inicioPalo + 1][1]).toBeGreaterThan(trazo[inicioPalo][1])
+  })
+
+  it('la g es un solo trazo: el óvalo, subir hasta el inicio del palo y bajar por él hasta el rabo', () => {
+    const [trazo, ...resto] = TRAZOS_MINUSCULA.G
+    expect(resto).toHaveLength(0)
+    const inicioPalo = trazo.findIndex(([x, y]) => x === 56.4 && y === 56)
+    expect(inicioPalo).toBeGreaterThan(0)
+    expect(trazo[inicioPalo][1]).toBeLessThan(trazo[inicioPalo - 1][1])
+    expect(trazo[inicioPalo + 1][1]).toBeGreaterThan(trazo[inicioPalo][1])
+  })
+
+  it('en la a, la d y la g el palo se sube y se baja por el mismo sitio (sin diagonal de unión)', () => {
+    const cimas: [Letra, number, number][] = [['A', 54.7, 56], ['D', 54.7, 13], ['G', 56.4, 56]]
+    for (const [letra, cx, cy] of cimas) {
+      const trazo = TRAZOS_MINUSCULA[letra][0]
+      const i = trazo.findIndex(([x, y]) => x === cx && y === cy)
+      expect(i).toBeGreaterThan(0)
+      expect(Math.abs(trazo[i - 1][0] - cx)).toBeLessThan(1)
+      expect(Math.abs(trazo[i + 1][0] - cx)).toBeLessThan(1)
+    }
+  })
+
+  it('la h es un solo trazo: baja el palo, vuelve a subir por él hasta el inicio del arco y sigue', () => {
+    const [trazo, ...resto] = TRAZOS_MINUSCULA.H
+    expect(resto).toHaveLength(0)
+    const i = trazo.findIndex(([x, y]) => x === 26.6 && y === 66.3)
+    expect(i).toBeGreaterThan(0)
+    expect(trazo[i - 1][1]).toBeGreaterThan(trazo[i][1]) // viene de abajo, por el palo
+    expect(Math.abs(trazo[i - 1][0] - trazo[i][0])).toBeLessThan(2)
+    expect(trazo[i + 1][0]).toBeGreaterThan(trazo[i][0]) // y arranca hacia la derecha
+  })
+
+  it('la m y la n son un solo trazo, y la ñ dos (el cuerpo y la tilde): al acabar cada palo se sube por él hasta el inicio del arco siguiente', () => {
+    expect(TRAZOS_MINUSCULA.M).toHaveLength(1)
+    expect(TRAZOS_MINUSCULA.N).toHaveLength(1)
+    expect(TRAZOS_MINUSCULA.Ñ).toHaveLength(2)
+    expect(TRAZOS_MINUSCULA.Ñ[0]).toEqual(TRAZOS_MINUSCULA.N[0].map(([x, y], i) => (i === 0 ? [13.7, y] : [x, y])))
+    for (const [letra, arcos] of [['M', 2], ['N', 1], ['Ñ', 1]] as [Letra, number][]) {
+      const trazo = TRAZOS_MINUSCULA[letra][0]
+      // los puntos donde el trazo da la vuelta abajo: el siguiente punto sube
+      const vueltas = trazo.filter((p, i) => i > 0 && i < trazo.length - 1 && trazo[i - 1][1] < p[1] && trazo[i + 1][1] < p[1] - 5)
+      expect(vueltas).toHaveLength(arcos)
+      for (const [x, y] of vueltas) {
+        const i = trazo.findIndex(([px, py]) => px === x && py === y)
+        expect(Math.abs(trazo[i + 1][0] - x)).toBeLessThan(2) // sube por el mismo palo, sin diagonal
+      }
+    }
+  })
+
+  it('la p y la q son un solo trazo: el palo con su rabo se baja y se vuelve a subir por el mismo sitio', () => {
+    expect(TRAZOS_MINUSCULA.P).toHaveLength(1)
+    expect(TRAZOS_MINUSCULA.Q).toHaveLength(1)
+    for (const letra of ['P', 'Q'] as Letra[]) {
+      const trazo = TRAZOS_MINUSCULA[letra][0]
+      const fondo = Math.max(...trazo.map(([, y]) => y))
+      const i = trazo.findIndex(([, y]) => y === fondo)
+      // tras llegar al fondo del rabo, el trazo sube por el palo (casi vertical)
+      expect(trazo[i + 1][1]).toBeLessThan(fondo)
+      expect(Math.abs(trazo[i + 1][0] - trazo[i][0])).toBeLessThan(2)
+    }
+  })
+
+  it('la z es un solo trazo: la raya de arriba enlaza con la diagonal sin levantar el dedo', () => {
+    expect(TRAZOS_MINUSCULA.Z).toHaveLength(1)
+  })
+
+  it('la y es un solo trazo: el cuenco sube por el palo hasta su inicio (y = 56) y baja por el mismo sitio hasta el rabo', () => {
+    const [trazo, ...resto] = TRAZOS_MINUSCULA.Y
+    expect(resto).toHaveLength(0)
+    const i = trazo.findIndex(([x, y]) => x === 57.1 && y === 56)
+    expect(i).toBeGreaterThan(0)
+    expect(trazo[i - 1][1]).toBeGreaterThan(trazo[i][1])
+    expect(Math.abs(trazo[i - 1][0] - trazo[i][0])).toBeLessThan(1.5)
+    expect(Math.abs(trazo[i + 1][0] - trazo[i][0])).toBeLessThan(1.5)
+    expect(trazo[i + 1][1]).toBeGreaterThan(trazo[i][1])
+  })
+
+  it('la y es como la u con el lazo abajo: los dos palos del cuenco suben a la misma altura (y = 56)', () => {
+    const trazo = TRAZOS_MINUSCULA.Y[0]
+    const cimas = trazo.filter(([, y]) => y === 56)
+    expect(cimas.some(([x]) => x < 40)).toBe(true)
+    expect(cimas.some(([x]) => x > 50)).toBe(true)
+  })
+
+  it('la t: la raya (trazo 2) está centrada en el palo, a la misma distancia por los dos lados', () => {
+    const [palo, raya] = TRAZOS_MINUSCULA.T
+    const x = palo[0][0]
+    const [inicio, fin] = [raya[0][0], raya.at(-1)![0]]
+    expect(inicio).toBeLessThan(x)
+    expect(fin).toBeGreaterThan(x)
+    expect(Math.abs((x - inicio) - (fin - x))).toBeLessThan(0.5)
+  })
+
+  it('la x son dos trazos: el primero enlaza la subida con la cola de abajo a la izquierda, el segundo la cola de arriba a la derecha con la salida', () => {
+    expect(TRAZOS_MINUSCULA.X).toHaveLength(2)
+    const [izquierda, derecha] = TRAZOS_MINUSCULA.X
+    expect(izquierda[0][0]).toBeLessThan(25) // empieza a la izquierda
+    expect(derecha[0][0]).toBeGreaterThan(60) // empieza arriba a la derecha
+    expect(derecha.at(-1)![0]).toBeGreaterThan(80) // y acaba con la salida a la derecha
+  })
+
+  it('la k es de dos trazos (el óvalo o el lazo, y el palo o el arco con su salida)', () => {
+    for (const letra of ['K'] as Letra[]) expect(TRAZOS_MINUSCULA[letra]).toHaveLength(2)
   })
 
   it('la b, la c, la e, la f, la l, la o, la s, la u, la v y la w se escriben sin levantar el dedo: un solo trazo', () => {

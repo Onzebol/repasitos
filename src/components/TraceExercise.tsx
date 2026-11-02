@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import type { PointerEvent } from 'react'
 import { arrowAt, pathData, TRAZOS, VIEWBOX } from '../infantil/trazos'
 import type { Digit } from '../infantil/trazos'
-import { TRAZOS_MAYUSCULA } from '../infantil/trazos-letras'
+import { TRAZOS_MAYUSCULA, TRAZOS_MINUSCULA } from '../infantil/trazos-letras'
 import type { Letra } from '../infantil/trazos-letras'
 import { speak } from '../speak'
 import { advance, createGuide, initialState, lift, toSvgPoint, traced } from '../trace'
@@ -11,16 +11,18 @@ import { Mascot } from './Mascot'
 
 type TraceExerciseProps = {
   digit?: Digit
-  letter?: Letra // mayúscula en lugar de cifra (hoja de adultos)
+  letter?: Letra // letra en lugar de cifra (hoja de adultos)
+  lowercase?: boolean // la letra es minúscula
   onDone: () => void // la cifra está repasada (con el dedo o con «Ya lo he hecho»)
 }
 
 // Repasar una cifra con el dedo, siguiendo la guía de punteado y empezando por el círculo amarillo. Sin tiempo ni
 // penalizaciones: si el dedo se sale, el trazo en curso vuelve a empezar con un «¡Casi!» amable. La lógica de
 // seguimiento está en src/trace.ts; aquí solo los eventos de puntero (táctil y ratón) y el dibujo.
-export function TraceExercise({ digit, letter, onDone }: TraceExerciseProps) {
-  const strokes = letter ? TRAZOS_MAYUSCULA[letter] : TRAZOS[digit ?? 0]
-  const name = letter ?? String(digit)
+export function TraceExercise({ digit, letter, lowercase, onDone }: TraceExerciseProps) {
+  const shown = letter && (lowercase ? letter.toLowerCase() : letter)
+  const strokes = letter ? (lowercase ? TRAZOS_MINUSCULA : TRAZOS_MAYUSCULA)[letter] : TRAZOS[digit ?? 0]
+  const name = shown ?? String(digit)
   const guide = useMemo(() => createGuide(strokes), [strokes])
   const [state, setState] = useState<TraceState>(initialState)
   const current = useRef<TraceState>(initialState) // siempre al día, aunque lleguen varios movimientos seguidos
@@ -78,7 +80,7 @@ export function TraceExercise({ digit, letter, onDone }: TraceExerciseProps) {
         className="trace-surface"
         viewBox={`${VIEWBOX.x} ${VIEWBOX.y} ${VIEWBOX.width} ${VIEWBOX.height}`}
         role="img"
-        aria-label={letter ? `Repasa la letra ${letter} con el dedo` : `Repasa el número ${digit} con el dedo`}
+        aria-label={letter ? `Repasa la letra ${shown} con el dedo` : `Repasa el número ${digit} con el dedo`}
         onPointerDown={press}
         onPointerMove={move}
         onPointerUp={release}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { arrowAt, DIGITS, HEIGHT, pathData, TRAZOS, WIDTH } from '../infantil/trazos'
 import type { Digit, Stroke } from '../infantil/trazos'
 import { ABECEDARIO, TRAZOS_MAYUSCULA, TRAZOS_MINUSCULA } from '../infantil/trazos-letras'
@@ -41,7 +41,7 @@ function StrokeSvg({ strokes, description }: { strokes: Stroke[]; description: s
 }
 
 // Hoja de letras (solo para ver los recorridos): sin ejercicio todavía
-function LetterSheet({ title, kind, strokes, onTry }: { title: string; kind: string; strokes: Record<Letra, Stroke[]>; onTry?: (letter: Letra) => void }) {
+function LetterSheet({ title, kind, strokes, onTry }: { title: string; kind: string; strokes: Record<Letra, Stroke[]>; onTry?: (letter: Letra, lowercase: boolean) => void }) {
   return (
     <ul className="trace-grid" aria-label={title}>
       {ABECEDARIO.map((letter) => {
@@ -52,7 +52,7 @@ function LetterSheet({ title, kind, strokes, onTry }: { title: string; kind: str
             <StrokeSvg strokes={strokes[letter]} description={`Letra ${shown} ${kind}: ${n} ${n === 1 ? 'trazo' : 'trazos'}`} />
             <span className="trace-label" aria-hidden="true">{shown}</span>
             {onTry && (
-              <button className="trace-try" onClick={() => onTry(letter)} aria-label={`Probar la letra ${shown}`}>
+              <button className="trace-try" onClick={() => onTry(letter, kind === 'minúscula')} aria-label={`Probar la letra ${shown}`}>
                 Probar
               </button>
             )}
@@ -75,6 +75,20 @@ const COLORES = ['#1f7ac4', '#e8832a', '#2e9e57', '#8e44ad', '#d6342f']
 export function TracePreview({ onHome }: TracePreviewProps) {
   const [selected, setSelected] = useState<Digit | null>(null)
   const [selectedLetter, setSelectedLetter] = useState<Letra | null>(null)
+  const [lowercase, setLowercase] = useState(false)
+  const scrollY = useRef<number | null>(null) // posición de la hoja al abrir un ejercicio, para volver al mismo sitio
+  const remember = () => {
+    scrollY.current = window.scrollY
+  }
+  const tryDigit = (digit: Digit) => {
+    remember()
+    setSelected(digit)
+  }
+  const tryLetter = (letter: Letra, lower: boolean) => {
+    remember()
+    setSelectedLetter(letter)
+    setLowercase(lower)
+  }
   const [done, setDone] = useState(false)
   const close = () => {
     setSelected(null)
@@ -82,9 +96,17 @@ export function TracePreview({ onHome }: TracePreviewProps) {
     setDone(false)
   }
 
+  const open = selected !== null || selectedLetter !== null
+  useLayoutEffect(() => {
+    if (!open && scrollY.current !== null) {
+      window.scrollTo(0, scrollY.current)
+      scrollY.current = null
+    }
+  }, [open])
+
   // Probar una cifra: el mismo ejercicio que verán en Infantil
   if (selected !== null || selectedLetter !== null) {
-    const what = selectedLetter !== null ? `la letra ${selectedLetter}` : `el número ${selected}`
+    const what = selectedLetter !== null ? `la letra ${lowercase ? selectedLetter.toLowerCase() : selectedLetter}` : `el número ${selected}`
     return (
       <main className="screen trace-page">
         <Hills />
@@ -99,7 +121,7 @@ export function TracePreview({ onHome }: TracePreviewProps) {
               </button>
             </>
           ) : (
-            <TraceExercise digit={selected ?? undefined} letter={selectedLetter ?? undefined} onDone={() => setDone(true)} />
+            <TraceExercise digit={selected ?? undefined} letter={selectedLetter ?? undefined} lowercase={lowercase} onDone={() => setDone(true)} />
           )}
         </div>
       </main>
@@ -123,7 +145,7 @@ export function TracePreview({ onHome }: TracePreviewProps) {
               <li key={digit}>
                 <StrokeSvg strokes={strokes} description={description} />
                 <span className="trace-label" aria-hidden="true">{digit}</span>
-                <button className="trace-try" onClick={() => setSelected(digit)} aria-label={`Probar el número ${digit}`}>
+                <button className="trace-try" onClick={() => tryDigit(digit)} aria-label={`Probar el número ${digit}`}>
                   Probar
                 </button>
               </li>
@@ -131,8 +153,8 @@ export function TracePreview({ onHome }: TracePreviewProps) {
           })}
         </ul>
         <h2 className="trace-note">Letras (recorridos por contrastar con el cuaderno)</h2>
-        <LetterSheet title="Letras en mayúscula" kind="mayúscula" strokes={TRAZOS_MAYUSCULA} onTry={setSelectedLetter} />
-        <LetterSheet title="Letras en minúscula" kind="minúscula" strokes={TRAZOS_MINUSCULA} />
+        <LetterSheet title="Letras en mayúscula" kind="mayúscula" strokes={TRAZOS_MAYUSCULA} onTry={tryLetter} />
+        <LetterSheet title="Letras en minúscula" kind="minúscula" strokes={TRAZOS_MINUSCULA} onTry={tryLetter} />
       </div>
     </main>
   )
