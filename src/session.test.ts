@@ -103,6 +103,12 @@ describe('exerciseKey: identifica un ejercicio por sus datos, no por el enunciad
     expect(exerciseKey(a)).not.toBe(exerciseKey(b))
   })
 
+  it('dos preguntas iguales con distinto texto de lectura tienen claves distintas', () => {
+    const conTexto = (text: string): Exercise => ({ ...eleccion('¿Hay que sumar o restar?', 'sumar', 'restar'), text })
+    expect(exerciseKey(conTexto('Tengo 23 pegatinas y me regalan 14.'))).not.toBe(exerciseKey(conTexto('En el parque hay 41 niños y llegan 25 más.')))
+    expect(exerciseKey(conTexto('Tengo 23 pegatinas y me regalan 14.'))).toBe(exerciseKey(conTexto('Tengo 23 pegatinas y me regalan 14.')))
+  })
+
   it('el orden de las opciones no cambia la clave', () => {
     expect(exerciseKey(eleccion('P', 'a', 'b', 'c'))).toBe(exerciseKey({ ...eleccion('P', 'a', 'c', 'b') }))
   })

@@ -8,15 +8,51 @@ import { temasUnidad1 } from './unidad1'
 describeUnit('Unidad 1 de Matemáticas', temasUnidad1)
 
 describe('Unidad 1 de Matemáticas: contenido', () => {
-  it('tiene los seis temas del índice', () => {
+  it('tiene los seis temas del índice y el laboratorio de problemas', () => {
     expect(temasUnidad1.map((topic) => topic.id)).toEqual([
       'numeros-99',
       'decenas-unidades',
       'mayor-menor',
       'sumas-restas',
       'decena-cercana',
+      'problemas',
       'calculo-mental',
     ])
+  })
+
+  it('"Los signos > y <" completa desigualdades y compara con pueblos, edades y mochilas', () => {
+    const tema = temasUnidad1.find((topic) => topic.id === 'mayor-menor')!
+    for (let seed = 0; seed < 30; seed++) {
+      const session = buildSession(tema.plan, mulberry32(seed))
+      expect(session.filter((e) => e.type === 'choice' && /recuadro/.test(e.question) && /[<>]/.test(e.visual ?? '') && /❓/.test(e.visual ?? ''))).toHaveLength(2)
+      expect(session.filter((e) => e.type === 'choice' && e.text !== undefined)).toHaveLength(2)
+    }
+  })
+
+  it('"Resolvemos problemas" enseña los pasos: sumar o restar, total o diferencia y problemas de dos pasos', () => {
+    const tema = temasUnidad1.find((topic) => topic.id === 'problemas')!
+    for (let seed = 0; seed < 30; seed++) {
+      const session = buildSession(tema.plan, mulberry32(seed))
+      expect(session.filter((e) => e.question === '¿Hay que sumar o restar?')).toHaveLength(2)
+      expect(session.filter((e) => e.question === '¿Qué hay que calcular?')).toHaveLength(2)
+      expect(session.filter((e) => e.type === 'number' && /ahora\?$/.test(e.question) && (e.question.match(/\d+/g) ?? []).length === 3)).toHaveLength(4)
+      expect(session.filter((e) => e.type === 'number' && (e.question.match(/\d+/g) ?? []).length === 2)).toHaveLength(2)
+    }
+  })
+
+  it('"Sumas y restas sin llevar" incluye columnas con un sumando de una cifra, como 83 + 5', () => {
+    const tema = temasUnidad1.find((topic) => topic.id === 'sumas-restas')!
+    for (let seed = 0; seed < 30; seed++) {
+      const columnas = buildSession(tema.plan, mulberry32(seed)).filter((e) => e.type === 'column')
+      expect(columnas.filter((e) => e.bottom < 10 && e.operator === '+')).toHaveLength(1)
+      expect(columnas.filter((e) => e.bottom < 10 && e.operator === '−')).toHaveLength(1)
+    }
+  })
+
+  it('"Cálculo mental" empieza por las sumas y restas fáciles de un dígito', () => {
+    const tema = temasUnidad1.find((topic) => topic.id === 'calculo-mental')!
+    const modos = tema.plan.map((bloque) => bloque.spec).flatMap((spec) => (spec.kind === 'mental' ? [spec.mode] : []))
+    expect(modos).toEqual(expect.arrayContaining(['add-small', 'sub-small', 'add-bridge', 'sub-bridge', 'tens-add', 'tens-sub']))
   })
 
   it('ningún tema depende de listas fijas: leer y escribir números se generan para todos los números', () => {

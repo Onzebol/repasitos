@@ -120,8 +120,19 @@ function sumandosLlevando(rng: Rng): [number, number] {
 
 const operandosLlevando = (operator: '+' | '−', rng: Rng) => (operator === '+' ? sumandosLlevando(rng) : restandosLlevando(rng))
 
-const columna = (operator: '+' | '−', carry: boolean, rng: Rng): ColumnExercise => {
-  const [top, bottom] = carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
+// Un número de dos cifras y otro de una, sin llevar: 83 + 5 (las unidades suman menos de 10) o 87 − 5 (las unidades alcanzan)
+function operandosUnaCifra(operator: '+' | '−', rng: Rng): [number, number] {
+  const topTens = int(rng, 1, 9)
+  if (operator === '+') {
+    const topUnits = int(rng, 0, 8)
+    return [topTens * 10 + topUnits, int(rng, 1, 9 - topUnits)]
+  }
+  const topUnits = int(rng, 1, 9)
+  return [topTens * 10 + topUnits, int(rng, 1, topUnits)]
+}
+
+const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = false): ColumnExercise => {
+  const [top, bottom] = oneDigit ? operandosUnaCifra(operator, rng) : carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
   return {
     type: 'column',
     question: operator === '+' ? 'Suma en columna' : 'Resta en columna',
@@ -151,6 +162,109 @@ const problema = (operator: '+' | '−', carry: boolean, rng: Rng): NumberExerci
   const [a, b] = carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
   const historia = pick(rng, operator === '+' ? HISTORIAS_SUMA : HISTORIAS_RESTA)
   return numero(historia(a, b), operator === '+' ? a + b : a - b)
+}
+
+// Los pasos de un problema: con el texto en la tarjeta de lectura, se elige qué operación hay que hacer o qué se calcula
+function pasoDeProblema(ask: 'operation' | 'calculate', rng: Rng): ChoiceExercise {
+  const operator = pick(rng, ['+', '−'] as const)
+  const [a, b] = operandos(operator, rng)
+  const text = pick(rng, operator === '+' ? HISTORIAS_SUMA : HISTORIAS_RESTA)(a, b)
+  const ejercicio =
+    ask === 'operation'
+      ? elegir('¿Hay que sumar o restar?', ['sumar', 'restar'], operator === '+' ? 'sumar' : 'restar')
+      : elegir('¿Qué hay que calcular?', ['el total', 'la diferencia'], operator === '+' ? 'el total' : 'la diferencia')
+  return { ...ejercicio, text }
+}
+
+const sumaSinLlevar = (x: number, y: number) => (x % 10) + (y % 10) < 10 && x + y <= 99
+const restaSinLlevar = (x: number, y: number) => x > y && x % 10 >= y % 10
+
+const HISTORIAS_SUMA_RESTA: ((a: number, b: number, c: number) => string)[] = [
+  (a, b, c) => `Tengo ${a} cromos y me regalan ${b}. Después regalo ${c}. ¿Cuántos cromos tengo ahora?`,
+  (a, b, c) => `En el autobús hay ${a} personas. Suben ${b} y bajan ${c}. ¿Cuántas personas hay ahora?`,
+]
+
+const HISTORIAS_RESTA_SUMA: ((a: number, b: number, c: number) => string)[] = [
+  (a, b, c) => `Tenía ${a} galletas. Me como ${b} y luego me dan ${c} más. ¿Cuántas galletas tengo ahora?`,
+  (a, b, c) => `En la bolsa hay ${a} canicas. Saco ${b} y echo ${c}. ¿Cuántas canicas hay ahora?`,
+]
+
+// Dos pasos sin llevar: sumar y restar (a + b − c) o restar y sumar (a − b + c), con resultados entre 1 y 99
+function dosPasos(mode: 'add-sub' | 'sub-add', rng: Rng): NumberExercise {
+  for (let intento = 0; intento < 1000; intento++) {
+    const a = int(rng, 10, 89)
+    const b = int(rng, 1, 50)
+    const c = int(rng, 1, 50)
+    if (mode === 'add-sub' && sumaSinLlevar(a, b) && restaSinLlevar(a + b, c)) {
+      return numero(pick(rng, HISTORIAS_SUMA_RESTA)(a, b, c), a + b - c)
+    }
+    if (mode === 'sub-add' && restaSinLlevar(a, b) && sumaSinLlevar(a - b, c)) {
+      return numero(pick(rng, HISTORIAS_RESTA_SUMA)(a, b, c), a - b + c)
+    }
+  }
+  throw new Error('No se ha podido crear un problema de dos pasos')
+}
+
+// Comparar con datos de la vida real: pueblos (km), edades y mochilas (kilos). Los datos van en la tarjeta de lectura
+type ContextoComparar = { intro: string; nombres: string[]; dato: (nombre: string, n: number) => string; min: number; max: number; mayor: string; menor: string }
+const CONTEXTOS_COMPARAR: ContextoComparar[] = [
+  {
+    intro: 'Distancias',
+    nombres: ['Robledal', 'Almendral', 'Pinares', 'Cañada', 'Los Olmos', 'Fuentes'],
+    dato: (nombre, n) => `${nombre} ${n} km`,
+    min: 10,
+    max: 99,
+    mayor: '¿Qué pueblo está más lejos?',
+    menor: '¿Qué pueblo está más cerca?',
+  },
+  {
+    intro: 'Edades',
+    nombres: ['Marta', 'Pablo', 'Lucía', 'Hugo', 'Sara', 'Iván'],
+    dato: (nombre, n) => `${nombre} ${n} años`,
+    min: 10,
+    max: 99,
+    mayor: '¿Quién es mayor?',
+    menor: '¿Quién es menor?',
+  },
+  {
+    intro: 'Pesos',
+    nombres: ['La mochila roja', 'La mochila azul', 'La mochila verde', 'La mochila negra', 'La mochila rosa', 'La mochila naranja'],
+    dato: (nombre, n) => `${nombre} ${n} kilos`,
+    min: 10,
+    max: 30,
+    mayor: '¿Qué mochila pesa más?',
+    menor: '¿Qué mochila pesa menos?',
+  },
+]
+
+function compararEnContexto(rng: Rng): ChoiceExercise {
+  const contexto = pick(rng, CONTEXTOS_COMPARAR)
+  const nombres = shuffle(rng, contexto.nombres).slice(0, 3)
+  const valores = tresDistintos(rng, contexto.min, contexto.max)
+  const mayor = pick(rng, [true, false])
+  const elegido = mayor ? Math.max(...valores) : Math.min(...valores)
+  const respuesta = nombres[valores.indexOf(elegido)]
+  return {
+    ...elegir(mayor ? contexto.mayor : contexto.menor, nombres, respuesta),
+    text: `${contexto.intro}: ${nombres.map((nombre, i) => contexto.dato(nombre, valores[i])).join(', ')}.`,
+  }
+}
+
+// Qué número va en «48 > ❓», «48 < ❓», «❓ > 48» o «❓ < 37»: solo una de las tres opciones hace cierta la comparación
+function completarDesigualdad(rng: Rng): ChoiceExercise {
+  const a = int(rng, 20, 90)
+  const [hueco, signo] = pick(rng, [['derecha', '>'], ['derecha', '<'], ['izquierda', '>'], ['izquierda', '<']] as const)
+  // El hueco debe ser mayor que a en «a < ❓» y «❓ > a»; menor en «a > ❓» y «❓ < a»
+  const mayor = (hueco === 'derecha') === (signo === '<')
+  const cumple = (x: number) => (mayor ? x > a : x < a)
+  const correcta = mayor ? int(rng, a + 1, 99) : int(rng, 10, a - 1)
+  const equivocadas = new Set<number>()
+  while (equivocadas.size < 2) {
+    const x = int(rng, 10, 99)
+    if (x !== a && !cumple(x)) equivocadas.add(x)
+  }
+  const visual = hueco === 'derecha' ? `${a}  ${signo}  ❓` : `❓  ${signo}  ${a}`
+  return elegir('¿Qué número va en el recuadro?', [correcta, ...equivocadas], correcta, visual)
 }
 
 // Elegir entre dibujos de palabras: las opciones son los emojis y cada uno lleva su palabra como nombre accesible
@@ -294,6 +408,8 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'compare': {
+      if (spec.mode === 'complete') return completarDesigualdad(rng)
+      if (spec.mode === 'context') return compararEnContexto(rng)
       const [a, b, c] = tresDistintos(rng, spec.min, spec.max)
       if (spec.mode === 'sign') {
         return elegir('¿Qué signo va en el recuadro?', ['>', '<'], a > b ? '>' : '<', `${a}  ❓  ${b}`)
@@ -315,7 +431,13 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'column':
-      return columna(spec.operator, spec.carry ?? false, rng)
+      return columna(spec.operator, spec.carry ?? false, rng, spec.oneDigit ?? false)
+
+    case 'problem-step':
+      return pasoDeProblema(spec.ask, rng)
+
+    case 'two-steps':
+      return dosPasos(spec.mode, rng)
 
     case 'word-problem':
       return problema(spec.operator, spec.carry ?? false, rng)
@@ -585,6 +707,18 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'mental': {
+      if (spec.mode === 'add-small') {
+        // Sin pasar de 10: 3 + 4, 6 + 2
+        const a = int(rng, 1, 8)
+        const b = int(rng, 1, 10 - a)
+        return numero(`${a} + ${b} =`, a + b)
+      }
+      if (spec.mode === 'sub-small') {
+        // Restas de números hasta el 10: 4 − 2, 9 − 5
+        const a = int(rng, 2, 10)
+        const b = int(rng, 1, a - 1)
+        return numero(`${a} − ${b} =`, a - b)
+      }
       if (spec.mode === 'add-three') {
         let a: number, b: number, c: number
         do {

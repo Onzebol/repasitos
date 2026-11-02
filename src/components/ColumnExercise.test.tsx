@@ -35,6 +35,15 @@ describe('Ejercicio en columna: aspecto', () => {
     expect(unidades()).toBeInTheDocument()
   })
 
+  it('un sumando de una cifra deja en blanco la columna de las decenas, sin un 0 delante', () => {
+    abrir({ type: 'column', question: 'Suma en columna', operator: '+', top: 83, bottom: 5, answer: 88 })
+    const columna = screen.getByRole('group', { name: '83 + 5' })
+    expect(within(columna).queryByText('0')).not.toBeInTheDocument()
+    expect(within(columna).getAllByText('5')).toHaveLength(1)
+    expect(within(columna).getByText('8')).toBeInTheDocument()
+    expect(within(columna).getByText('3')).toBeInTheDocument()
+  })
+
   it('las restas usan el signo −', () => {
     abrir(resta)
     expect(within(screen.getByRole('group', { name: '68 − 63' })).getByText('−')).toBeInTheDocument()
