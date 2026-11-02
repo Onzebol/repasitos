@@ -134,7 +134,7 @@ export type BlockSpec =
   // que acaban los de una columna naranja (`column`) o qué número falta en un hueco (`missing`)
   | { kind: 'table-99'; ask: 'row' | 'column' | 'missing' }
   // Itinerarios con flechas en un mapa de 4 × 5 (elegir): seguir unas flechas y decir dónde se llega (`where`), elegir el
-  // itinerario que recorre el camino dibujado (`which`) o por qué lugar pasa el camino (`passes`)
+  // itinerario que recorre el camino dibujado (`which`) o por qué lugar pasa Repi al seguir unas flechas, sin pintar el camino (`passes`)
   | { kind: 'route'; ask: 'where' | 'which' | 'passes' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
   // sumas que no pasan de 10 y restas de números hasta el 10

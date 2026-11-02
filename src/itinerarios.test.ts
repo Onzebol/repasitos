@@ -1,13 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import emojiFont from './assets/emoji-font.css?raw'
 import { emojisDeLaFuente } from './emojiFont'
 import { generate } from './generators'
-import { ADORNOS, LUGARES, MAPA_COLUMNAS, MAPA_FILAS, META, REPI } from './itinerarios'
+import { ADORNOS, LUGARES, MAPA_COLUMNAS, MAPA_FILAS, REPI } from './itinerarios'
 import { mulberry32 } from './random'
 import { describeSteps, followSteps, formatSteps, parseSteps } from './route'
 import type { BlockSpec, ChoiceExercise } from './types'
 
 const SEMILLAS = 300
+
+// Cada test recorre 300 mapas con muchas comprobaciones: con todos los tests corriendo a la vez pueden pasar de los 5 s por defecto
+vi.setConfig({ testTimeout: 30_000 })
 
 // Tabla escrita a mano, independiente del código: dibujo de cada lugar y cómo se nombra
 const NOMBRES: Record<string, string> = {
@@ -51,7 +54,7 @@ describe('el mapa de los itinerarios', () => {
   it('mide 4 filas × 5 columnas y todo lo que se dibuja sale de la fuente de emojis', () => {
     expect([MAPA_FILAS, MAPA_COLUMNAS]).toEqual([4, 5])
     const fuente = new Set(emojisDeLaFuente(emojiFont))
-    for (const dibujo of [REPI, META, ...Object.keys(LUGARES), ...ADORNOS.filter((a) => a !== '')]) {
+    for (const dibujo of [REPI, ...Object.keys(LUGARES), ...ADORNOS.filter((a) => a !== '')]) {
       expect(fuente.has(dibujo), dibujo).toBe(true)
     }
   })
@@ -124,17 +127,23 @@ describe('itinerarios: elegir el itinerario («¿qué itinerario lleva…?»)', 
   })
 })
 
-describe('itinerarios: por dónde pasa el camino', () => {
-  it('el camino dibujado pasa por un solo lugar de los tres de las opciones y acaba en la meta', () => {
+describe('itinerarios: por qué sitio pasa Repi', () => {
+  it('se dan las instrucciones sin dibujar el camino y siguiéndolas se pasa por un solo lugar de los tres', () => {
     for (const e of muchos({ kind: 'route', ask: 'passes' })) {
-      expect(e.question).toBe('¿Por qué sitio pasa el camino?')
+      expect(e.question).toBe('¿Por qué sitio pasa Repi?')
       const mapa = e.route!
-      expect(mapa.arrows).toBe(true)
-      const camino = mapa.path!
-      expect(mapa.start).toEqual(camino[0])
-      comprobarCamino(camino, e.question)
+      // el camino no se pinta (se vería la respuesta): solo están las instrucciones
+      expect(mapa.path, e.steps).toBeUndefined()
+      expect(mapa.arrows, e.steps).toBeFalsy()
+      expect(e.stepOptions).toBeFalsy()
+      const pasos = parseSteps(e.steps!)
+      for (let i = 1; i < pasos.length; i++) expect(pasos[i].dir, e.steps).not.toBe(pasos[i - 1].dir)
+      const camino = followSteps(mapa.start, pasos)
+      comprobarCamino(camino, e.steps!)
+      expect(mapa.cells[mapa.start[0]][mapa.start[1]], 'Repi sale de una casilla libre').toBe('')
+      // la meta no lleva bandera ni lugar: ya no hace falta
       const meta = camino.at(-1)!
-      expect(mapa.cells[meta[0]][meta[1]]).toBe(META)
+      expect(mapa.cells[meta[0]][meta[1]], e.steps).toBe('')
 
       expect(e.options).toHaveLength(3)
       const lugares = lugaresEn(e)

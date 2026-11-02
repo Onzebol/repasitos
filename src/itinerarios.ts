@@ -10,7 +10,6 @@ export const MAPA_FILAS = 4
 export const MAPA_COLUMNAS = 5
 
 export const REPI = '🦊' // sale de la casilla de salida
-export const META = '🏁' // marca el final del camino cuando no hay un lugar
 
 export const LUGARES: Record<string, { nombre: string }> = {
   '🏫': { nombre: 'el colegio' },
@@ -116,21 +115,22 @@ export function generarItinerario(ask: 'where' | 'which' | 'passes', rng: Rng): 
     }
   }
 
-  // passes: el camino pasa por un lugar y los otros dos quedan fuera; el final se marca con una bandera
+  // passes: se dan las instrucciones, sin pintar el camino (se vería la respuesta). Siguiéndolas se pasa por un lugar
+  // y los otros dos quedan fuera; el final del camino no lleva nada
   const [alPasar, ...otros] = tresLugares(rng)
   const interior = pick(rng, camino.slice(1, -1))
   const sitios = shuffle(rng, casillasLibres(ocupadas)).slice(0, 2)
   sitios.forEach((c) => ocupadas.add(claveDe(c)))
   const cells = mapaConAdornos(ocupadas, rng)
-  cells[meta[0]][meta[1]] = META
   cells[interior[0]][interior[1]] = alPasar
   otros.forEach((lugar, i) => (cells[sitios[i][0]][sitios[i][1]] = lugar))
   return {
     type: 'choice',
-    question: '¿Por qué sitio pasa el camino?',
+    question: '¿Por qué sitio pasa Repi?',
     options: [alPasar, ...otros],
     answer: alPasar,
     labels: etiquetasDeLugares([alPasar, ...otros]),
-    route: { cells, start: salida, path: camino, arrows: true },
+    steps: formatSteps(stepsFromPath(camino)),
+    route: { cells, start: salida },
   }
 }
