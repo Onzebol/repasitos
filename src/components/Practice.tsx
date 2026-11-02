@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { randomRng } from '../random'
 import type { Rng } from '../random'
+import { describeSteps, followSteps, parseSteps } from '../route'
 import { buildSession, exerciseKey } from '../session'
 import type { Profile, Topic } from '../types'
 import { ColumnExercise } from './ColumnExercise'
@@ -10,6 +11,8 @@ import { HundredTable } from './HundredTable'
 import { Icon } from './Icon'
 import { Keypad } from './Keypad'
 import { Mascot } from './Mascot'
+import { RouteMap } from './RouteMap'
+import { Steps } from './Steps'
 import { TopBar } from './TopBar'
 import { TraceExercise } from './TraceExercise'
 
@@ -119,10 +122,26 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
   const lectura = texto && <p className="reading-text">{texto}</p>
   const marcas = exercise.type === 'choice' ? exercise.table : undefined
 
+  // Itinerarios con flechas: las instrucciones (fichas con flechas y, para lectores de pantalla y voz, con palabras) y el mapa.
+  // Al acertar, el mapa muestra el camino que seguían las flechas.
+  const pasos = exercise.type === 'choice' ? exercise.steps : undefined
+  const mapa = exercise.type === 'choice' ? exercise.route : undefined
+  const descripcion = pasos ? describeSteps(parseSteps(pasos)) : undefined
+  const itinerario = (resuelto: boolean) => (
+    <>
+      {pasos && (
+        <div role="img" aria-label={`Itinerario: ${descripcion}`}>
+          <Steps value={pasos} />
+        </div>
+      )}
+      {mapa && <RouteMap map={resuelto && pasos && !mapa.path ? { ...mapa, path: followSteps(mapa.start, parseSteps(pasos)), arrows: true } : mapa} />}
+    </>
+  )
+
   return (
     <main className={`screen ${profile}`}>
       <Hills />
-      <TopBar title={topic.name} prompt={texto ? `${texto} ${exercise.question}` : exercise.question} onHome={onHome} onBack={onBack} />
+      <TopBar title={topic.name} prompt={[texto, exercise.question, descripcion].filter(Boolean).join(' ')} onHome={onHome} onBack={onBack} />
       <section className="practice">
         <div className="progress" aria-label={`Ejercicio ${index + 1} de ${total}`}>
           {session.map((_, i) => (
@@ -137,6 +156,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
             {visual}
             {/* Al acertar, el hueco de la tabla se rellena con su número */}
             {marcas && <HundredTable {...marcas} hole={undefined} />}
+            {itinerario(true)}
             <div className="feedback solved" role="status">
               <p className="answer-ok">
                 <Icon name="check" /> {exercise.answer}
@@ -160,6 +180,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
             </div>
             {!tapToCount && visual}
             {marcas && <HundredTable {...marcas} />}
+            {itinerario(false)}
             {exercise.type === 'choice' ? (
               <>
                 {tapToCount && (
@@ -173,12 +194,12 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
                     {exercise.options.map((option) => (
                       <button
                         key={option}
-                        className={exercise.labels ? 'option option-group' : 'option'}
+                        className={exercise.stepOptions ? 'option option-steps' : exercise.labels ? 'option option-group' : 'option'}
                         aria-label={exercise.labels?.[option]}
                         disabled={tried.includes(option)}
                         onClick={() => answerChoice(option)}
                       >
-                        {option}
+                        {exercise.stepOptions ? <Steps value={option} /> : option}
                       </button>
                     ))}
                   </div>

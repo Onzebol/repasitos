@@ -103,6 +103,14 @@ describe('exerciseKey: identifica un ejercicio por sus datos, no por el enunciad
     expect(exerciseKey(a)).not.toBe(exerciseKey(b))
   })
 
+  it('la misma pregunta con otro mapa o con otras instrucciones es otro ejercicio', () => {
+    const celdas = [['🌳', '', ''], ['', '🏫', '']]
+    const conMapa = (steps: string, start: [number, number]): Exercise => ({ ...eleccion('Sigue las flechas desde Repi. ¿Dónde llegas?', '🏫', '🏪'), steps, route: { cells: celdas, start } })
+    expect(exerciseKey(conMapa('2> 1v', [0, 0]))).not.toBe(exerciseKey(conMapa('1> 1v', [0, 0])))
+    expect(exerciseKey(conMapa('2> 1v', [0, 0]))).not.toBe(exerciseKey(conMapa('2> 1v', [0, 1])))
+    expect(exerciseKey(conMapa('2> 1v', [0, 0]))).toBe(exerciseKey(conMapa('2> 1v', [0, 0])))
+  })
+
   it('la misma pregunta con otra tabla del 0 al 99 es otro ejercicio', () => {
     const conTabla = (table: { row?: number; col?: number; hole?: number }): Exercise => ({ ...eleccion('¿Qué número falta?', '47', '74'), table })
     expect(exerciseKey(conTabla({ hole: 47 }))).not.toBe(exerciseKey(conTabla({ hole: 48 })))

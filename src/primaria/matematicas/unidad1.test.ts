@@ -8,7 +8,7 @@ import { temasUnidad1 } from './unidad1'
 describeUnit('Unidad 1 de Matemáticas', temasUnidad1)
 
 describe('Unidad 1 de Matemáticas: contenido', () => {
-  it('tiene los seis temas del índice y el laboratorio de problemas', () => {
+  it('tiene los seis temas del índice, el laboratorio de problemas y el taller de itinerarios', () => {
     expect(temasUnidad1.map((topic) => topic.id)).toEqual([
       'numeros-99',
       'decenas-unidades',
@@ -17,7 +17,20 @@ describe('Unidad 1 de Matemáticas: contenido', () => {
       'decena-cercana',
       'problemas',
       'calculo-mental',
+      'itinerarios',
     ])
+  })
+
+  it('"Planos e itinerarios" sigue las flechas, elige el itinerario y pregunta por dónde pasa el camino', () => {
+    const tema = temasUnidad1.find((topic) => topic.id === 'itinerarios')!
+    for (let seed = 0; seed < 30; seed++) {
+      const session = buildSession(tema.plan, mulberry32(seed))
+      const preguntas = session.map((e) => e.question)
+      expect(preguntas.filter((q) => /^Sigue las flechas desde Repi/.test(q))).toHaveLength(4)
+      expect(preguntas.filter((q) => /^¿Qué itinerario lleva a Repi/.test(q))).toHaveLength(3)
+      expect(preguntas.filter((q) => q === '¿Por qué sitio pasa el camino?')).toHaveLength(3)
+      expect(session.every((e) => e.type === 'choice' && e.route !== undefined)).toBe(true)
+    }
   })
 
   it('"Los signos > y <" completa desigualdades y compara con pueblos, edades y mochilas', () => {

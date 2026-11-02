@@ -1,3 +1,4 @@
+import { generarItinerario } from './itinerarios'
 import { nombreNumero } from './numberNames'
 import { int, pick, shuffle } from './random'
 import type { Rng } from './random'
@@ -318,6 +319,9 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       const resultado = operador === '+' ? a + b : a - b
       return elegir('¿Qué signo va en el recuadro?', ['+', '−'], operador, `${a}  ❓  ${b}  =  ${resultado}`)
     }
+
+    case 'route':
+      return generarItinerario(spec.ask, rng)
 
     case 'table-99': {
       if (spec.ask === 'row' || spec.ask === 'column') {

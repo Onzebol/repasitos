@@ -68,7 +68,7 @@ describe('Practice: ejercicios de elegir', () => {
 
   it('el resplandor va en los iconos y dibujos (pregunta de Infantil, opciones de dibujos, contar, materias y temas, interfaz), no en las opciones de texto', () => {
     expect(css).toMatch(
-      /\.infantil \.visual,\s*\.option-group,\s*\.count-item,\s*\.subject-icon,\s*\.ui-icon,\s*\.icon-sample\s*\{[^}]*text-shadow/,
+      /\.infantil \.visual,\s*\.option-group,\s*\.rm-cell,\s*\.count-item,\s*\.subject-icon,\s*\.ui-icon,\s*\.icon-sample\s*\{[^}]*text-shadow/,
     )
     expect(css).toMatch(/\.count-badge\s*\{[^}]*text-shadow:\s*none/)
     expect(css).toMatch(/--resplandor:\s*#575757/)
@@ -422,5 +422,83 @@ describe('Practice: ejercicios sobre la tabla del 0 al 99', () => {
     await user.click(screen.getByRole('button', { name: /Siguiente/ }))
     expect(screen.getByRole('heading', { name: '¿Cuánto es 2 + 2?' })).toBeInTheDocument()
     expect(screen.queryByRole('img', { name: /Tabla del 0 al 99/ })).not.toBeInTheDocument()
+  })
+})
+
+describe('Practice: itinerarios con flechas', () => {
+  const celdas = [
+    ['🌳', '', '🌲', '🌳', ''],
+    ['', '🌷', '', '🏪', '🏫'],
+    ['', '', '', '⛲', ''],
+    ['', '', '', '', ''],
+  ]
+  const camino: [number, number][] = [[2, 0], [2, 1], [2, 2], [2, 3], [1, 3], [1, 4]]
+  const seguir = topicFrom([
+    {
+      type: 'choice',
+      question: 'Sigue las flechas desde Repi. ¿Dónde llegas?',
+      options: ['🏫', '🏪', '⛲'],
+      answer: '🏫',
+      steps: '3> 1^ 1>',
+      route: { cells: celdas, start: [2, 0] },
+      labels: { '🏫': 'el colegio', '🏪': 'la tienda', '⛲': 'la fuente' },
+    },
+  ])
+  const elegir = topicFrom([
+    {
+      type: 'choice',
+      question: '¿Qué itinerario lleva a Repi hasta el colegio?',
+      options: ['3> 1^ 1>', '1^ 3> 1>', '3> 1^ 2>'],
+      answer: '3> 1^ 1>',
+      stepOptions: true,
+      route: { cells: celdas, start: [2, 0], path: camino, arrows: true },
+      labels: {
+        '3> 1^ 1>': '3 pasos a la derecha, 1 paso hacia arriba y 1 paso a la derecha',
+        '1^ 3> 1>': '1 paso hacia arriba, 3 pasos a la derecha y 1 paso a la derecha',
+        '3> 1^ 2>': '3 pasos a la derecha, 1 paso hacia arriba y 2 pasos a la derecha',
+      },
+    },
+  ])
+
+  it('muestra las instrucciones, con su descripción, y el mapa entre la pregunta y las opciones', () => {
+    render(<Practice topic={seguir} onHome={vi.fn()} onBack={vi.fn()} />)
+    const itinerario = screen.getByRole('img', { name: 'Itinerario: 3 pasos a la derecha, 1 paso hacia arriba y 1 paso a la derecha' })
+    const mapa = screen.getByRole('img', { name: 'Mapa con Repi' })
+    const pregunta = screen.getByRole('heading', { name: 'Sigue las flechas desde Repi. ¿Dónde llegas?' })
+    const opcion = screen.getByRole('button', { name: 'el colegio' })
+    expect(pregunta.compareDocumentPosition(itinerario) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(itinerario.compareDocumentPosition(mapa) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(mapa.compareDocumentPosition(opcion) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('las opciones con dibujo se nombran por su lugar y acertar lleva a «¡Muy bien!»', async () => {
+    render(<Practice topic={seguir} onHome={vi.fn()} onBack={vi.fn()} />)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'la tienda' }))
+    expect(screen.getByText('¡Casi! Inténtalo otra vez')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'el colegio' }))
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+
+  it('el botón de escuchar lee la pregunta y después las instrucciones con palabras', async () => {
+    render(<Practice topic={seguir} onHome={vi.fn()} onBack={vi.fn()} />)
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Escuchar' }))
+    expect(speak).toHaveBeenLastCalledWith('Sigue las flechas desde Repi. ¿Dónde llegas? 3 pasos a la derecha, 1 paso hacia arriba y 1 paso a la derecha')
+  })
+
+  it('las opciones que son itinerarios se dibujan con flechas y se nombran con palabras', async () => {
+    render(<Practice topic={elegir} onHome={vi.fn()} onBack={vi.fn()} />)
+    const correcta = screen.getByRole('button', { name: '3 pasos a la derecha, 1 paso hacia arriba y 1 paso a la derecha' })
+    expect(correcta.querySelectorAll('svg')).toHaveLength(3)
+    expect(correcta).toHaveTextContent(/^3\s*1\s*1$/)
+    expect(screen.getByRole('img', { name: 'Mapa con Repi y un camino' })).toBeInTheDocument()
+    await userEvent.setup().click(correcta)
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+
+  it('un ejercicio sin itinerario no dibuja instrucciones ni mapa', () => {
+    render(<Practice topic={tema} onHome={vi.fn()} onBack={vi.fn()} />)
+    expect(screen.queryByRole('img', { name: /Itinerario/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: /Mapa/ })).not.toBeInTheDocument()
   })
 })
