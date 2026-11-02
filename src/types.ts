@@ -82,7 +82,18 @@ export type TraceExercise = {
   answer: Digit // la propia cifra, para mostrarla al terminar
 }
 
-export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise | TraceExercise
+// Completar una fila o una columna de la tabla del 0 al 99 con el teclado (TableFill). Se ve solo esa fila o columna, con
+// sus cabeceras, para que quepa con el teclado; cinco de los diez números hay que escribirlos y los otros cinco vienen dados
+export type TableFillExercise = {
+  type: 'table-fill'
+  question: string
+  line: 'row' | 'column' // la fila de una decena (40 a 49) o la columna de una unidad (02, 12… 92)
+  index: number // la decena de la fila o la unidad de la columna, de 0 a 9
+  blanks: number[] // posiciones (de 0 a 9) de los números que hay que escribir, de menor a mayor
+  answer: string // «40 a 49», para mostrarlo al acertar
+}
+
+export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise | TraceExercise | TableFillExercise
 
 // Plantilla de un bloque de ejercicios: describe qué se quiere y src/generators.ts crea uno nuevo cada vez
 export type BlockSpec =
@@ -136,6 +147,8 @@ export type BlockSpec =
   // Itinerarios con flechas en un mapa de 4 × 5 (elegir): seguir unas flechas y decir dónde se llega (`where`), elegir el
   // itinerario que recorre el camino dibujado (`which`) o por qué lugar pasa Repi al seguir unas flechas, sin pintar el camino (`passes`)
   | { kind: 'route'; ask: 'where' | 'which' | 'passes' }
+  // Completar con el teclado una fila (`row`, de la decena 1 a la 9) o una columna (`column`) de la tabla del 0 al 99
+  | { kind: 'table-fill'; ask: 'row' | 'column' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
   // sumas que no pasan de 10 y restas de números hasta el 10
   | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' | 'add-small' | 'sub-small' }

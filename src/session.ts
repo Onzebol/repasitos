@@ -21,6 +21,8 @@ export function exerciseKey(exercise: Exercise): string {
       return JSON.stringify([exercise.type, exercise.question, exercise.visual, exercise.answer])
     case 'trace':
       return JSON.stringify([exercise.type, exercise.digit])
+    case 'table-fill':
+      return JSON.stringify([exercise.type, exercise.line, exercise.index, exercise.blanks])
     case 'column':
       return JSON.stringify([exercise.type, exercise.operator, exercise.top, exercise.bottom, exercise.carry ?? false])
   }

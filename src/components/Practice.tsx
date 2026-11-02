@@ -13,6 +13,7 @@ import { Keypad } from './Keypad'
 import { Mascot } from './Mascot'
 import { RouteMap } from './RouteMap'
 import { Steps } from './Steps'
+import { TableFill } from './TableFill'
 import { TopBar } from './TopBar'
 import { TraceExercise } from './TraceExercise'
 
@@ -80,6 +81,12 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
       setFailed(true)
       setInput('')
     }
+  }
+
+  // Completar una fila o columna de la tabla: TableFill ya ha comprobado los números y vacía los equivocados
+  const checkTableFill = (correct: boolean) => {
+    setSolved(correct)
+    setFailed(!correct)
   }
 
   // Devuelve si el resultado en columna es correcto (si no, ColumnExercise vacía los cuadros)
@@ -157,6 +164,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
             {/* Al acertar, el hueco de la tabla se rellena con su número */}
             {marcas && <HundredTable {...marcas} hole={undefined} />}
             {itinerario(true)}
+            {exercise.type === 'table-fill' && <TableFill exercise={exercise} solved />}
             <div className="feedback solved" role="status">
               <p className="answer-ok">
                 <Icon name="check" />{' '}
@@ -217,6 +225,8 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
               <TraceExercise key={index} digit={exercise.digit} onDone={() => setSolved(true)} />
             ) : exercise.type === 'column' ? (
               <ColumnExercise key={index} exercise={exercise} onCheck={checkColumn} />
+            ) : exercise.type === 'table-fill' ? (
+              <TableFill key={index} exercise={exercise} onCheck={checkTableFill} />
             ) : (
               <>
                 <output className="answer-box" aria-label="Tu respuesta">{input || '?'}</output>
