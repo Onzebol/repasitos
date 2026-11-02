@@ -103,6 +103,15 @@ describe('exerciseKey: identifica un ejercicio por sus datos, no por el enunciad
     expect(exerciseKey(a)).not.toBe(exerciseKey(b))
   })
 
+  it('dos mapas para programar a Repi, o con otra meta, son ejercicios distintos', () => {
+    const celdas = [['🌳', '', ''], ['', '🏫', '']]
+    const programa: Exercise = { type: 'route-program', question: 'Programa a Repi para que llegue al colegio', route: { cells: celdas, start: [0, 1] }, goal: [1, 1], answer: '1v' }
+    expect(exerciseKey(programa)).not.toBe(exerciseKey({ ...programa, route: { cells: celdas, start: [0, 2] } }))
+    expect(exerciseKey(programa)).not.toBe(exerciseKey({ ...programa, goal: [1, 2] }))
+    expect(exerciseKey(programa)).not.toBe(exerciseKey({ ...programa, route: { cells: [['🌲', '', ''], ['', '🏫', '']], start: [0, 1] } }))
+    expect(exerciseKey(programa)).toBe(exerciseKey({ ...programa }))
+  })
+
   it('dos filas o columnas de la tabla, o con otros huecos, son ejercicios distintos', () => {
     const fila: Exercise = { type: 'table-fill', question: 'Completa la fila amarilla', line: 'row', index: 4, blanks: [2, 3, 5, 7, 8], answer: '40 a 49' }
     expect(exerciseKey(fila)).not.toBe(exerciseKey({ ...fila, index: 5, answer: '50 a 59' }))

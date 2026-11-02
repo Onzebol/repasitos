@@ -12,6 +12,7 @@ import { Icon } from './Icon'
 import { Keypad } from './Keypad'
 import { Mascot } from './Mascot'
 import { RouteMap } from './RouteMap'
+import { RouteProgram } from './RouteProgram'
 import { Steps } from './Steps'
 import { TableFill } from './TableFill'
 import { TopBar } from './TopBar'
@@ -35,6 +36,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
   const [tried, setTried] = useState<string[]>([])
   const [input, setInput] = useState('')
   const [counted, setCounted] = useState(false) // contar tocando: ya se han contado todos los dibujos
+  const [program, setProgram] = useState('') // programar a Repi: el programa con el que ha llegado a la meta («3> 1^ 1>»)
 
   const total = session.length
   const finished = index >= total
@@ -48,6 +50,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
     setFailed(false)
     setTried([])
     setInput('')
+    setProgram('')
   }
 
   // Repetir empieza otra sesión, evitando los ejercicios de la anterior
@@ -59,6 +62,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
     setFailed(false)
     setTried([])
     setInput('')
+    setProgram('')
   }
 
   const answerChoice = (option: string) => {
@@ -81,6 +85,13 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
       setFailed(true)
       setInput('')
     }
+  }
+
+  // Programar a Repi: RouteProgram ya ha movido a Repi; si llega a la meta se guarda su programa para enseñarlo
+  const checkProgram = (correct: boolean, written: string) => {
+    if (correct) setProgram(written)
+    setSolved(correct)
+    setFailed(!correct)
   }
 
   // Completar una fila o columna de la tabla: TableFill ya ha comprobado los números y vacía los equivocados
@@ -165,6 +176,10 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
             {marcas && <HundredTable {...marcas} hole={undefined} />}
             {itinerario(true)}
             {exercise.type === 'table-fill' && <TableFill exercise={exercise} solved />}
+            {/* Al llegar a la meta, el mapa dibuja el camino que ha hecho Repi, que está en la meta */}
+            {exercise.type === 'route-program' && (
+              <RouteMap map={{ cells: exercise.route.cells, start: exercise.goal, path: followSteps(exercise.route.start, parseSteps(program)), arrows: true }} />
+            )}
             <div className="feedback solved" role="status">
               <p className="answer-ok">
                 <Icon name="check" />{' '}
@@ -172,6 +187,11 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
                   // la respuesta es un itinerario: se dibuja con flechas, igual que las opciones
                   <span role="img" aria-label={exercise.labels?.[exercise.answer]}>
                     <Steps value={exercise.answer} />
+                  </span>
+                ) : exercise.type === 'route-program' ? (
+                  // la respuesta es el programa que ha escrito: se dibuja con flechas
+                  <span role="img" aria-label={describeSteps(parseSteps(program))}>
+                    <Steps value={program} />
                   </span>
                 ) : (
                   exercise.answer
@@ -227,6 +247,8 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
               <ColumnExercise key={index} exercise={exercise} onCheck={checkColumn} />
             ) : exercise.type === 'table-fill' ? (
               <TableFill key={index} exercise={exercise} onCheck={checkTableFill} />
+            ) : exercise.type === 'route-program' ? (
+              <RouteProgram key={index} exercise={exercise} onResult={checkProgram} />
             ) : (
               <>
                 <output className="answer-box" aria-label="Tu respuesta">{input || '?'}</output>

@@ -1,4 +1,4 @@
-import { generarItinerario } from './itinerarios'
+import { generarItinerario, generarProgramacion } from './itinerarios'
 import { nombreNumero } from './numberNames'
 import { int, pick, shuffle } from './random'
 import type { Rng } from './random'
@@ -322,6 +322,9 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
 
     case 'route':
       return generarItinerario(spec.ask, rng)
+
+    case 'route-program':
+      return generarProgramacion(rng)
 
     case 'table-fill': {
       // Fila: la decena de 1 a 9 (la 0 empieza por «0»); columna: la unidad de 0 a 9. Se escriben cinco de los diez números

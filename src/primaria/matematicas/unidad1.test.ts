@@ -22,15 +22,17 @@ describe('Unidad 1 de Matemáticas: contenido', () => {
     ])
   })
 
-  it('"Planos e itinerarios" sigue las flechas, elige el itinerario y pregunta por dónde pasa el camino', () => {
+  it('"Planos e itinerarios" sigue las flechas, elige el itinerario, pregunta por dónde pasa Repi y programa a Repi', () => {
     const tema = temasUnidad1.find((topic) => topic.id === 'itinerarios')!
     for (let seed = 0; seed < 30; seed++) {
       const session = buildSession(tema.plan, mulberry32(seed))
       const preguntas = session.map((e) => e.question)
-      expect(preguntas.filter((q) => /^Sigue las flechas desde Repi/.test(q))).toHaveLength(4)
-      expect(preguntas.filter((q) => /^¿Qué itinerario lleva a Repi/.test(q))).toHaveLength(3)
-      expect(preguntas.filter((q) => q === '¿Por qué sitio pasa Repi?')).toHaveLength(3)
-      expect(session.every((e) => e.type === 'choice' && e.route !== undefined)).toBe(true)
+      expect(preguntas.filter((q) => /^Sigue las flechas desde Repi/.test(q))).toHaveLength(3)
+      expect(preguntas.filter((q) => /^¿Qué itinerario lleva a Repi/.test(q))).toHaveLength(2)
+      expect(preguntas.filter((q) => q === '¿Por qué sitio pasa Repi?')).toHaveLength(2)
+      expect(preguntas.filter((q) => /^Programa a Repi para que llegue/.test(q))).toHaveLength(3)
+      expect(session.filter((e) => e.type === 'route-program')).toHaveLength(3)
+      expect(session.filter((e) => e.type === 'choice' && e.route !== undefined)).toHaveLength(7)
     }
   })
 

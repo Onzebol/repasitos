@@ -784,6 +784,49 @@ body {
   color: #b45f06;
 }
 
+/* Programar a Repi (RouteProgram): el programa escrito con fichas, la paleta de cuatro flechas y los botones de borrar e ir */
+.program {
+  min-height: 3.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step.step-empty {
+  min-width: 3.2rem;
+  justify-content: center;
+  border-style: dashed;
+  color: #7a8a96;
+}
+
+.program-actions,
+.palette {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.palette .option {
+  min-width: clamp(3.75rem, 16vw, 4.5rem);
+  min-height: clamp(3.5rem, 15vw, 4.5rem);
+  padding: 0.5rem;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.program-actions .option {
+  min-width: clamp(3.75rem, 16vw, 4.5rem);
+  min-height: clamp(3.25rem, 14vw, 4rem);
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Flechas dibujadas en SVG (ArrowIcon): del tamaño del texto y del color del botón */
 .arrow-icon {
   width: 1em;
