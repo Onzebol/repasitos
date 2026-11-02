@@ -71,8 +71,8 @@ export type BlockSpec =
   | { kind: 'neighbor'; mode: 'after' | 'before' | 'between'; min: number; max: number }
   // ¿Cuál es el número mayor o el menor de tres? (elegir). Rango por defecto: 10 a 99
   | { kind: 'extreme'; mode: 'greatest' | 'smallest'; min?: number; max?: number }
-  // Completar una serie de 1 en 1 o de 10 en 10 (escribir). Rango por defecto: 10 a 99
-  | { kind: 'series'; step: 1 | 10; min?: number; max?: number }
+  // Completar una serie que sube (o baja, con `down`) de 1 a 5 en 1 o de 10 en 10 (escribir). Rango por defecto: 10 a 99
+  | { kind: 'series'; step: 1 | 2 | 3 | 4 | 5 | 10; down?: boolean; min?: number; max?: number }
   // Decenas y unidades: leer un número, contar decenas o unidades, componerlo con cifras o con piezas
   | { kind: 'place-value'; ask: 'read' | 'tens' | 'units' | 'compose' | 'blocks' }
   // Comparar números: signo > o <, frase correcta u ordenar tres números (elegir). Rango por defecto: 10 a 99
@@ -87,8 +87,11 @@ export type BlockSpec =
   | { kind: 'cdu'; ask: 'read' | 'compose' | 'blocks' | 'count' }
   // El litro: qué recipiente tiene más o menos capacidad de tres (elegir)
   | { kind: 'capacity'; mode: 'more' | 'less' }
-  // Decena más cercana a un número (elegir)
-  | { kind: 'nearest-ten' }
+  // Decena más cercana a un número (elegir); con `ask`: entre qué dos decenas está, si la cifra de las unidades
+  // es mayor o menor que 5, o la decena más cercana en un problema «más o menos» (por defecto: 'nearest')
+  | { kind: 'nearest-ten'; ask?: 'nearest' | 'between' | 'rule' | 'approx' }
+  // ¿Qué signo (+ o −) va en «a ❓ b = c»? Sumas y restas sin llevar de dos cifras (elegir)
+  | { kind: 'operation-sign' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir)
   | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' }
   // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
