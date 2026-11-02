@@ -174,6 +174,9 @@ export type BlockSpec =
   // Colorear tocando en la tabla del 0 al 99: los números con N unidades (`units`), con N decenas (`tens`) o el que tiene
   // N decenas y M unidades (`both`, una sola casilla)
   | { kind: 'table-paint'; ask: 'units' | 'tens' | 'both' }
+  // La información oculta (elegir): cuatro deportes con un número cada uno y una resta sin llevar cuyo resultado es el
+  // número de uno de ellos: se pregunta qué deporte practica quien la hace
+  | { kind: 'hidden-info' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
   // sumas que no pasan de 10 y restas de números hasta el 10
   | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' | 'add-small' | 'sub-small' }

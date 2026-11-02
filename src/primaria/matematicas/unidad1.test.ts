@@ -124,15 +124,16 @@ describe('Unidad 1 de Matemáticas: contenido', () => {
     }
   })
 
-  it('"Sumas y restas sin llevar" mezcla columnas, problemas con texto y elegir el signo de la operación', () => {
+  it('"Sumas y restas sin llevar" mezcla columnas, problemas con texto, el signo de la operación y la información oculta', () => {
     const tema = temasUnidad1.find((topic) => topic.id === 'sumas-restas')!
     for (let seed = 0; seed < 30; seed++) {
       const session = buildSession(tema.plan, mulberry32(seed))
       expect(session.filter((e) => e.type === 'column')).toHaveLength(5)
-      expect(session.filter((e) => e.type === 'number')).toHaveLength(4)
-      const signo = session.filter((e) => e.type === 'choice')
-      expect(signo).toHaveLength(1)
-      expect(signo[0].question).toMatch(/signo/)
+      expect(session.filter((e) => e.type === 'number')).toHaveLength(2)
+      const elegir = session.filter((e) => e.type === 'choice')
+      expect(elegir).toHaveLength(3)
+      expect(elegir.filter((e) => /signo/.test(e.question))).toHaveLength(1)
+      expect(elegir.filter((e) => /^¿Qué deporte practica/.test(e.question))).toHaveLength(2)
     }
   })
 

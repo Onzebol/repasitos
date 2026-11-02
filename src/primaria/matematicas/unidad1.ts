@@ -82,9 +82,10 @@ export const temasUnidad1: Topic[] = [
       { spec: { kind: 'column', operator: '+', oneDigit: true }, count: 1 },
       { spec: { kind: 'column', operator: '−' }, count: 1 },
       { spec: { kind: 'column', operator: '−', oneDigit: true }, count: 1 },
-      { spec: { kind: 'word-problem', operator: '+' }, count: 2 },
-      { spec: { kind: 'word-problem', operator: '−' }, count: 2 },
+      { spec: { kind: 'word-problem', operator: '+' }, count: 1 },
+      { spec: { kind: 'word-problem', operator: '−' }, count: 1 },
       { spec: { kind: 'operation-sign' }, count: 1 },
+      { spec: { kind: 'hidden-info' }, count: 2 },
     ],
   },
   {
