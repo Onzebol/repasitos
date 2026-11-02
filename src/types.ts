@@ -75,6 +75,15 @@ export type BlockSpec =
   | { kind: 'series'; step: 1 | 2 | 3 | 4 | 5 | 10; down?: boolean; min?: number; max?: number }
   // Decenas y unidades: leer un número, contar decenas o unidades, componerlo con cifras o con piezas
   | { kind: 'place-value'; ask: 'read' | 'tens' | 'units' | 'compose' | 'blocks' }
+  // Cómo se lee un número de 10 a 99 (elegir) o escribirlo con cifras a partir de su nombre (escribir)
+  | { kind: 'number-name'; ask: 'read' | 'write' }
+  // Descomponer un número de dos cifras: la suma que falta, «4 decenas y 3 unidades» ↔ 40 + 3 (elegir)
+  // y 30 + 4 ↔ «treinta y cuatro» (elegir)
+  | { kind: 'decompose'; ask: 'sum' | 'pieces' | 'words' }
+  // Decenas ↔ unidades: «3 decenas = ❓ unidades» y «30 unidades = ❓ decenas» (escribir)
+  | { kind: 'tens-units'; ask: 'to-units' | 'to-tens' }
+  // «¿Qué número tiene 3 decenas?» / «…7 unidades?»: elegir entre tres números de dos cifras
+  | { kind: 'digit-clue'; ask: 'tens' | 'units' }
   // Comparar números: signo > o <, frase correcta u ordenar tres números (elegir). Rango por defecto: 10 a 99
   | { kind: 'compare'; mode: 'sign' | 'statement' | 'order'; min?: number; max?: number }
   // Centenas (de 100 a 199): leer un número con centena, decenas y unidades (elegir) o componerlo (escribir)

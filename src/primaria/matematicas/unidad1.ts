@@ -1,22 +1,9 @@
-import type { ChoiceExercise, NumberExercise, Topic } from '../../types'
-
-const elegir = (question: string, options: string[], answer: string): ChoiceExercise => ({
-  type: 'choice',
-  question,
-  options,
-  answer,
-})
-
-const numero = (question: string, answer: number): NumberExercise => ({
-  type: 'number',
-  question,
-  answer,
-})
+import type { Topic } from '../../types'
 
 // Unidad 1: números hasta el 99, decenas y unidades, signos > y <,
 // sumas y restas sin llevar, decena más cercana y cálculo mental.
 // Cada tema es un plan de 10 ejercicios: las plantillas (src/generators.ts) crean ejercicios nuevos
-// en cada sesión y las listas ("bag") reparten ejercicios escritos a mano.
+// en cada sesión (también la lectura y la escritura de números: src/numberNames.ts).
 export const temasUnidad1: Topic[] = [
   {
     id: 'numeros-99',
@@ -29,34 +16,11 @@ export const temasUnidad1: Topic[] = [
       { spec: { kind: 'neighbor', mode: 'between', min: 10, max: 99 }, count: 1 },
       { spec: { kind: 'extreme', mode: 'greatest' }, count: 1 },
       { spec: { kind: 'extreme', mode: 'smallest' }, count: 1 },
-      {
-        spec: {
-          kind: 'bag',
-          items: [
-            elegir('¿Cómo se lee el número 86?', ['ochenta y seis', 'sesenta y ocho', 'ochenta y cinco'], 'ochenta y seis'),
-            elegir('¿Cómo se lee el número 54?', ['cincuenta y cuatro', 'cuarenta y cinco', 'cincuenta y cinco'], 'cincuenta y cuatro'),
-            elegir('¿Cómo se lee el número 91?', ['noventa y uno', 'diecinueve', 'ochenta y uno'], 'noventa y uno'),
-            elegir('¿Cómo se lee el número 73?', ['setenta y tres', 'treinta y siete', 'setenta y dos'], 'setenta y tres'),
-          ],
-        },
-        count: 1,
-      },
       { spec: { kind: 'series', step: 10 }, count: 1 },
-      { spec: { kind: 'series', step: 1 }, count: 1 },
-      {
-        spec: {
-          kind: 'bag',
-          items: [
-            numero('Escribe con cifras: setenta y dos', 72),
-            numero('Escribe con cifras: cuarenta y cinco', 45),
-            numero('Escribe con cifras: noventa y tres', 93),
-            numero('Escribe con cifras: sesenta y uno', 61),
-            numero('Escribe con cifras: ochenta y ocho', 88),
-            numero('Escribe con cifras: cincuenta y siete', 57),
-          ],
-        },
-        count: 2,
-      },
+      { spec: { kind: 'number-name', ask: 'read' }, count: 1 },
+      { spec: { kind: 'number-name', ask: 'write' }, count: 1 },
+      { spec: { kind: 'digit-clue', ask: 'tens' }, count: 1 },
+      { spec: { kind: 'digit-clue', ask: 'units' }, count: 1 },
     ],
   },
   {
@@ -65,21 +29,16 @@ export const temasUnidad1: Topic[] = [
     icon: '🧱',
     tint: '#ffe9a8',
     plan: [
-      { spec: { kind: 'place-value', ask: 'read' }, count: 3 },
+      { spec: { kind: 'place-value', ask: 'read' }, count: 1 },
       { spec: { kind: 'place-value', ask: 'tens' }, count: 1 },
       { spec: { kind: 'place-value', ask: 'units' }, count: 1 },
-      { spec: { kind: 'place-value', ask: 'compose' }, count: 2 },
-      { spec: { kind: 'place-value', ask: 'blocks' }, count: 2 },
-      {
-        spec: {
-          kind: 'bag',
-          items: [
-            elegir('10 unidades forman 1…', ['decena', 'centena', 'unidad'], 'decena'),
-            numero('¿Cuántas unidades tiene 1 decena?', 10),
-          ],
-        },
-        count: 1,
-      },
+      { spec: { kind: 'place-value', ask: 'compose' }, count: 1 },
+      { spec: { kind: 'place-value', ask: 'blocks' }, count: 1 },
+      { spec: { kind: 'decompose', ask: 'sum' }, count: 1 },
+      { spec: { kind: 'decompose', ask: 'pieces' }, count: 1 },
+      { spec: { kind: 'decompose', ask: 'words' }, count: 1 },
+      { spec: { kind: 'tens-units', ask: 'to-units' }, count: 1 },
+      { spec: { kind: 'tens-units', ask: 'to-tens' }, count: 1 },
     ],
   },
   {

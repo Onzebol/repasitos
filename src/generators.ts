@@ -1,3 +1,4 @@
+import { nombreNumero } from './numberNames'
 import { int, pick, shuffle } from './random'
 import type { Rng } from './random'
 import { ANIMALES as ANIMALES_CON_NOMBRE } from './infantil/animales'
@@ -225,6 +226,71 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       }
       const u = int(rng, 1, 9)
       return numero('🟦 es una decena y 🟨 es una unidad. ¿Qué número es?', d * 10 + u, piezas(d, u))
+    }
+
+    case 'number-name': {
+      const n = int(rng, 10, 99)
+      if (spec.ask === 'write') return numero(`Escribe con cifras: ${nombreNumero(n)}`, n)
+      // Los números vecinos y, si las cifras son distintas, el de las cifras cambiadas (86 → 68)
+      const cambiado = (n % 10) * 10 + Math.floor(n / 10)
+      const cambiadoVale = n % 10 !== 0 && n % 10 !== Math.floor(n / 10)
+      const vecinos = shuffle(rng, [n - 10, n - 1, n + 1, n + 10].filter((m) => m >= 10 && m <= 99))
+      const otros = cambiadoVale ? [cambiado, vecinos[0]] : vecinos.slice(0, 2)
+      return elegir(`¿Cómo se lee el número ${n}?`, [n, ...otros].map(nombreNumero), nombreNumero(n))
+    }
+
+    case 'decompose': {
+      // Decena y unidad distintas y sin cero: así las opciones nunca se repiten ni suenan raras
+      const d = int(rng, 1, 9)
+      let u = int(rng, 1, 9)
+      while (u === d) u = int(rng, 1, 9)
+      const n = d * 10 + u
+      if (spec.ask === 'sum') {
+        return pick(rng, [true, false])
+          ? numero(`Descompón el ${n}: ${n} = ${d * 10} + ❓`, u)
+          : numero(`Descompón el ${n}: ${n} = ❓ + ${u}`, d * 10)
+      }
+      if (spec.ask === 'pieces') {
+        return elegir(
+          `${decenas(d)} y ${unidades(u)}. ¿Qué suma es?`,
+          [`${d * 10} + ${u}`, `${u * 10} + ${d}`, `${d} + ${u}`],
+          `${d * 10} + ${u}`,
+        )
+      }
+      const otraUnidad = pick(rng, [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((x) => x !== u))
+      const otraDecena = pick(rng, [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((x) => x !== d))
+      const confundido = pick(rng, [d * 10 + otraUnidad, otraDecena * 10 + u])
+      return elegir(
+        `¿Cómo se lee ${d * 10} + ${u}?`,
+        [n, u * 10 + d, confundido].map(nombreNumero),
+        nombreNumero(n),
+      )
+    }
+
+    case 'tens-units': {
+      const d = int(rng, 1, 9)
+      return spec.ask === 'to-units'
+        ? numero(`${decenas(d)} = ❓ unidades`, d * 10)
+        : numero(`${unidades(d * 10)} = ❓ decenas`, d)
+    }
+
+    case 'digit-clue': {
+      const cifra = int(rng, 1, 9)
+      const cumple = (m: number) => (spec.ask === 'tens' ? Math.floor(m / 10) : m % 10) === cifra
+      const correcta = spec.ask === 'tens' ? cifra * 10 + int(rng, 0, 9) : int(rng, 1, 9) * 10 + cifra
+      // Una opción con las cifras cambiadas (37 y 73) y otra al azar, ninguna de las dos cumple la condición
+      const equivocadas = new Set<number>()
+      const cambiado = (correcta % 10) * 10 + Math.floor(correcta / 10)
+      if (cambiado >= 10 && !cumple(cambiado)) equivocadas.add(cambiado)
+      while (equivocadas.size < 2) {
+        const m = int(rng, 10, 99)
+        if (!cumple(m)) equivocadas.add(m)
+      }
+      return elegir(
+        `¿Qué número tiene ${spec.ask === 'tens' ? decenas(cifra) : unidades(cifra)}?`,
+        [correcta, ...equivocadas],
+        correcta,
+      )
     }
 
     case 'compare': {
