@@ -681,6 +681,78 @@ body {
   background: var(--card);
 }
 
+/* Itinerarios con flechas (Steps y RouteMap): fichas con número y flecha, y un mapa de 4 × 5 casillas de hierba con el
+   camino de arena y, en cada casilla del camino, una flecha hacia la siguiente */
+.steps {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.8rem;
+  border: 3px solid var(--ink);
+  border-radius: 1rem;
+  background: var(--card);
+  font-size: clamp(1.25rem, 4.5vw, 1.75rem);
+  font-weight: 700;
+}
+
+.option-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 3.75rem;
+  padding: 0.5rem 0.9rem;
+}
+
+.option-steps .step {
+  padding: 0.1rem 0.5rem;
+  border-width: 2px;
+  font-size: clamp(1.1rem, 4vw, 1.4rem);
+}
+
+.route-map {
+  width: 100%;
+  max-width: 26rem;
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr));
+  gap: 4px;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  background: var(--card);
+  box-shadow: 0 6px 0 var(--card-shadow);
+}
+
+.rm-cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.7rem;
+  background: #d9f0c2;
+  font-size: clamp(1.4rem, 7vw, 2.3rem);
+}
+
+.rm-cell.camino {
+  background: #f3e3b0;
+}
+
+.rm-arrow {
+  position: absolute;
+  right: 0.15rem;
+  bottom: 0.1rem;
+  font-size: clamp(0.9rem, 3.4vw, 1.3rem);
+  line-height: 1;
+  color: #b45f06;
+}
+
 /* Flechas dibujadas en SVG (ArrowIcon): del tamaño del texto y del color del botón */
 .arrow-icon {
   width: 1em;
@@ -1150,6 +1222,7 @@ body {
    --opacidad (de 0 a 1). Las flechas y Repi son SVG: no les afecta. */
 .infantil .visual,
 .option-group,
+.rm-cell,
 .count-item,
 .subject-icon,
 .ui-icon,

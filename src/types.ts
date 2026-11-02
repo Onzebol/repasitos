@@ -13,6 +13,15 @@ export type Subject = {
 // que falta (se dibuja como ❓)
 export type TableMarks = { row?: number; col?: number; hole?: number }
 
+// Mapa de un itinerario (4 filas × 5 columnas, ver src/itinerarios.ts): el dibujo de cada casilla ('' = hierba), la casilla
+// donde está Repi, el camino (casillas contiguas, se tiñen de arena) y si cada casilla del camino lleva una flecha
+export type RouteMapData = {
+  cells: string[][]
+  start: [number, number]
+  path?: [number, number][]
+  arrows?: boolean
+}
+
 // Elegir una respuesta entre varias
 export type ChoiceExercise = {
   type: 'choice'
@@ -22,6 +31,12 @@ export type ChoiceExercise = {
   text?: string
   // Tabla del 0 al 99 dibujada entre la pregunta y las opciones, con una fila o columna marcadas y/o un número que falta
   table?: TableMarks
+  // Itinerarios con flechas: mapa dibujado entre la pregunta y las opciones. `steps` son las instrucciones («3> 1^ 1>», ver
+  // src/route.ts) que se ven como fichas con flechas sobre el mapa; con `stepOptions`, las opciones son itinerarios y se
+  // dibujan también con flechas (su nombre accesible sale de `labels`)
+  route?: RouteMapData
+  steps?: string
+  stepOptions?: boolean
   options: string[]
   answer: string
   // Contar tocando (Infantil): primero hay que tocar uno a uno los dibujos de `visual`; las opciones salen al contarlos todos
@@ -118,6 +133,9 @@ export type BlockSpec =
   // La tabla del 0 al 99 dibujada (elegir): la cifra con la que empiezan los números de una fila amarilla (`row`), con la
   // que acaban los de una columna naranja (`column`) o qué número falta en un hueco (`missing`)
   | { kind: 'table-99'; ask: 'row' | 'column' | 'missing' }
+  // Itinerarios con flechas en un mapa de 4 × 5 (elegir): seguir unas flechas y decir dónde se llega (`where`), elegir el
+  // itinerario que recorre el camino dibujado (`which`) o por qué lugar pasa el camino (`passes`)
+  | { kind: 'route'; ask: 'where' | 'which' | 'passes' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
   // sumas que no pasan de 10 y restas de números hasta el 10
   | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' | 'add-small' | 'sub-small' }

@@ -115,4 +115,16 @@ export const temasUnidad1: Topic[] = [
       { spec: { kind: 'series', step: 3, min: 0, max: 20, down: true }, count: 1 },
     ],
   },
+  {
+    // Taller de programación del libro: seguir y elegir itinerarios con flechas en un mapa
+    id: 'itinerarios',
+    name: 'Planos e itinerarios',
+    icon: '🧭',
+    tint: '#c9f0e0',
+    plan: [
+      { spec: { kind: 'route', ask: 'where' }, count: 4 },
+      { spec: { kind: 'route', ask: 'which' }, count: 3 },
+      { spec: { kind: 'route', ask: 'passes' }, count: 3 },
+    ],
+  },
 ]
