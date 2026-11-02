@@ -719,6 +719,17 @@ body {
   font-size: clamp(0.8rem, 3.6vw, 1.5rem);
 }
 
+/* Colorear tocando (TablePaint): la tabla entera con casillas que se marcan en naranja y algo más altas, para el dedo */
+.t99 .c.sel {
+  background: #ffb27a;
+  border-color: #e0782b;
+}
+
+.t99-pintar .c,
+.t99-pintar button.c {
+  height: clamp(2rem, 8.5vw, 2.6rem);
+}
+
 /* Itinerarios con flechas (Steps y RouteMap): fichas con número y flecha, y un mapa de 4 × 5 casillas de hierba con el
    camino de arena y, en cada casilla del camino, una flecha hacia la siguiente */
 .steps {

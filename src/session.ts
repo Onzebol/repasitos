@@ -25,6 +25,8 @@ export function exerciseKey(exercise: Exercise): string {
       return JSON.stringify([exercise.type, exercise.line, exercise.index, exercise.blanks])
     case 'route-program':
       return JSON.stringify([exercise.type, exercise.route, exercise.goal])
+    case 'table-paint':
+      return JSON.stringify([exercise.type, exercise.question, exercise.targets])
     case 'column':
       return JSON.stringify([exercise.type, exercise.operator, exercise.top, exercise.bottom, exercise.carry ?? false])
   }

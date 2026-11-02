@@ -37,6 +37,11 @@ function esValido(e: Exercise, spec?: BlockSpec) {
     expect(e.digit, e.question).toBeLessThanOrEqual(9)
     expect(e.answer, e.question).toBe(e.digit)
     expect(e.question, e.question).toContain(String(e.digit))
+  } else if (e.type === 'table-paint') {
+    expect(e.targets.length, e.question).toBeGreaterThanOrEqual(1)
+    expect(e.targets, e.question).toEqual([...e.targets].sort((a, b) => a - b))
+    expect(new Set(e.targets).size, e.question).toBe(e.targets.length)
+    for (const n of e.targets) expect(Number.isInteger(n) && n >= 0 && n <= 99, e.question).toBe(true)
   } else if (e.type === 'route-program') {
     expect(e.route.cells, e.question).toHaveLength(4)
     expect(e.answer, e.question).toMatch(/^(\d+[<>^v] ?)+$/)
@@ -87,6 +92,9 @@ const SPECS: BlockSpec[] = [
   { kind: 'table-fill', ask: 'row' },
   { kind: 'table-fill', ask: 'column' },
   { kind: 'route-program' },
+  { kind: 'table-paint', ask: 'units' },
+  { kind: 'table-paint', ask: 'tens' },
+  { kind: 'table-paint', ask: 'both' },
   { kind: 'number-name', ask: 'read' },
   { kind: 'number-name', ask: 'write' },
   { kind: 'decompose', ask: 'sum' },
@@ -507,6 +515,52 @@ describe('generate: reglas de cada plantilla', () => {
     }
     expect(columnas.size).toBe(10)
     expect(huecos.size, 'salen todas las posiciones del 1 al 9').toBe(9)
+  })
+
+  it('colorear en la tabla, unidades: los diez números que acaban en la cifra, y nada más', () => {
+    const cifras = new Set<number>()
+    for (const e of muchos({ kind: 'table-paint', ask: 'units' })) {
+      if (e.type !== 'table-paint') throw new Error('se esperaba colorear la tabla')
+      const [, texto] = e.question.match(/^Toca los números que tienen (\d) unidad(?:es)?$/)!
+      const unidades = Number(texto)
+      expect(e.question).toBe(`Toca los números que tienen ${unidades} ${unidades === 1 ? 'unidad' : 'unidades'}`)
+      expect(unidades).toBeGreaterThanOrEqual(1)
+      // tabla de verdad independiente: de los cien números, los que acaban en esa cifra
+      expect(e.targets, e.question).toEqual(Array.from({ length: 100 }, (_, i) => i).filter((i) => i % 10 === unidades))
+      expect(e.targets).toHaveLength(10)
+      expect(e.answer).toBe(`Acaban en ${unidades}`)
+      cifras.add(unidades)
+    }
+    expect(cifras.size).toBe(9)
+  })
+
+  it('colorear en la tabla, decenas: los diez números de la fila de esa decena, y nada más', () => {
+    const cifras = new Set<number>()
+    for (const e of muchos({ kind: 'table-paint', ask: 'tens' })) {
+      if (e.type !== 'table-paint') throw new Error('se esperaba colorear la tabla')
+      const [, texto] = e.question.match(/^Toca los números que tienen (\d) decenas?$/)!
+      const decenas = Number(texto)
+      expect(e.question).toBe(`Toca los números que tienen ${decenas} ${decenas === 1 ? 'decena' : 'decenas'}`)
+      expect(decenas).toBeGreaterThanOrEqual(1)
+      expect(e.targets, e.question).toEqual(Array.from({ length: 100 }, (_, i) => i).filter((i) => Math.floor(i / 10) === decenas))
+      expect(e.answer).toBe(`Empiezan por ${decenas}`)
+      cifras.add(decenas)
+    }
+    expect(cifras.size).toBe(9)
+  })
+
+  it('colorear en la tabla, las dos condiciones: un solo número, el que tiene esas decenas y esas unidades', () => {
+    const numeros = new Set<number>()
+    for (const e of muchos({ kind: 'table-paint', ask: 'both' })) {
+      if (e.type !== 'table-paint') throw new Error('se esperaba colorear la tabla')
+      const [, d, u] = e.question.match(/^Toca el número que tiene (\d) decenas? y (\d) unidad(?:es)?$/)!
+      expect(e.targets, e.question).toEqual([Number(d) * 10 + Number(u)])
+      expect(e.answer).toBe(String(Number(d) * 10 + Number(u)))
+      expect(Number(d)).toBeGreaterThanOrEqual(1)
+      expect(Number(u)).toBeGreaterThanOrEqual(1)
+      numeros.add(e.targets[0])
+    }
+    expect(numeros.size, 'salen muchos números distintos').toBeGreaterThan(30)
   })
 
   it('tabla del 99, fila: todos los números de la fila empiezan por la cifra de las decenas', () => {

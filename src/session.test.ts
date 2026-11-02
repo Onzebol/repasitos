@@ -103,6 +103,13 @@ describe('exerciseKey: identifica un ejercicio por sus datos, no por el enunciad
     expect(exerciseKey(a)).not.toBe(exerciseKey(b))
   })
 
+  it('dos coloreados de la tabla con otras casillas son ejercicios distintos', () => {
+    const a: Exercise = { type: 'table-paint', question: 'Toca los números que tienen 2 unidades', targets: [2, 12, 22, 32, 42, 52, 62, 72, 82, 92], answer: 'Acaban en 2' }
+    expect(exerciseKey(a)).not.toBe(exerciseKey({ ...a, question: 'Toca los números que tienen 3 unidades', targets: [3, 13, 23, 33, 43, 53, 63, 73, 83, 93], answer: 'Acaban en 3' }))
+    expect(exerciseKey(a)).not.toBe(exerciseKey({ ...a, targets: [22] }))
+    expect(exerciseKey(a)).toBe(exerciseKey({ ...a }))
+  })
+
   it('dos mapas para programar a Repi, o con otra meta, son ejercicios distintos', () => {
     const celdas = [['🌳', '', ''], ['', '🏫', '']]
     const programa: Exercise = { type: 'route-program', question: 'Programa a Repi para que llegue al colegio', route: { cells: celdas, start: [0, 1] }, goal: [1, 1], answer: '1v' }

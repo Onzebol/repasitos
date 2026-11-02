@@ -24,17 +24,21 @@ export const temasUnidad1: Topic[] = [
     ],
   },
   {
-    // La tabla del 0 al 99 (libro, p. 18): elegir sobre la tabla dibujada y completar una fila o columna con el teclado
+    // La tabla del 0 al 99 (libro, p. 18 y 19): elegir sobre la tabla dibujada, completar una fila o columna con el teclado y
+    // colorear tocando las casillas que cumplen una condición
     id: 'tabla-99',
     name: 'La tabla del 0 al 99',
     icon: '🧮',
     tint: '#e3d4ff',
     plan: [
-      { spec: { kind: 'table-99', ask: 'row' }, count: 2 },
-      { spec: { kind: 'table-99', ask: 'column' }, count: 2 },
-      { spec: { kind: 'table-99', ask: 'missing' }, count: 2 },
-      { spec: { kind: 'table-fill', ask: 'row' }, count: 2 },
-      { spec: { kind: 'table-fill', ask: 'column' }, count: 2 },
+      { spec: { kind: 'table-99', ask: 'row' }, count: 1 },
+      { spec: { kind: 'table-99', ask: 'column' }, count: 1 },
+      { spec: { kind: 'table-99', ask: 'missing' }, count: 3 },
+      { spec: { kind: 'table-fill', ask: 'row' }, count: 1 },
+      { spec: { kind: 'table-fill', ask: 'column' }, count: 1 },
+      { spec: { kind: 'table-paint', ask: 'units' }, count: 1 },
+      { spec: { kind: 'table-paint', ask: 'tens' }, count: 1 },
+      { spec: { kind: 'table-paint', ask: 'both' }, count: 1 },
     ],
   },
   {

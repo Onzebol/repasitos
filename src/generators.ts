@@ -326,6 +326,20 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     case 'route-program':
       return generarProgramacion(rng)
 
+    case 'table-paint': {
+      // De 1 a 9: con 0 unidades o 0 decenas saldrían los números de una cifra con un 0 delante, que confunden
+      if (spec.ask === 'units') {
+        const n = int(rng, 1, 9)
+        return { type: 'table-paint', question: `Toca los números que tienen ${unidades(n)}`, targets: Array.from({ length: 10 }, (_, d) => d * 10 + n), answer: `Acaban en ${n}` }
+      }
+      if (spec.ask === 'tens') {
+        const n = int(rng, 1, 9)
+        return { type: 'table-paint', question: `Toca los números que tienen ${decenas(n)}`, targets: Array.from({ length: 10 }, (_, u) => n * 10 + u), answer: `Empiezan por ${n}` }
+      }
+      const [d, u] = [int(rng, 1, 9), int(rng, 1, 9)]
+      return { type: 'table-paint', question: `Toca el número que tiene ${decenas(d)} y ${unidades(u)}`, targets: [d * 10 + u], answer: String(d * 10 + u) }
+    }
+
     case 'table-fill': {
       // Fila: la decena de 1 a 9 (la 0 empieza por «0»); columna: la unidad de 0 a 9. Se escriben cinco de los diez números
       // (ordenados); en una columna el de arriba (02) viene siempre dado para no escribir un 0 delante

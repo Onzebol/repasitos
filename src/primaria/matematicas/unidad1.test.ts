@@ -93,18 +93,22 @@ describe('Unidad 1 de Matemáticas: contenido', () => {
     }
   })
 
-  it('"La tabla del 0 al 99" elige sobre la tabla dibujada y completa filas y columnas con el teclado', () => {
+  it('"La tabla del 0 al 99" elige sobre la tabla, completa filas y columnas con el teclado y colorea tocando', () => {
     const tema = temasUnidad1.find((topic) => topic.id === 'tabla-99')!
     for (let seed = 0; seed < 30; seed++) {
       const session = buildSession(tema.plan, mulberry32(seed))
       const preguntas = session.map((e) => e.question)
-      expect(preguntas.filter((q) => /fila amarilla empiezan/.test(q))).toHaveLength(2)
-      expect(preguntas.filter((q) => /columna naranja acaban/.test(q))).toHaveLength(2)
-      expect(preguntas.filter((q) => q === '¿Qué número falta?')).toHaveLength(2)
-      expect(preguntas.filter((q) => q === 'Completa la fila amarilla')).toHaveLength(2)
-      expect(preguntas.filter((q) => q === 'Completa la columna naranja')).toHaveLength(2)
-      expect(session.filter((e) => e.type === 'choice' && e.table !== undefined)).toHaveLength(6)
-      expect(session.filter((e) => e.type === 'table-fill')).toHaveLength(4)
+      expect(preguntas.filter((q) => /fila amarilla empiezan/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /columna naranja acaban/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => q === '¿Qué número falta?')).toHaveLength(3)
+      expect(preguntas.filter((q) => q === 'Completa la fila amarilla')).toHaveLength(1)
+      expect(preguntas.filter((q) => q === 'Completa la columna naranja')).toHaveLength(1)
+      expect(preguntas.filter((q) => /^Toca los números que tienen \d unidad/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /^Toca los números que tienen \d decena/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /^Toca el número que tiene \d decena.* y \d unidad/.test(q))).toHaveLength(1)
+      expect(session.filter((e) => e.type === 'choice' && e.table !== undefined)).toHaveLength(5)
+      expect(session.filter((e) => e.type === 'table-fill')).toHaveLength(2)
+      expect(session.filter((e) => e.type === 'table-paint')).toHaveLength(3)
     }
   })
 
