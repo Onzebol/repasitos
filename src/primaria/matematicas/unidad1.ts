@@ -127,11 +127,12 @@ export const temasUnidad1: Topic[] = [
       { spec: { kind: 'mental', mode: 'sub-bridge' }, count: 1 },
       { spec: { kind: 'mental', mode: 'tens-add' }, count: 1 },
       { spec: { kind: 'mental', mode: 'tens-sub' }, count: 1 },
-      // Series de saltos pequeños, como en el libro (+4, +3, −2, −3), entre 0 y 20
+      // Series de saltos pequeños, como en el libro (+4 y −3), entre 0 y 20
       { spec: { kind: 'series', step: 4, min: 0, max: 20 }, count: 1 },
-      { spec: { kind: 'series', step: 3, min: 0, max: 20 }, count: 1 },
-      { spec: { kind: 'series', step: 2, min: 0, max: 20, down: true }, count: 1 },
       { spec: { kind: 'series', step: 3, min: 0, max: 20, down: true }, count: 1 },
+      // Figuras con valores (p. 27): sumar dos figuras y buscar la que falta
+      { spec: { kind: 'shape-sum', ask: 'sum' }, count: 1 },
+      { spec: { kind: 'shape-sum', ask: 'find' }, count: 1 },
     ],
   },
   {
