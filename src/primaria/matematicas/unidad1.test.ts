@@ -28,7 +28,7 @@ describe('Unidad 1 de Matemáticas: contenido', () => {
       const preguntas = session.map((e) => e.question)
       expect(preguntas.filter((q) => /^Sigue las flechas desde Repi/.test(q))).toHaveLength(4)
       expect(preguntas.filter((q) => /^¿Qué itinerario lleva a Repi/.test(q))).toHaveLength(3)
-      expect(preguntas.filter((q) => q === '¿Por qué sitio pasa el camino?')).toHaveLength(3)
+      expect(preguntas.filter((q) => q === '¿Por qué sitio pasa Repi?')).toHaveLength(3)
       expect(session.every((e) => e.type === 'choice' && e.route !== undefined)).toBe(true)
     }
   })

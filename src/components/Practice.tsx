@@ -159,7 +159,15 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
             {itinerario(true)}
             <div className="feedback solved" role="status">
               <p className="answer-ok">
-                <Icon name="check" /> {exercise.answer}
+                <Icon name="check" />{' '}
+                {exercise.type === 'choice' && exercise.stepOptions ? (
+                  // la respuesta es un itinerario: se dibuja con flechas, igual que las opciones
+                  <span role="img" aria-label={exercise.labels?.[exercise.answer]}>
+                    <Steps value={exercise.answer} />
+                  </span>
+                ) : (
+                  exercise.answer
+                )}
               </p>
               <Mascot size={150} />
               <p className="bubble">¡Muy bien!</p>

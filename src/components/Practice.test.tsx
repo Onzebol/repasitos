@@ -496,6 +496,25 @@ describe('Practice: itinerarios con flechas', () => {
     expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
   })
 
+  it('al acertar, la respuesta también se dibuja con flechas (no con el texto «3> 1^ 1>») y se nombra con palabras', async () => {
+    render(<Practice topic={elegir} onHome={vi.fn()} onBack={vi.fn()} />)
+    await userEvent.setup().click(screen.getByRole('button', { name: '3 pasos a la derecha, 1 paso hacia arriba y 1 paso a la derecha' }))
+    const acierto = screen.getByRole('status')
+    expect(acierto).not.toHaveTextContent(/[<>^]/)
+    // (la mascota y la flecha de «Siguiente» también son SVG: se cuentan solo las de la respuesta)
+    const respuesta = within(acierto).getByRole('img', { name: '3 pasos a la derecha, 1 paso hacia arriba y 1 paso a la derecha' })
+    expect(respuesta.querySelectorAll('svg')).toHaveLength(3)
+    expect(respuesta).toHaveTextContent(/^3\s*1\s*1$/)
+  })
+
+  it('con las instrucciones el camino no está pintado, y al acertar el mapa lo dibuja', async () => {
+    render(<Practice topic={seguir} onHome={vi.fn()} onBack={vi.fn()} />)
+    expect(screen.getByRole('img', { name: 'Mapa con Repi' })).toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: 'Mapa con Repi y un camino' })).not.toBeInTheDocument()
+    await userEvent.setup().click(screen.getByRole('button', { name: 'el colegio' }))
+    expect(screen.getByRole('img', { name: 'Mapa con Repi y un camino' })).toBeInTheDocument()
+  })
+
   it('un ejercicio sin itinerario no dibuja instrucciones ni mapa', () => {
     render(<Practice topic={tema} onHome={vi.fn()} onBack={vi.fn()} />)
     expect(screen.queryByRole('img', { name: /Itinerario/ })).not.toBeInTheDocument()
