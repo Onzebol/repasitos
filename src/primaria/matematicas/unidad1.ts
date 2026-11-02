@@ -100,9 +100,10 @@ export const temasUnidad1: Topic[] = [
     tint: '#b5ecc1',
     plan: [
       { spec: { kind: 'column', operator: '+' }, count: 3 },
-      { spec: { kind: 'column', operator: '−' }, count: 3 },
+      { spec: { kind: 'column', operator: '−' }, count: 2 },
       { spec: { kind: 'word-problem', operator: '+' }, count: 2 },
       { spec: { kind: 'word-problem', operator: '−' }, count: 2 },
+      { spec: { kind: 'operation-sign' }, count: 1 },
     ],
   },
   {
@@ -110,7 +111,12 @@ export const temasUnidad1: Topic[] = [
     name: 'La decena más cercana',
     icon: '🎯',
     tint: '#bfe3ff',
-    plan: [{ spec: { kind: 'nearest-ten' }, count: 10 }],
+    plan: [
+      { spec: { kind: 'nearest-ten' }, count: 5 },
+      { spec: { kind: 'nearest-ten', ask: 'between' }, count: 2 },
+      { spec: { kind: 'nearest-ten', ask: 'rule' }, count: 1 },
+      { spec: { kind: 'nearest-ten', ask: 'approx' }, count: 2 },
+    ],
   },
   {
     id: 'calculo-mental',
@@ -118,10 +124,15 @@ export const temasUnidad1: Topic[] = [
     icon: '🧠',
     tint: '#ffd2b0',
     plan: [
-      { spec: { kind: 'mental', mode: 'add-bridge' }, count: 3 },
-      { spec: { kind: 'mental', mode: 'sub-bridge' }, count: 3 },
-      { spec: { kind: 'mental', mode: 'tens-add' }, count: 2 },
-      { spec: { kind: 'mental', mode: 'tens-sub' }, count: 2 },
+      { spec: { kind: 'mental', mode: 'add-bridge' }, count: 2 },
+      { spec: { kind: 'mental', mode: 'sub-bridge' }, count: 2 },
+      { spec: { kind: 'mental', mode: 'tens-add' }, count: 1 },
+      { spec: { kind: 'mental', mode: 'tens-sub' }, count: 1 },
+      // Series de saltos pequeños, como en el libro (+4, +3, −2, −3), entre 0 y 20
+      { spec: { kind: 'series', step: 4, min: 0, max: 20 }, count: 1 },
+      { spec: { kind: 'series', step: 3, min: 0, max: 20 }, count: 1 },
+      { spec: { kind: 'series', step: 2, min: 0, max: 20, down: true }, count: 1 },
+      { spec: { kind: 'series', step: 3, min: 0, max: 20, down: true }, count: 1 },
     ],
   },
 ]

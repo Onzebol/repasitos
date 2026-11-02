@@ -188,9 +188,20 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'series': {
-      const inicio = int(rng, spec.min ?? 10, (spec.max ?? 99) - 3 * spec.step)
-      const mostrados = [0, 1, 2].map((i) => inicio + i * spec.step)
-      return numero(`Completa la serie: ${mostrados.join(', ')}, …`, inicio + 3 * spec.step)
+      const min = spec.min ?? 10
+      const max = spec.max ?? 99
+      // Hacia atrás: se empieza arriba y siempre queda sitio para bajar tres veces sin salirse del rango
+      const salto = spec.down ? -spec.step : spec.step
+      const inicio = spec.down ? int(rng, min + 3 * spec.step, max) : int(rng, min, max - 3 * spec.step)
+      const mostrados = [0, 1, 2].map((i) => inicio + i * salto)
+      return numero(`Completa la serie: ${mostrados.join(', ')}, …`, inicio + 3 * salto)
+    }
+
+    case 'operation-sign': {
+      const operador = pick(rng, ['+', '−'] as const)
+      const [a, b] = operandos(operador, rng)
+      const resultado = operador === '+' ? a + b : a - b
+      return elegir('¿Qué signo va en el recuadro?', ['+', '−'], operador, `${a}  ❓  ${b}  =  ${resultado}`)
     }
 
     case 'place-value': {
@@ -295,10 +306,44 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
 
     case 'nearest-ten': {
       // Sin acabar en 0 (ya es decena) ni en 5 (a mitad de camino, no hay una más cercana)
-      let n = int(rng, 11, 99)
-      while (n % 10 === 0 || n % 10 === 5) n = int(rng, 11, 99)
+      const sinMitad = (min: number) => {
+        let n = int(rng, min, 99)
+        while (n % 10 === 0 || n % 10 === 5) n = int(rng, min, 99)
+        return n
+      }
+      if (spec.ask === 'between') {
+        // Aquí vale cualquier número de dos cifras que no sea una decena (también los acabados en 5)
+        let n = int(rng, 11, 99)
+        while (n % 10 === 0) n = int(rng, 11, 99)
+        const bajo = Math.floor(n / 10) * 10
+        const par = (x: number) => `${x} y ${x + 10}`
+        const equivocadas = [par(bajo - 10), ...(bajo <= 80 ? [par(bajo + 10)] : []), ...(bajo >= 20 ? [par(bajo - 20)] : [])]
+        return elegir(`¿Entre qué dos decenas está el ${n}?`, [par(bajo), ...dosAlAzar(rng, equivocadas, par(bajo), 'entre qué decenas')], par(bajo))
+      }
+      if (spec.ask === 'rule') {
+        const n = sinMitad(11)
+        return elegir(`¿La cifra de las unidades del ${n} es mayor o menor que 5?`, ['mayor que 5', 'menor que 5'], n % 10 > 5 ? 'mayor que 5' : 'menor que 5')
+      }
+      if (spec.ask === 'approx') {
+        const n = sinMitad(11)
+        const bajo = Math.floor(n / 10) * 10
+        const cercana = Math.round(n / 10) * 10
+        const otra = cercana === bajo ? bajo + 10 : bajo
+        const historia = pick(rng, [
+          `Un abuelo tiene ${n} años. Más o menos, ¿cuántos años tiene?`,
+          `Un libro tiene ${n} páginas. Más o menos, ¿cuántas páginas tiene?`,
+          `Un camino mide ${n} kilómetros. Más o menos, ¿cuántos kilómetros mide?`,
+          `En el cine hay ${n} personas. Más o menos, ¿cuántas hay?`,
+        ])
+        // La tercera opción, otra decena más lejos, entre 10 y 100
+        const lejana = pick(rng, [...(bajo >= 20 ? [bajo - 10] : []), ...(bajo <= 80 ? [bajo + 20] : [])])
+        return elegir(historia, [cercana, otra, lejana], cercana)
+      }
+      // Con el 6, 7, 8 y 9 la decena de arriba es el 10 (y la otra opción, el 20)
+      const n = sinMitad(6)
       const bajo = Math.floor(n / 10) * 10
-      return elegir(`¿Cuál es la decena más cercana a ${n}?`, [bajo, bajo + 10], Math.round(n / 10) * 10)
+      const opciones = n < 10 ? [10, 20] : [bajo, bajo + 10]
+      return elegir(`¿Cuál es la decena más cercana a ${n}?`, opciones, Math.round(n / 10) * 10)
     }
 
     case 'how-many': {

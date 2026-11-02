@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mulberry32 } from '../../random'
 import { buildSession } from '../../session'
 import { describeUnit } from '../../test/unitChecks'
+import type { BlockSpec } from '../../types'
 import { temasUnidad1 } from './unidad1'
 
 describeUnit('Unidad 1 de Matemáticas', temasUnidad1)
@@ -18,10 +19,44 @@ describe('Unidad 1 de Matemáticas: contenido', () => {
     ])
   })
 
-  it('"Sumas y restas sin llevar" mezcla columnas y problemas con texto', () => {
+  it('"Sumas y restas sin llevar" mezcla columnas, problemas con texto y elegir el signo de la operación', () => {
     const tema = temasUnidad1.find((topic) => topic.id === 'sumas-restas')!
-    const session = buildSession(tema.plan, mulberry32(1))
-    expect(session.filter((e) => e.type === 'column')).toHaveLength(6)
-    expect(session.filter((e) => e.type === 'number')).toHaveLength(4)
+    for (let seed = 0; seed < 30; seed++) {
+      const session = buildSession(tema.plan, mulberry32(seed))
+      expect(session.filter((e) => e.type === 'column')).toHaveLength(5)
+      expect(session.filter((e) => e.type === 'number')).toHaveLength(4)
+      const signo = session.filter((e) => e.type === 'choice')
+      expect(signo).toHaveLength(1)
+      expect(signo[0].question).toMatch(/signo/)
+    }
+  })
+
+  it('"La decena más cercana" practica la decena, entre qué decenas está, la regla del 5 y el «más o menos»', () => {
+    const tema = temasUnidad1.find((topic) => topic.id === 'decena-cercana')!
+    for (let seed = 0; seed < 30; seed++) {
+      const session = buildSession(tema.plan, mulberry32(seed))
+      const preguntas = session.map((e) => e.question)
+      expect(preguntas.filter((q) => /decena más cercana/.test(q))).toHaveLength(5)
+      expect(preguntas.filter((q) => /Entre qué dos decenas/.test(q))).toHaveLength(2)
+      expect(preguntas.filter((q) => /cifra de las unidades/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /más o menos/i.test(q))).toHaveLength(2)
+    }
+  })
+
+  it('"Cálculo mental" incluye series de saltos pequeños, también hacia atrás', () => {
+    const tema = temasUnidad1.find((topic) => topic.id === 'calculo-mental')!
+    const series = tema.plan
+      .map((bloque) => bloque.spec)
+      .filter((spec): spec is Extract<BlockSpec, { kind: 'series' }> => spec.kind === 'series')
+    expect(series.some((spec) => !spec.down)).toBe(true)
+    expect(series.some((spec) => spec.down)).toBe(true)
+    for (const spec of series) {
+      expect([2, 3, 4, 5]).toContain(spec.step)
+      expect(spec.max).toBeLessThanOrEqual(20)
+    }
+    for (let seed = 0; seed < 30; seed++) {
+      const session = buildSession(tema.plan, mulberry32(seed))
+      expect(session.filter((e) => /Completa la serie/.test(e.question))).toHaveLength(4)
+    }
   })
 })

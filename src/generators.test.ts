@@ -65,6 +65,9 @@ const SPECS: BlockSpec[] = [
   { kind: 'extreme', mode: 'smallest' },
   { kind: 'series', step: 1 },
   { kind: 'series', step: 10 },
+  { kind: 'series', step: 4, min: 0, max: 20 },
+  { kind: 'series', step: 3, min: 0, max: 20, down: true },
+  { kind: 'operation-sign' },
   { kind: 'place-value', ask: 'read' },
   { kind: 'place-value', ask: 'tens' },
   { kind: 'place-value', ask: 'units' },
@@ -80,6 +83,9 @@ const SPECS: BlockSpec[] = [
   { kind: 'word-problem', operator: '−' },
   { kind: 'word-problem', operator: '+', carry: true },
   { kind: 'nearest-ten' },
+  { kind: 'nearest-ten', ask: 'between' },
+  { kind: 'nearest-ten', ask: 'rule' },
+  { kind: 'nearest-ten', ask: 'approx' },
   { kind: 'mental', mode: 'add-bridge' },
   { kind: 'mental', mode: 'sub-bridge' },
   { kind: 'mental', mode: 'tens-add' },
@@ -257,6 +263,62 @@ describe('generate: reglas de cada plantilla', () => {
         expect(e.answer, e.question).toBe(c + paso)
       }
     }
+  })
+
+  it('las series pueden saltar de 2 a 5 y bajar, sin salirse del rango', () => {
+    for (const paso of [2, 3, 4, 5] as const) {
+      for (const down of [false, true]) {
+        for (const e of muchos({ kind: 'series', step: paso, min: 0, max: 20, down }).map(number)) {
+          const [a, b, c] = e.question.match(/\d+/g)!.map(Number)
+          const signo = down ? -1 : 1
+          expect(b - a, e.question).toBe(signo * paso)
+          expect(c - b, e.question).toBe(signo * paso)
+          expect(e.answer, e.question).toBe(c + signo * paso)
+          for (const n of [a, b, c, e.answer]) {
+            expect(n, e.question).toBeGreaterThanOrEqual(0)
+            expect(n, e.question).toBeLessThanOrEqual(20)
+          }
+        }
+      }
+    }
+  })
+
+  it('las series hacia atrás por defecto también salen de dos cifras y bajan de 1 en 1 o de 10 en 10', () => {
+    for (const paso of [1, 10] as const) {
+      for (const e of muchos({ kind: 'series', step: paso, down: true }).map(number)) {
+        const [a, b, c] = e.question.match(/\d+/g)!.map(Number)
+        expect(a - b, e.question).toBe(paso)
+        expect(b - c, e.question).toBe(paso)
+        expect(e.answer, e.question).toBe(c - paso)
+        expect(e.answer, e.question).toBeGreaterThanOrEqual(10)
+      }
+    }
+  })
+
+  it('elegir el signo: la operación escrita es cierta con el signo de la respuesta y falsa con el otro', () => {
+    const vistos = new Set<string>()
+    for (const e of muchos({ kind: 'operation-sign' }).map(choice)) {
+      const [a, b, c] = e.visual!.match(/\d+/g)!.map(Number)
+      expect([...e.options].sort(), e.question).toEqual(['+', '−'])
+      const suma = a + b === c
+      const resta = a - b === c
+      expect(suma !== resta, e.visual).toBe(true) // solo una de las dos es cierta
+      expect(e.answer, e.visual).toBe(suma ? '+' : '−')
+      // sin llevar y con números de dos cifras, como en la unidad 1
+      for (const n of [a, b]) {
+        expect(n, e.visual).toBeGreaterThanOrEqual(10)
+        expect(n, e.visual).toBeLessThanOrEqual(99)
+      }
+      expect(c, e.visual).toBeGreaterThan(0)
+      expect(c, e.visual).toBeLessThanOrEqual(99)
+      if (suma) expect((a % 10) + (b % 10), e.visual).toBeLessThan(10)
+      else {
+        expect(a % 10, e.visual).toBeGreaterThanOrEqual(b % 10)
+        expect(Math.floor(a / 10), e.visual).toBeGreaterThanOrEqual(Math.floor(b / 10))
+      }
+      vistos.add(e.answer)
+    }
+    expect(vistos).toEqual(new Set(['+', '−']))
   })
 
   it('decenas y unidades: leer un número da la descomposición correcta, con singular y plural', () => {
@@ -480,6 +542,67 @@ describe('generate: reglas de cada plantilla', () => {
       expect(n % 10, e.question).not.toBe(0)
       expect(e.answer, e.question).toBe(String(Math.round(n / 10) * 10))
       expect(e.options, e.question).toHaveLength(2)
+    }
+  })
+
+  it('la decena más cercana también se pregunta para el 6, 7, 8 y 9 (la de arriba es el 10)', () => {
+    const pequenos = muchos({ kind: 'nearest-ten' })
+      .map(choice)
+      .filter((e) => Number(e.question.match(/\d+/)![0]) < 10)
+    expect(pequenos.length).toBeGreaterThan(0)
+    for (const e of pequenos) {
+      const n = Number(e.question.match(/\d+/)![0])
+      expect(n, e.question).toBeGreaterThanOrEqual(6)
+      expect(e.answer, e.question).toBe('10')
+      expect(e.options, e.question).not.toContain('0')
+    }
+  })
+
+  it('«¿Entre qué dos decenas está…?» da dos decenas seguidas que rodean al número', () => {
+    for (const e of muchos({ kind: 'nearest-ten', ask: 'between' }).map(choice)) {
+      const n = Number(e.question.match(/\d+/)![0])
+      expect(n % 10, e.question).not.toBe(0)
+      const bajo = Math.floor(n / 10) * 10
+      expect(e.answer, e.question).toBe(`${bajo} y ${bajo + 10}`)
+      expect(e.options, e.question).toHaveLength(3)
+      for (const opcion of e.options) {
+        const [x, y] = opcion.split(' y ').map(Number)
+        expect(y - x, opcion).toBe(10)
+        expect(x % 10, opcion).toBe(0)
+        expect(x, opcion).toBeGreaterThanOrEqual(0)
+        expect(y, opcion).toBeLessThanOrEqual(100)
+      }
+    }
+  })
+
+  it('la regla del 5: la cifra de las unidades es mayor o menor que 5 y nunca igual', () => {
+    const respuestas = new Set<string>()
+    for (const e of muchos({ kind: 'nearest-ten', ask: 'rule' }).map(choice)) {
+      const n = Number(e.question.match(/\d+/)![0])
+      expect(n % 10, e.question).not.toBe(5)
+      expect([...e.options].sort(), e.question).toEqual(['mayor que 5', 'menor que 5'])
+      expect(e.answer, e.question).toBe(n % 10 > 5 ? 'mayor que 5' : 'menor que 5')
+      respuestas.add(e.answer)
+    }
+    expect(respuestas.size).toBe(2)
+  })
+
+  it('«más o menos»: la respuesta es la decena más cercana y las otras opciones son otras decenas', () => {
+    for (const e of muchos({ kind: 'nearest-ten', ask: 'approx' }).map(choice)) {
+      const n = Number(e.question.match(/\d+/)![0])
+      expect(n % 10, e.question).not.toBe(5)
+      expect(n % 10, e.question).not.toBe(0)
+      expect(e.question, e.question).toMatch(/más o menos/i)
+      expect(e.answer, e.question).toBe(String(Math.round(n / 10) * 10))
+      expect(e.options, e.question).toHaveLength(3)
+      for (const opcion of e.options) {
+        expect(Number(opcion) % 10, e.question).toBe(0)
+        expect(Number(opcion), e.question).toBeGreaterThanOrEqual(0)
+        expect(Number(opcion), e.question).toBeLessThanOrEqual(100)
+      }
+      // la otra decena que rodea al número también es una opción equivocada
+      const bajo = Math.floor(n / 10) * 10
+      expect(e.options, e.question).toContain(String(Math.round(n / 10) * 10 === bajo ? bajo + 10 : bajo))
     }
   })
 
