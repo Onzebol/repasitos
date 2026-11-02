@@ -19,7 +19,7 @@ export function exerciseKey(exercise: Exercise): string {
     case 'number':
       return JSON.stringify([exercise.type, exercise.question, exercise.visual, exercise.answer])
     case 'trace':
-      return JSON.stringify([exercise.type, exercise.digit])
+      return JSON.stringify([exercise.type, exercise.digit, exercise.letter, exercise.lowercase ?? false])
     case 'column':
       return JSON.stringify([exercise.type, exercise.operator, exercise.top, exercise.bottom, exercise.carry ?? false])
   }

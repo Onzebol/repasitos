@@ -180,7 +180,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
                 )}
               </>
             ) : exercise.type === 'trace' ? (
-              <TraceExercise key={index} digit={exercise.digit} onDone={() => setSolved(true)} />
+              <TraceExercise key={index} digit={exercise.digit} letter={exercise.letter} lowercase={exercise.lowercase} onDone={() => setSolved(true)} />
             ) : exercise.type === 'column' ? (
               <ColumnExercise key={index} exercise={exercise} onCheck={checkColumn} />
             ) : (

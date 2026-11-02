@@ -6,6 +6,7 @@ import { buildSession } from '../../session'
 import { describeUnit } from '../../test/unitChecks'
 import type { ChoiceExercise } from '../../types'
 import { unidadesInfantil } from '../contenido'
+import { ABECEDARIO } from '../trazos-letras'
 import { RIMAS, SONIDOS } from './palabras'
 import { temasLetras, unidadLetras } from './temas'
 
@@ -43,7 +44,7 @@ function sonidoInicial(palabra: string): string {
 
 describe('Letras de Infantil: contenido', () => {
   it('tiene sus temas y está registrada como la unidad de la materia Letras', () => {
-    expect(temasLetras.map((topic) => topic.id)).toEqual(['rimas', 'sonido-inicial'])
+    expect(temasLetras.map((topic) => topic.id)).toEqual(['rimas', 'sonido-inicial', 'trazo-vocales', 'trazo-consonantes', 'trazo-resto'])
     expect(unidadLetras.topics).toBe(temasLetras)
     expect(unidadesInfantil.letras).toEqual([unidadLetras])
   })
@@ -180,5 +181,44 @@ describe('Letras de Infantil: «Sonido inicial»', () => {
     const vistos = new Set<string>()
     for (let seed = 0; seed < SEMILLAS; seed++) for (const e of elegir('sonido-inicial', seed)) vistos.add(sonidoInicial(/que (\p{L}+)\?/u.exec(e.question)![1]))
     expect([...vistos].sort()).toEqual([...new Set(SONIDOS.map((s) => s.sonido))].sort())
+  })
+})
+
+describe('Letras de Infantil: trazo de letras con el dedo (#99)', () => {
+  const trazos = ['trazo-vocales', 'trazo-consonantes', 'trazo-resto']
+  const letrasDe = (id: string, seed: number) => sesion(id, seed).map((e) => (e.type === 'trace' ? e : null))
+
+  it('hay un tema por tanda y cada ejercicio es de trazar una letra', () => {
+    for (const id of trazos) {
+      expect(temasLetras.some((t) => t.id === id), id).toBe(true)
+      for (const e of letrasDe(id, 1)) expect(e?.letter, id).toBeDefined()
+    }
+  })
+
+  it('las tres tandas reparten las 27 letras sin repetir ninguna, con la k y la ñ, vocales primero', () => {
+    const todas = trazos.flatMap((id) => {
+      const plan = temasLetras.find((t) => t.id === id)!.plan
+      return plan.flatMap((b) => (b.spec.kind === 'trace' ? (b.spec.letters ?? []) : []))
+    })
+    const unicas = [...new Set(todas)]
+    expect(unicas.sort()).toEqual([...ABECEDARIO].sort())
+    expect(unicas).toContain('K')
+    expect(todas.slice(0, 5)).toEqual(['A', 'E', 'I', 'O', 'U'])
+  })
+
+  it('cada tanda se hace en minúscula y en mayúscula, 10 ejercicios sin repetir', () => {
+    for (const id of trazos) {
+      for (let seed = 0; seed < SEMILLAS; seed++) {
+        const ej = letrasDe(id, seed)
+        expect(ej).toHaveLength(10)
+        expect(ej.some((e) => e?.lowercase)).toBe(true)
+        expect(ej.some((e) => !e?.lowercase)).toBe(true)
+        expect(new Set(ej.map((e) => e!.answer)).size).toBe(10)
+      }
+    }
+  })
+
+  it('las vocales salen todas, en las dos formas', () => {
+    expect(new Set(letrasDe('trazo-vocales', 3).map((e) => e!.answer))).toEqual(new Set(['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U']))
   })
 })

@@ -1,4 +1,5 @@
 import type { Digit } from './infantil/trazos'
+import type { Letra } from './infantil/trazos-letras'
 
 export type Profile = 'infantil' | 'primaria'
 
@@ -57,8 +58,10 @@ export type ColumnExercise = {
 export type TraceExercise = {
   type: 'trace'
   question: string
-  digit: Digit
-  answer: Digit // la propia cifra, para mostrarla al terminar
+  digit?: Digit // cifra a repasar (si no hay letra)
+  letter?: Letra // letra a repasar, en lugar de cifra
+  lowercase?: boolean // la letra es minúscula
+  answer: string | number // la propia cifra o letra, para mostrarla al terminar
 }
 
 export type Exercise = ChoiceExercise | NumberExercise | ColumnExercise | TraceExercise
@@ -119,7 +122,7 @@ export type BlockSpec =
   // Las cifras (Infantil): «Toca el número 5» entre tres cifras (por defecto, del 1 al 9)
   | { kind: 'digit'; min?: number; max?: number }
   // Trazo guiado: repasar con el dedo una cifra de min a max (por defecto, del 0 al 9)
-  | { kind: 'trace'; min?: Digit; max?: Digit }
+  | { kind: 'trace'; min?: Digit; max?: Digit; letters?: Letra[]; lowercase?: boolean }
   // Rimas (Infantil): «¿Qué rima con gato?» entre tres dibujos (uno de la misma familia de rima y dos de otras)
   | { kind: 'rhyme' }
   // Sonido inicial (Infantil): «¿Cuál empieza igual que mono?» entre tres dibujos (uno con el mismo sonido y dos con otros distintos)

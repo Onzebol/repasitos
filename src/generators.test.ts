@@ -29,11 +29,17 @@ function esValido(e: Exercise) {
     expect(e.answer, e.question).toBeGreaterThanOrEqual(0)
     expect(e.answer, e.question).toBeLessThanOrEqual(999)
   } else if (e.type === 'trace') {
-    expect(Number.isInteger(e.digit), e.question).toBe(true)
-    expect(e.digit, e.question).toBeGreaterThanOrEqual(0)
-    expect(e.digit, e.question).toBeLessThanOrEqual(9)
-    expect(e.answer, e.question).toBe(e.digit)
-    expect(e.question, e.question).toContain(String(e.digit))
+    if (e.letter !== undefined) {
+      const mostrada = e.lowercase ? e.letter.toLowerCase() : e.letter
+      expect(e.answer, e.question).toBe(mostrada)
+      expect(e.question, e.question).toContain(mostrada)
+    } else {
+      expect(Number.isInteger(e.digit), e.question).toBe(true)
+      expect(e.digit, e.question).toBeGreaterThanOrEqual(0)
+      expect(e.digit, e.question).toBeLessThanOrEqual(9)
+      expect(e.answer, e.question).toBe(e.digit)
+      expect(e.question, e.question).toContain(String(e.digit))
+    }
   } else {
     const nombre = `${e.top} ${e.operator} ${e.bottom}`
     expect(e.top, nombre).toBeGreaterThanOrEqual(10)
@@ -192,6 +198,28 @@ describe('generate: las cifras (Infantil)', () => {
   it('respeta el rango pedido y salen todas las cifras', () => {
     const respuestas = ejercicios({ kind: 'digit', min: 0, max: 4 }).map((e) => Number(e.answer))
     expect(new Set(respuestas)).toEqual(new Set([0, 1, 2, 3, 4]))
+  })
+})
+
+describe('generate: trazo guiado de letras', () => {
+  it('solo salen las letras pedidas, en la forma pedida, y salen todas', () => {
+    const vistas = new Set<string>()
+    for (const e of muchos({ kind: 'trace', letters: ['A', 'K', 'Ñ'], lowercase: true })) {
+      if (e.type !== 'trace') throw new Error('se esperaba trazar')
+      expect(e.digit).toBeUndefined()
+      expect(e.lowercase).toBe(true)
+      expect(e.question).toBe(`Repasa la letra ${e.answer}`)
+      vistas.add(String(e.answer))
+    }
+    expect(vistas).toEqual(new Set(['a', 'k', 'ñ']))
+  })
+
+  it('sin lowercase salen mayúsculas', () => {
+    for (const e of muchos({ kind: 'trace', letters: ['B', 'C'] })) {
+      if (e.type !== 'trace') throw new Error('se esperaba trazar')
+      expect(['B', 'C']).toContain(e.answer)
+      expect(e.lowercase).toBeFalsy()
+    }
   })
 })
 

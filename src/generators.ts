@@ -417,6 +417,11 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'trace': {
+      if (spec.letters) {
+        const letter = pick(rng, spec.letters)
+        const shown = spec.lowercase ? letter.toLowerCase() : letter
+        return { type: 'trace', question: `Repasa la letra ${shown}`, letter, lowercase: spec.lowercase, answer: shown }
+      }
       const digit = int(rng, spec.min ?? 0, spec.max ?? 9) as Digit
       return { type: 'trace', question: `Repasa el número ${digit}`, digit, answer: digit }
     }

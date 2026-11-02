@@ -84,7 +84,7 @@ describe('Números de Infantil: contenido', () => {
   })
 
   it('«Trazo de las cifras» reparte las diez cifras, del 0 al 9, una vez cada una', () => {
-    const cifras = sesion('trazo').map((e) => (e.type === 'trace' ? e.digit : -1))
+    const cifras = sesion('trazo').map((e) => (e.type === 'trace' ? (e.digit ?? -1) : -1))
     expect([...cifras].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
   })
 })
