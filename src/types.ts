@@ -177,6 +177,9 @@ export type BlockSpec =
   // La información oculta (elegir): cuatro deportes con un número cada uno y una resta sin llevar cuyo resultado es el
   // número de uno de ellos: se pregunta qué deporte practica quien la hace
   | { kind: 'hidden-info' }
+  // Figuras con valores (cálculo mental, p. 27): cuatro figuras valen un número cada una (distintos, de 2 a 9, nuevos en cada
+  // ejercicio); `sum`: sumar dos figuras (escribir) y `find`: «🟩 + ❓ = 7», qué figura falta (elegir entre tres)
+  | { kind: 'shape-sum'; ask: 'sum' | 'find' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
   // sumas que no pasan de 10 y restas de números hasta el 10
   | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' | 'add-small' | 'sub-small' }

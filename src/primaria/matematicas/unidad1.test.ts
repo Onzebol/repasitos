@@ -162,7 +162,16 @@ describe('Unidad 1 de Matemáticas: contenido', () => {
     }
     for (let seed = 0; seed < 30; seed++) {
       const session = buildSession(tema.plan, mulberry32(seed))
-      expect(session.filter((e) => /Completa la serie/.test(e.question))).toHaveLength(4)
+      expect(session.filter((e) => /Completa la serie/.test(e.question))).toHaveLength(2)
+    }
+  })
+
+  it('"Cálculo mental" suma figuras con valores y busca la figura que falta', () => {
+    const tema = temasUnidad1.find((topic) => topic.id === 'calculo-mental')!
+    for (let seed = 0; seed < 30; seed++) {
+      const preguntas = buildSession(tema.plan, mulberry32(seed)).map((e) => e.question)
+      expect(preguntas.filter((q) => /^(🟩|🔺|🔵|🟡) \+ (🟩|🔺|🔵|🟡) =$/u.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /^¿Qué figura falta\?/.test(q))).toHaveLength(1)
     }
   })
 })

@@ -73,6 +73,14 @@ const DEPORTES = [
 ]
 const DEPORTISTAS = ['Lucía', 'Pablo', 'Marta', 'Hugo', 'Sara', 'Iván']
 
+// Las figuras de «figuras con valores» (dibujo y cómo se nombran para lectores de pantalla)
+const FIGURAS = [
+  { emoji: '🟩', nombre: 'cuadrado verde' },
+  { emoji: '🔺', nombre: 'triángulo rojo' },
+  { emoji: '🔵', nombre: 'círculo azul' },
+  { emoji: '🟡', nombre: 'círculo amarillo' },
+]
+
 const decenas = (n: number) => `${n} ${n === 1 ? 'decena' : 'decenas'}`
 const unidades = (n: number) => `${n} ${n === 1 ? 'unidad' : 'unidades'}`
 
@@ -338,6 +346,25 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
 
     case 'route-program':
       return generarProgramacion(rng)
+
+    case 'shape-sum': {
+      // Cada figura vale un número distinto de 2 a 9 que cambia en cada ejercicio: no hay que aprenderlo, se lee en la leyenda
+      const valores = shuffle(rng, [2, 3, 4, 5, 6, 7, 8, 9])
+      const figuras = FIGURAS.map((figura, i) => ({ ...figura, valor: valores[i] }))
+      const leyenda = figuras.map((f) => `${f.emoji} = ${f.valor}`).join('  ')
+      const primera = pick(rng, figuras)
+      if (spec.ask === 'sum') {
+        const segunda = pick(rng, figuras) // a veces la misma: «🔺 + 🔺»
+        return numero(`${primera.emoji} + ${segunda.emoji} =`, primera.valor + segunda.valor, leyenda)
+      }
+      // Como los valores son distintos, solo una figura completa la suma
+      const buscada = pick(rng, figuras)
+      const opciones = [buscada, ...shuffle(rng, figuras.filter((f) => f !== buscada)).slice(0, 2)]
+      return {
+        ...elegir(`¿Qué figura falta? ${primera.emoji} + ❓ = ${primera.valor + buscada.valor}`, opciones.map((o) => o.emoji), buscada.emoji, leyenda),
+        labels: Object.fromEntries(opciones.map((o) => [o.emoji, o.nombre])),
+      }
+    }
 
     case 'hidden-info': {
       // Resta sin llevar con un resultado de dos cifras, que es el número de un deporte de la tabla

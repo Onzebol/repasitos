@@ -98,6 +98,8 @@ const SPECS: BlockSpec[] = [
   { kind: 'table-paint', ask: 'tens' },
   { kind: 'table-paint', ask: 'both' },
   { kind: 'hidden-info' },
+  { kind: 'shape-sum', ask: 'sum' },
+  { kind: 'shape-sum', ask: 'find' },
   { kind: 'number-name', ask: 'read' },
   { kind: 'number-name', ask: 'write' },
   { kind: 'decompose', ask: 'sum' },
@@ -518,6 +520,57 @@ describe('generate: reglas de cada plantilla', () => {
     }
     expect(columnas.size).toBe(10)
     expect(huecos.size, 'salen todas las posiciones del 1 al 9').toBe(9)
+  })
+
+  describe('figuras con valores', () => {
+    // tabla de referencia escrita a mano, independiente del código: cada figura y cómo se nombra
+    const FIGURAS: Record<string, string> = { '🟩': 'cuadrado verde', '🔺': 'triángulo rojo', '🔵': 'círculo azul', '🟡': 'círculo amarillo' }
+    // valores que se muestran en la leyenda («🟩 = 3  🔺 = 4 …»)
+    const leyenda = (visual: string) => Object.fromEntries([...visual.matchAll(/(\S+) = (\d+)/gu)].map(([, figura, valor]) => [figura, Number(valor)]))
+
+    it('las figuras salen de la fuente de emojis', () => {
+      const fuente = new Set(emojisDeLaFuente(emojiFont))
+      for (const figura of Object.keys(FIGURAS)) expect(fuente.has(figura), figura).toBe(true)
+    })
+
+    it('sumar dos figuras: la respuesta es la suma de sus valores, que cambian en cada ejercicio', () => {
+      const repetidas = new Set<boolean>()
+      const valoresDeLaPrimera = new Set<number>()
+      for (const e of muchos({ kind: 'shape-sum', ask: 'sum' }).map(number)) {
+        const valores = leyenda(e.visual!)
+        expect(Object.keys(valores).sort(), e.visual).toEqual(Object.keys(FIGURAS).sort())
+        expect(new Set(Object.values(valores)).size, `valores distintos: ${e.visual}`).toBe(4)
+        for (const v of Object.values(valores)) {
+          expect(v, e.visual).toBeGreaterThanOrEqual(2)
+          expect(v, e.visual).toBeLessThanOrEqual(9)
+        }
+        const [, f1, f2] = e.question.match(/^(\S+) \+ (\S+) =$/u)!
+        expect(valores[f1], e.question).toBeDefined()
+        expect(valores[f2], e.question).toBeDefined()
+        expect(e.answer, `${e.question} ${e.visual}`).toBe(valores[f1] + valores[f2])
+        repetidas.add(f1 === f2)
+        valoresDeLaPrimera.add(valores['🟩'])
+      }
+      expect(repetidas, 'salen sumas de dos figuras distintas y de la misma figura dos veces').toEqual(new Set([true, false]))
+      expect(valoresDeLaPrimera.size, 'el valor de una figura cambia de un ejercicio a otro').toBeGreaterThan(4)
+    })
+
+    it('qué figura falta: una sola de las tres opciones completa la suma', () => {
+      for (const e of muchos({ kind: 'shape-sum', ask: 'find' }).map(choice)) {
+        const valores = leyenda(e.visual!)
+        expect(Object.keys(valores).sort(), e.visual).toEqual(Object.keys(FIGURAS).sort())
+        expect(new Set(Object.values(valores)).size, e.visual).toBe(4)
+        const [, f1, suma] = e.question.match(/^¿Qué figura falta\? (\S+) \+ ❓ = (\d+)$/u)!
+        expect(valores[f1], e.question).toBeDefined()
+        expect(e.options, e.question).toHaveLength(3)
+        for (const opcion of e.options) {
+          expect(valores[opcion], opcion).toBeDefined()
+          expect(e.labels![opcion], opcion).toBe(FIGURAS[opcion])
+        }
+        const queCompletan = e.options.filter((opcion) => valores[f1] + valores[opcion] === Number(suma))
+        expect(queCompletan, `${e.question} ${e.visual}`).toEqual([e.answer])
+      }
+    })
   })
 
   it('la información oculta: la resta sin llevar da el número del deporte que practica, y la suma es una trampa', () => {
