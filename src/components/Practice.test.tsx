@@ -66,6 +66,16 @@ describe('Practice: ejercicios de elegir', () => {
     }
   })
 
+  it('el resplandor va en los iconos y dibujos (pregunta de Infantil, opciones de dibujos, contar, materias y temas, interfaz), no en las opciones de texto', () => {
+    expect(css).toMatch(
+      /\.infantil \.visual,\s*\.option-group,\s*\.count-item,\s*\.subject-icon,\s*\.ui-icon,\s*\.icon-sample\s*\{[^}]*text-shadow/,
+    )
+    expect(css).toMatch(/\.count-badge\s*\{[^}]*text-shadow:\s*none/)
+    expect(css).toMatch(/--resplandor:\s*#575757/)
+    expect(css).toMatch(/--opacidad:\s*0\.4/)
+    expect(css).not.toMatch(/\n\.option\s*\{[^}]*text-shadow/)
+  })
+
   it('las opciones normales no llevan el estilo de grupo', () => {
     renderPractice()
     expect(screen.getByRole('button', { name: '40' })).not.toHaveClass('option-group')

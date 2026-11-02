@@ -11,7 +11,7 @@ type IconProps = {
 export function Icon({ name, className }: IconProps) {
   const icon: UiIcon = iconosInterfaz[name]
   return (
-    <span className={className} aria-hidden="true">
+    <span className={className ? `ui-icon ${className}` : 'ui-icon'} aria-hidden="true">
       {icon.arrow ? <ArrowIcon direction={icon.arrow} /> : icon.glyph}
     </span>
   )

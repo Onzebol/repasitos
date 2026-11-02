@@ -76,5 +76,5 @@ En la web solo entran las materias que tienen sentido como repaso en pantalla.
 - [x] Confirmar qué materias quedan (hecho, ver "Materias de la web").
 - [ ] Editorial de 2º de Primaria: Santillana, Construyendo Mundos (hecho). Índices de unidades de Matemáticas, Lengua y Conocimiento del Medio en `docs/` (hecho). Falta la editorial de 3º de Infantil y los libros de Inglés, Música, Teatro y Educación emocional.
 - [x] Conseguir el texto del Decreto 41/2022 (Primaria) y detallar los contenidos de cada área de 2º (hecho, ver `docs/curriculo-primaria-la-rioja.md`).
-- [ ] Concretar los contenidos de lectoescritura de 3º de Infantil (los de números, hechos: ver «Números de 3º de Infantil»).
+- [ ] Concretar los contenidos de lectoescritura de 3º de Infantil (los de números, hechos: ver «Números de 3º de Infantil»). Ya se sabe (2026-11-01): van por las consonantes, mayúsculas y minúsculas, letra ligada, centro no bilingüe. Falta el orden de consonantes del cuaderno. Rimas y sonido inicial hechos (#86).
 - [ ] Después, crear el índice como datos tipados en `src/infantil/` y `src/primaria/` y buscar contenido materia por materia.

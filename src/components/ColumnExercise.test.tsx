@@ -24,7 +24,7 @@ describe('Ejercicio en columna: aspecto', () => {
   it('pone un número encima del otro, con el signo y las columnas D y U', () => {
     abrir(suma)
     const columna = screen.getByRole('group', { name: '23 + 14' })
-    expect(within(columna).getByText('C')).toBeInTheDocument()
+    expect(within(columna).queryByText('C')).not.toBeInTheDocument()
     expect(within(columna).getByText('D')).toBeInTheDocument()
     expect(within(columna).getByText('U')).toBeInTheDocument()
     expect(within(columna).getByText('+')).toBeInTheDocument()
@@ -185,15 +185,16 @@ describe('Ejercicio en columna: sumas llevando', () => {
     expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
   })
 
-  it('las sumas muestran siempre el cuadro de centenas, también con un resultado menor de 100', () => {
+  it('las sumas llevando muestran siempre el cuadro de centenas, también con un resultado menor de 100', () => {
     abrir(llevando)
     expect(centenas()).toBeInTheDocument()
     expect(screen.getByText('C')).toBeInTheDocument()
   })
 
-  it('las sumas sin llevar también lo muestran', () => {
+  it('las sumas sin llevar no lo muestran: su resultado nunca llega a 100', () => {
     abrir(suma)
-    expect(centenas()).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Centenas/ })).not.toBeInTheDocument()
+    expect(screen.queryByText('C')).not.toBeInTheDocument()
   })
 
   it('con un resultado menor de 100 la centena puede quedar vacía', async () => {

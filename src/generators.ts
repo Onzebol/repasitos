@@ -2,6 +2,8 @@ import { int, pick, shuffle } from './random'
 import type { Rng } from './random'
 import { ANIMALES as ANIMALES_CON_NOMBRE } from './infantil/animales'
 import type { Animal } from './infantil/animales'
+import { RIMAS, SONIDOS } from './infantil/letras/palabras'
+import type { Palabra } from './infantil/letras/palabras'
 import type { Digit } from './infantil/trazos'
 import type { BlockSpec, ChoiceExercise, ColumnExercise, Exercise, NumberExercise } from './types'
 
@@ -149,6 +151,12 @@ const problema = (operator: '+' | '−', carry: boolean, rng: Rng): NumberExerci
   const historia = pick(rng, operator === '+' ? HISTORIAS_SUMA : HISTORIAS_RESTA)
   return numero(historia(a, b), operator === '+' ? a + b : a - b)
 }
+
+// Elegir entre dibujos de palabras: las opciones son los emojis y cada uno lleva su palabra como nombre accesible
+const conPalabras = (question: string, modelo: Palabra, opciones: Palabra[], respuesta: Palabra): ChoiceExercise => ({
+  ...elegir(question, opciones.map((o) => o.emoji), respuesta.emoji, modelo.emoji),
+  labels: Object.fromEntries(opciones.map((o) => [o.emoji, o.palabra])),
+})
 
 // Crea un ejercicio nuevo a partir de una plantilla. Las listas fijas ('bag') las reparte buildSession.
 export function generate(spec: BlockSpec, rng: Rng): Exercise {
@@ -411,6 +419,23 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     case 'trace': {
       const digit = int(rng, spec.min ?? 0, spec.max ?? 9) as Digit
       return { type: 'trace', question: `Repasa el número ${digit}`, digit, answer: digit }
+    }
+
+    case 'rhyme': {
+      const familia = pick(rng, RIMAS)
+      const [modelo, respuesta] = shuffle(rng, familia.palabras)
+      // Equivocadas: dibujos de otras familias, de dos familias distintas
+      const otras = shuffle(rng, RIMAS.filter((r) => r !== familia)).slice(0, 2).map((r) => pick(rng, r.palabras))
+      return conPalabras(`¿Qué rima con ${modelo.palabra}?`, modelo, [respuesta, ...otras], respuesta)
+    }
+
+    case 'initial-sound': {
+      const modelo = pick(rng, SONIDOS)
+      const respuesta = pick(rng, SONIDOS.filter((p) => p.sonido === modelo.sonido && p !== modelo))
+      // Equivocadas: dos sonidos distintos entre sí y del de la respuesta (así ninguna opción es dudosa)
+      const sonidos = shuffle(rng, [...new Set(SONIDOS.map((p) => p.sonido))].filter((s) => s !== modelo.sonido)).slice(0, 2)
+      const otras = sonidos.map((s) => pick(rng, SONIDOS.filter((p) => p.sonido === s && p.emoji !== modelo.emoji && p.emoji !== respuesta.emoji)))
+      return conPalabras(`¿Cuál empieza igual que ${modelo.palabra}?`, modelo, [respuesta, ...otras], respuesta)
     }
 
     case 'ordinal': {

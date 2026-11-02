@@ -17,15 +17,16 @@ const LABELS: Record<Box, string> = { hundreds: 'Centenas', tens: 'Decenas', uni
 const HEADS: Record<Place, string> = { hundreds: 'C', tens: 'D', units: 'U' }
 
 // Suma o resta en columna: un número encima del otro y el resultado en un cuadro por cifra.
-// Se empieza por las unidades; el teclado pasa solo al siguiente cuadro. Las sumas tienen siempre el cuadro
-// de las centenas (obligatorio solo si el resultado llega a 100). En las sumas llevando hay un cuadro de
-// llevada opcional que no se comprueba.
+// Se empieza por las unidades; el teclado pasa solo al siguiente cuadro. Las sumas llevando tienen siempre el
+// cuadro de las centenas (obligatorio solo si el resultado llega a 100) y un cuadro de llevada opcional que no
+// se comprueba; las sumas sin llevar no llegan a 100 y no tienen centenas.
 export function ColumnExercise({ exercise, onCheck }: ColumnExerciseProps) {
   const [digits, setDigits] = useState<Record<Box, string>>(EMPTY)
   const [active, setActive] = useState<Box>('units')
 
-  // Las sumas llevan siempre el cuadro de centenas (para que su presencia no dé pistas); las restas, nunca
-  const places: Place[] = exercise.operator === '+' ? ['hundreds', 'tens', 'units'] : ['tens', 'units']
+  // Las sumas llevando llevan siempre el cuadro de centenas (para que su presencia no dé pistas); las sumas sin
+  // llevar (no llegan a 100) y las restas, nunca
+  const places: Place[] = exercise.operator === '+' && exercise.carry ? ['hundreds', 'tens', 'units'] : ['tens', 'units']
   // Si el resultado no llega a 100, la centena puede quedar vacía (o con 0)
   const required = places.filter((place) => place !== 'hundreds' || exercise.answer >= 100)
   const ready = required.every((place) => digits[place] !== '')
