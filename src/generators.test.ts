@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { generate } from './generators'
 import { ANIMALES } from './infantil/animales'
+import { nombreNumero } from './numberNames'
 import { mulberry32 } from './random'
 import type { BlockSpec, Exercise } from './types'
 
@@ -68,6 +69,15 @@ const SPECS: BlockSpec[] = [
   { kind: 'series', step: 4, min: 0, max: 20 },
   { kind: 'series', step: 3, min: 0, max: 20, down: true },
   { kind: 'operation-sign' },
+  { kind: 'number-name', ask: 'read' },
+  { kind: 'number-name', ask: 'write' },
+  { kind: 'decompose', ask: 'sum' },
+  { kind: 'decompose', ask: 'pieces' },
+  { kind: 'decompose', ask: 'words' },
+  { kind: 'tens-units', ask: 'to-units' },
+  { kind: 'tens-units', ask: 'to-tens' },
+  { kind: 'digit-clue', ask: 'tens' },
+  { kind: 'digit-clue', ask: 'units' },
   { kind: 'place-value', ask: 'read' },
   { kind: 'place-value', ask: 'tens' },
   { kind: 'place-value', ask: 'units' },
@@ -319,6 +329,112 @@ describe('generate: reglas de cada plantilla', () => {
       vistos.add(e.answer)
     }
     expect(vistos).toEqual(new Set(['+', '−']))
+  })
+
+  it('leer un número: la respuesta es su nombre y las otras dos opciones son nombres de otros números', () => {
+    const numeros = new Set<number>()
+    for (const e of muchos({ kind: 'number-name', ask: 'read' }).map(choice)) {
+      const n = Number(e.question.match(/\d+/)![0])
+      numeros.add(n)
+      expect(n, e.question).toBeGreaterThanOrEqual(10)
+      expect(n, e.question).toBeLessThanOrEqual(99)
+      expect(e.answer, e.question).toBe(nombreNumero(n))
+      expect(e.options, e.question).toHaveLength(3)
+      for (const opcion of e.options) {
+        const otro = Array.from({ length: 90 }, (_, i) => i + 10).find((m) => nombreNumero(m) === opcion)
+        expect(otro, `${e.question} → ${opcion}`).toBeDefined()
+      }
+    }
+    // salen números de todas las decenas, también del 10 al 19
+    expect(new Set([...numeros].map((n) => Math.floor(n / 10))).size).toBe(9)
+  })
+
+  it('escribir con cifras: la respuesta es el número que dice el nombre', () => {
+    for (const e of muchos({ kind: 'number-name', ask: 'write' }).map(number)) {
+      const nombre = e.question.replace('Escribe con cifras: ', '')
+      expect(nombreNumero(e.answer), e.question).toBe(nombre)
+    }
+  })
+
+  it('descomponer en una suma: falta la decena o la unidad y se escribe con cifras', () => {
+    const faltan = new Set<string>()
+    for (const e of muchos({ kind: 'decompose', ask: 'sum' }).map(number)) {
+      const coincidencia = e.question.match(/(\d+) = (\d+|❓) \+ (\d+|❓)/)
+      expect(coincidencia, e.question).not.toBeNull()
+      const [, total, a, b] = coincidencia!
+      const [conocido, falta] = a === '❓' ? [Number(b), 'primero'] : [Number(a), 'segundo']
+      faltan.add(falta)
+      expect(conocido + e.answer, e.question).toBe(Number(total))
+      // un sumando es la decena (acaba en 0) y el otro la unidad (una cifra, no 0)
+      const [decena, unidad] = [conocido, e.answer].sort((x, y) => y - x)
+      expect(decena % 10, e.question).toBe(0)
+      expect(unidad, e.question).toBeGreaterThanOrEqual(1)
+      expect(unidad, e.question).toBeLessThanOrEqual(9)
+    }
+    expect(faltan).toEqual(new Set(['primero', 'segundo']))
+  })
+
+  it('«4 decenas y 3 unidades»: la respuesta es la suma 40 + 3 y las otras no valen', () => {
+    for (const e of muchos({ kind: 'decompose', ask: 'pieces' }).map(choice)) {
+      const [d, u] = e.question.match(/\d+/g)!.map(Number)
+      expect(d, e.question).not.toBe(u)
+      expect(e.question, e.question).toContain(d === 1 ? '1 decena' : `${d} decenas`)
+      expect(e.question, e.question).toContain(u === 1 ? '1 unidad' : `${u} unidades`)
+      expect(e.answer, e.question).toBe(`${d * 10} + ${u}`)
+      expect(e.options, e.question).toHaveLength(3)
+      for (const opcion of e.options.filter((o) => o !== e.answer)) {
+        const [x, y] = opcion.split(' + ').map(Number)
+        expect(x * 1 + y * 1 === d * 10 + u, `${e.question} → ${opcion}`).toBe(false)
+      }
+    }
+  })
+
+  it('«30 + 4»: la respuesta es cómo se lee ese número', () => {
+    for (const e of muchos({ kind: 'decompose', ask: 'words' }).map(choice)) {
+      const [a, b] = e.question.match(/\d+/g)!.map(Number)
+      expect(a % 10, e.question).toBe(0)
+      expect(b, e.question).toBeGreaterThanOrEqual(1)
+      expect(b, e.question).toBeLessThanOrEqual(9)
+      expect(e.answer, e.question).toBe(nombreNumero(a + b))
+      expect(e.options, e.question).toHaveLength(3)
+    }
+  })
+
+  it('decenas ↔ unidades: 1 decena son 10 unidades, con singular y plural', () => {
+    for (const e of muchos({ kind: 'tens-units', ask: 'to-units' }).map(number)) {
+      const d = Number(e.question.match(/\d+/)![0])
+      expect(d, e.question).toBeGreaterThanOrEqual(1)
+      expect(d, e.question).toBeLessThanOrEqual(9)
+      expect(e.question, e.question).toContain(d === 1 ? '1 decena' : `${d} decenas`)
+      expect(e.question, e.question).toMatch(/unidades/)
+      expect(e.answer, e.question).toBe(d * 10)
+    }
+    for (const e of muchos({ kind: 'tens-units', ask: 'to-tens' }).map(number)) {
+      const u = Number(e.question.match(/\d+/)![0])
+      expect(u % 10, e.question).toBe(0)
+      expect(u, e.question).toBeGreaterThanOrEqual(10)
+      expect(u, e.question).toBeLessThanOrEqual(90)
+      expect(e.question, e.question).toContain(`${u} unidades`)
+      expect(e.question, e.question).toMatch(/decenas/)
+      expect(e.answer, e.question).toBe(u / 10)
+    }
+  })
+
+  it('«¿Qué número tiene 3 decenas?» y «…7 unidades?»: solo la respuesta cumple la condición', () => {
+    for (const lugar of ['tens', 'units'] as const) {
+      for (const e of muchos({ kind: 'digit-clue', ask: lugar }).map(choice)) {
+        const cifra = Number(e.question.match(/\d+/)![0])
+        const palabra = lugar === 'tens' ? (cifra === 1 ? 'decena' : 'decenas') : cifra === 1 ? 'unidad' : 'unidades'
+        expect(e.question, e.question).toContain(`${cifra} ${palabra}`)
+        const cumple = (opcion: string) => (lugar === 'tens' ? Math.floor(Number(opcion) / 10) : Number(opcion) % 10) === cifra
+        expect(e.options.filter(cumple), e.question).toEqual([e.answer])
+        expect(e.options, e.question).toHaveLength(3)
+        for (const opcion of e.options) {
+          expect(Number(opcion), e.question).toBeGreaterThanOrEqual(10)
+          expect(Number(opcion), e.question).toBeLessThanOrEqual(99)
+        }
+      }
+    }
   })
 
   it('decenas y unidades: leer un número da la descomposición correcta, con singular y plural', () => {

@@ -65,7 +65,7 @@ Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el 
 
 | Unidad | Estado | Temas |
 |---|---|---|
-| 1 | Hecha (sesiones de 10 ejercicios aleatorios por tema) | Números hasta el 99 · Decenas y unidades · Los signos > y < · Sumas y restas sin llevar (en columna, con cuadros de decenas y unidades; elegir el signo + o −) · La decena más cercana (entre qué decenas está, la regla del 5, «más o menos») · Cálculo mental (con series +4, +3, −2, −3) |
+| 1 | Hecha (sesiones de 10 ejercicios aleatorios por tema) | Números hasta el 99 (leer y escribir cualquier número, decenas y unidades de un número) · Decenas y unidades (descomponer, decenas ↔ unidades) · Los signos > y < · Sumas y restas sin llevar (en columna, con cuadros de decenas y unidades; elegir el signo + o −) · La decena más cercana (entre qué decenas está, la regla del 5, «más o menos») · Cálculo mental (con series +4, +3, −2, −3) |
 | 2 | Hecha (sesiones de 10 ejercicios aleatorios por tema) | Sumas llevando (columna con llevada opcional y cuadro de centenas) · La suma y la resta se relacionan · Ordinales hasta el 10.º · Del 100 al 199 · Cálculo mental (tres sumandos) |
 | 3 | Hecha (sesiones de 10 ejercicios aleatorios por tema) | Restas llevando (columna con llevada opcional) · Centenas, decenas y unidades (números de tres cifras, piezas 🟥🟦🟨) · El litro (qué recipiente cabe más o menos, litros) · Cálculo mental (sumar un dígito) |
 | 4 a 9 | Muy pronto | |

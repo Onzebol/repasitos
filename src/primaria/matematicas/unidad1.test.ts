@@ -19,6 +19,35 @@ describe('Unidad 1 de Matemáticas: contenido', () => {
     ])
   })
 
+  it('ningún tema depende de listas fijas: leer y escribir números se generan para todos los números', () => {
+    for (const tema of temasUnidad1) {
+      expect(tema.plan.some((bloque) => bloque.spec.kind === 'bag'), tema.name).toBe(false)
+    }
+  })
+
+  it('"Números hasta el 99" lee y escribe números y pregunta por las decenas y las unidades', () => {
+    const tema = temasUnidad1.find((topic) => topic.id === 'numeros-99')!
+    for (let seed = 0; seed < 30; seed++) {
+      const preguntas = buildSession(tema.plan, mulberry32(seed)).map((e) => e.question)
+      expect(preguntas.filter((q) => /¿Cómo se lee el número/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /Escribe con cifras/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /¿Qué número tiene \d+ decenas?\?/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /¿Qué número tiene \d+ unidad(es)?\?/.test(q))).toHaveLength(1)
+    }
+  })
+
+  it('"Decenas y unidades" descompone números y pasa de decenas a unidades y al revés', () => {
+    const tema = temasUnidad1.find((topic) => topic.id === 'decenas-unidades')!
+    for (let seed = 0; seed < 30; seed++) {
+      const preguntas = buildSession(tema.plan, mulberry32(seed)).map((e) => e.question)
+      expect(preguntas.filter((q) => /^Descompón el/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /¿Qué suma es\?/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /¿Cómo se lee \d+ \+ \d+\?/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /= ❓ unidades/.test(q))).toHaveLength(1)
+      expect(preguntas.filter((q) => /= ❓ decenas/.test(q))).toHaveLength(1)
+    }
+  })
+
   it('"Sumas y restas sin llevar" mezcla columnas, problemas con texto y elegir el signo de la operación', () => {
     const tema = temasUnidad1.find((topic) => topic.id === 'sumas-restas')!
     for (let seed = 0; seed < 30; seed++) {
