@@ -40,6 +40,9 @@ export function describeUnit(name: string, topics: Topic[]) {
           } else if (exercise.type === 'trace') {
             expect(exercise.answer, exercise.question).toBe(exercise.digit)
             expect(exercise.question, exercise.question).toContain(String(exercise.digit))
+          } else if (exercise.type === 'table-fill') {
+            expect(exercise.question.trim()).not.toBe('')
+            expect(new Set(exercise.blanks).size, exercise.question).toBe(exercise.blanks.length)
           } else {
             const nombre = `${exercise.top} ${exercise.operator} ${exercise.bottom}`
             expect(exercise.answer, nombre).toBe(exercise.operator === '+' ? exercise.top + exercise.bottom : exercise.top - exercise.bottom)

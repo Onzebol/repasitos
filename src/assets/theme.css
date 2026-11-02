@@ -681,6 +681,37 @@ body {
   background: var(--card);
 }
 
+/* Completar una fila o columna (TableFill): los huecos son botones y el que tiene el foco se resalta */
+.t99 button.c {
+  padding: 0;
+  font: inherit;
+  font-size: clamp(0.75rem, 3vw, 1.05rem);
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.t99 .c.activo {
+  border: 3px solid #3a9be0;
+  background: #fff7cc;
+  box-shadow: 0 0 0 3px #3a9be055;
+}
+
+/* La tira de una sola fila o columna: casillas más altas y con letra mayor, para el dedo */
+.t99-tira {
+  max-width: 40rem;
+}
+
+.t99-tira .h {
+  font-size: clamp(0.65rem, 2.4vw, 0.95rem);
+}
+
+.t99-tira .c,
+.t99-tira button.c {
+  height: clamp(2.75rem, 9vw, 4rem);
+  font-size: clamp(0.8rem, 3.6vw, 1.5rem);
+}
+
 /* Itinerarios con flechas (Steps y RouteMap): fichas con número y flecha, y un mapa de 4 × 5 casillas de hierba con el
    camino de arena y, en cada casilla del camino, una flecha hacia la siguiente */
 .steps {

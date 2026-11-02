@@ -152,7 +152,7 @@ describe('App: navegación', () => {
     await user.click(screen.getByRole('button', { name: /Primaria/ }))
     await user.click(screen.getByRole('button', { name: 'Matemáticas' }))
     await user.click(screen.getByRole('button', { name: /Unidad 1/ }))
-    expect(screen.getAllByRole('listitem')).toHaveLength(8) // los seis temas del índice, «Resolvemos problemas» y «Planos e itinerarios»
+    expect(screen.getAllByRole('listitem')).toHaveLength(9) // los seis temas del índice, «La tabla del 0 al 99», «Resolvemos problemas» y «Planos e itinerarios»
     await user.click(screen.getByRole('button', { name: /Decenas y unidades/ }))
     expect(screen.getByRole('heading', { name: 'Decenas y unidades' })).toBeInTheDocument()
     expect(screen.getByLabelText('Ejercicio 1 de 10')).toBeInTheDocument()

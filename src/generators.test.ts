@@ -37,6 +37,10 @@ function esValido(e: Exercise, spec?: BlockSpec) {
     expect(e.digit, e.question).toBeLessThanOrEqual(9)
     expect(e.answer, e.question).toBe(e.digit)
     expect(e.question, e.question).toContain(String(e.digit))
+  } else if (e.type === 'table-fill') {
+    expect(e.blanks, e.question).toHaveLength(5)
+    expect(new Set(e.blanks).size, e.question).toBe(5)
+    for (const hueco of e.blanks) expect(Number.isInteger(hueco) && hueco >= 0 && hueco <= 9, e.question).toBe(true)
   } else {
     const nombre = `${e.top} ${e.operator} ${e.bottom}`
     expect(e.top, nombre).toBeGreaterThanOrEqual(10)
@@ -77,6 +81,8 @@ const SPECS: BlockSpec[] = [
   { kind: 'route', ask: 'where' },
   { kind: 'route', ask: 'which' },
   { kind: 'route', ask: 'passes' },
+  { kind: 'table-fill', ask: 'row' },
+  { kind: 'table-fill', ask: 'column' },
   { kind: 'number-name', ask: 'read' },
   { kind: 'number-name', ask: 'write' },
   { kind: 'decompose', ask: 'sum' },
@@ -463,6 +469,40 @@ describe('generate: reglas de cada plantilla', () => {
       expect(b, e.question).toBeLessThan(a)
       expect(e.answer, e.question).toBe(a - b)
     }
+  })
+
+  it('completar una fila de la tabla: de las decenas 1 a 9, con cinco huecos ordenados entre los diez números', () => {
+    const filas = new Set<number>()
+    for (const e of muchos({ kind: 'table-fill', ask: 'row' })) {
+      if (e.type !== 'table-fill') throw new Error('se esperaba completar la tabla')
+      expect(e.question).toBe('Completa la fila amarilla')
+      expect(e.line).toBe('row')
+      expect(e.index, e.answer).toBeGreaterThanOrEqual(1) // la fila 0 empieza por «0»
+      expect(e.index, e.answer).toBeLessThanOrEqual(9)
+      expect(e.blanks, e.answer).toEqual([...e.blanks].sort((a, b) => a - b))
+      expect(e.answer).toBe(`${e.index * 10} a ${e.index * 10 + 9}`)
+      filas.add(e.index)
+    }
+    expect(filas.size).toBe(9)
+  })
+
+  it('completar una columna de la tabla: de las unidades 0 a 9, sin pedir nunca el número de una cifra (02)', () => {
+    const columnas = new Set<number>()
+    const huecos = new Set<number>()
+    for (const e of muchos({ kind: 'table-fill', ask: 'column' })) {
+      if (e.type !== 'table-fill') throw new Error('se esperaba completar la tabla')
+      expect(e.question).toBe('Completa la columna naranja')
+      expect(e.line).toBe('column')
+      expect(e.index, e.answer).toBeGreaterThanOrEqual(0)
+      expect(e.index, e.answer).toBeLessThanOrEqual(9)
+      expect(e.blanks, e.answer).toEqual([...e.blanks].sort((a, b) => a - b))
+      expect(e.blanks, e.answer).not.toContain(0) // la casilla de arriba (02) siempre viene dada
+      expect(e.answer).toBe(`${String(e.index).padStart(2, '0')} a ${90 + e.index}`)
+      columnas.add(e.index)
+      e.blanks.forEach((h) => huecos.add(h))
+    }
+    expect(columnas.size).toBe(10)
+    expect(huecos.size, 'salen todas las posiciones del 1 al 9').toBe(9)
   })
 
   it('tabla del 99, fila: todos los números de la fila empiezan por la cifra de las decenas', () => {

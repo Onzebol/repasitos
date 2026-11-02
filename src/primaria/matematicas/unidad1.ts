@@ -12,15 +12,29 @@ export const temasUnidad1: Topic[] = [
     tint: '#ffd1dc',
     plan: [
       { spec: { kind: 'neighbor', mode: 'after', min: 10, max: 99 }, count: 1 },
+      { spec: { kind: 'neighbor', mode: 'before', min: 10, max: 99 }, count: 1 },
       { spec: { kind: 'neighbor', mode: 'between', min: 10, max: 99 }, count: 1 },
       { spec: { kind: 'extreme', mode: 'greatest' }, count: 1 },
+      { spec: { kind: 'extreme', mode: 'smallest' }, count: 1 },
       { spec: { kind: 'series', step: 10 }, count: 1 },
       { spec: { kind: 'number-name', ask: 'read' }, count: 1 },
       { spec: { kind: 'number-name', ask: 'write' }, count: 1 },
       { spec: { kind: 'digit-clue', ask: 'tens' }, count: 1 },
-      { spec: { kind: 'table-99', ask: 'row' }, count: 1 },
-      { spec: { kind: 'table-99', ask: 'column' }, count: 1 },
-      { spec: { kind: 'table-99', ask: 'missing' }, count: 1 },
+      { spec: { kind: 'digit-clue', ask: 'units' }, count: 1 },
+    ],
+  },
+  {
+    // La tabla del 0 al 99 (libro, p. 18): elegir sobre la tabla dibujada y completar una fila o columna con el teclado
+    id: 'tabla-99',
+    name: 'La tabla del 0 al 99',
+    icon: '🧮',
+    tint: '#e3d4ff',
+    plan: [
+      { spec: { kind: 'table-99', ask: 'row' }, count: 2 },
+      { spec: { kind: 'table-99', ask: 'column' }, count: 2 },
+      { spec: { kind: 'table-99', ask: 'missing' }, count: 2 },
+      { spec: { kind: 'table-fill', ask: 'row' }, count: 2 },
+      { spec: { kind: 'table-fill', ask: 'column' }, count: 2 },
     ],
   },
   {

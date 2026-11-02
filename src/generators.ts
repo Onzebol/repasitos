@@ -323,6 +323,24 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     case 'route':
       return generarItinerario(spec.ask, rng)
 
+    case 'table-fill': {
+      // Fila: la decena de 1 a 9 (la 0 empieza por «0»); columna: la unidad de 0 a 9. Se escriben cinco de los diez números
+      // (ordenados); en una columna el de arriba (02) viene siempre dado para no escribir un 0 delante
+      const fila = spec.ask === 'row'
+      const index = int(rng, fila ? 1 : 0, 9)
+      const posibles = Array.from({ length: fila ? 10 : 9 }, (_, i) => i + (fila ? 0 : 1))
+      const blanks = shuffle(rng, posibles).slice(0, 5).sort((a, b) => a - b)
+      const dos = (n: number) => String(n).padStart(2, '0')
+      return {
+        type: 'table-fill',
+        question: fila ? 'Completa la fila amarilla' : 'Completa la columna naranja',
+        line: spec.ask,
+        index,
+        blanks,
+        answer: fila ? `${dos(index * 10)} a ${dos(index * 10 + 9)}` : `${dos(index)} a ${dos(90 + index)}`,
+      }
+    }
+
     case 'table-99': {
       if (spec.ask === 'row' || spec.ask === 'column') {
         // Fila: las decenas, de 1 a 9 (la 0 empieza por «0»); columna: las unidades, de 0 a 9
