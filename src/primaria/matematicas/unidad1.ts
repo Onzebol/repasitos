@@ -47,9 +47,11 @@ export const temasUnidad1: Topic[] = [
     icon: '⚖️',
     tint: '#cdb9ff',
     plan: [
-      { spec: { kind: 'compare', mode: 'sign' }, count: 5 },
-      { spec: { kind: 'compare', mode: 'statement' }, count: 2 },
-      { spec: { kind: 'compare', mode: 'order' }, count: 3 },
+      { spec: { kind: 'compare', mode: 'sign' }, count: 3 },
+      { spec: { kind: 'compare', mode: 'complete' }, count: 2 },
+      { spec: { kind: 'compare', mode: 'statement' }, count: 1 },
+      { spec: { kind: 'compare', mode: 'order' }, count: 2 },
+      { spec: { kind: 'compare', mode: 'context' }, count: 2 },
     ],
   },
   {
@@ -58,8 +60,10 @@ export const temasUnidad1: Topic[] = [
     icon: '➕',
     tint: '#b5ecc1',
     plan: [
-      { spec: { kind: 'column', operator: '+' }, count: 3 },
-      { spec: { kind: 'column', operator: '−' }, count: 2 },
+      { spec: { kind: 'column', operator: '+' }, count: 2 },
+      { spec: { kind: 'column', operator: '+', oneDigit: true }, count: 1 },
+      { spec: { kind: 'column', operator: '−' }, count: 1 },
+      { spec: { kind: 'column', operator: '−', oneDigit: true }, count: 1 },
       { spec: { kind: 'word-problem', operator: '+' }, count: 2 },
       { spec: { kind: 'word-problem', operator: '−' }, count: 2 },
       { spec: { kind: 'operation-sign' }, count: 1 },
@@ -78,13 +82,30 @@ export const temasUnidad1: Topic[] = [
     ],
   },
   {
+    // Laboratorio de problemas del libro: los pasos para resolver un problema y los de dos pasos
+    id: 'problemas',
+    name: 'Resolvemos problemas',
+    icon: '🧩',
+    tint: '#f7c8e0',
+    plan: [
+      { spec: { kind: 'problem-step', ask: 'operation' }, count: 2 },
+      { spec: { kind: 'problem-step', ask: 'calculate' }, count: 2 },
+      { spec: { kind: 'word-problem', operator: '+' }, count: 1 },
+      { spec: { kind: 'word-problem', operator: '−' }, count: 1 },
+      { spec: { kind: 'two-steps', mode: 'add-sub' }, count: 2 },
+      { spec: { kind: 'two-steps', mode: 'sub-add' }, count: 2 },
+    ],
+  },
+  {
     id: 'calculo-mental',
     name: 'Cálculo mental',
     icon: '🧠',
     tint: '#ffd2b0',
     plan: [
-      { spec: { kind: 'mental', mode: 'add-bridge' }, count: 2 },
-      { spec: { kind: 'mental', mode: 'sub-bridge' }, count: 2 },
+      { spec: { kind: 'mental', mode: 'add-small' }, count: 1 },
+      { spec: { kind: 'mental', mode: 'sub-small' }, count: 1 },
+      { spec: { kind: 'mental', mode: 'add-bridge' }, count: 1 },
+      { spec: { kind: 'mental', mode: 'sub-bridge' }, count: 1 },
       { spec: { kind: 'mental', mode: 'tens-add' }, count: 1 },
       { spec: { kind: 'mental', mode: 'tens-sub' }, count: 1 },
       // Series de saltos pequeños, como en el libro (+4, +3, −2, −3), entre 0 y 20

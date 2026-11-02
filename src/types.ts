@@ -84,12 +84,20 @@ export type BlockSpec =
   | { kind: 'tens-units'; ask: 'to-units' | 'to-tens' }
   // «¿Qué número tiene 3 decenas?» / «…7 unidades?»: elegir entre tres números de dos cifras
   | { kind: 'digit-clue'; ask: 'tens' | 'units' }
-  // Comparar números: signo > o <, frase correcta u ordenar tres números (elegir). Rango por defecto: 10 a 99
-  | { kind: 'compare'; mode: 'sign' | 'statement' | 'order'; min?: number; max?: number }
+  // Comparar números: signo > o <, frase correcta u ordenar tres números (elegir). Rango por defecto: 10 a 99.
+  // `complete`: qué número va en «48 > ❓» (o «❓ < 37»); `context`: quién o qué tiene el valor mayor o menor entre
+  // pueblos (km), edades y mochilas (kilos), con los datos en el texto de lectura. Ambos ignoran min y max.
+  | { kind: 'compare'; mode: 'sign' | 'statement' | 'order' | 'complete' | 'context'; min?: number; max?: number }
   // Centenas (de 100 a 199): leer un número con centena, decenas y unidades (elegir) o componerlo (escribir)
   | { kind: 'hundreds'; ask: 'read' | 'compose' }
-  // Suma o resta en columna: sin llevar, o con `carry` (sumas: las unidades pasan de 9; restas: se pide una decena)
-  | { kind: 'column'; operator: '+' | '−'; carry?: boolean }
+  // Suma o resta en columna: sin llevar, o con `carry` (sumas: las unidades pasan de 9; restas: se pide una decena).
+  // Con `oneDigit` el segundo número tiene una cifra (83 + 5, 87 − 5), sin llevar
+  | { kind: 'column'; operator: '+' | '−'; carry?: boolean; oneDigit?: boolean }
+  // Pasos de un problema (elegir): a partir de un texto corto, ¿hay que sumar o restar? (`operation`) o ¿hay que calcular
+  // el total o la diferencia? (`calculate`). Sin llevar
+  | { kind: 'problem-step'; ask: 'operation' | 'calculate' }
+  // Problema de dos pasos (escribir): sumar y restar (`add-sub`) o restar y sumar (`sub-add`), sin llevar y entre 1 y 99
+  | { kind: 'two-steps'; mode: 'add-sub' | 'sub-add' }
   // Problema de suma o resta con un enunciado corto (escribir): sin llevar, o con `carry` (como en `column`)
   | { kind: 'word-problem'; operator: '+' | '−'; carry?: boolean }
   // Centenas, decenas y unidades de números de 3 cifras: leer (elegir), componer, contar con piezas 🟥🟦🟨 o contar un lugar (escribir)
@@ -101,8 +109,9 @@ export type BlockSpec =
   | { kind: 'nearest-ten'; ask?: 'nearest' | 'between' | 'rule' | 'approx' }
   // ¿Qué signo (+ o −) va en «a ❓ b = c»? Sumas y restas sin llevar de dos cifras (elegir)
   | { kind: 'operation-sign' }
-  // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir)
-  | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' }
+  // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
+  // sumas que no pasan de 10 y restas de números hasta el 10
+  | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' | 'add-small' | 'sub-small' }
   // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
   // o qué resta comprueba una suma (elegir)
   | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }

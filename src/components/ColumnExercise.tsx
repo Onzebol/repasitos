@@ -58,9 +58,10 @@ export function ColumnExercise({ exercise, onCheck }: ColumnExerciseProps) {
     </button>
   )
 
-  // Cifra de un operando en cada columna (las centenas quedan en blanco: los operandos tienen dos cifras)
+  // Cifra de un operando en cada columna (las centenas quedan en blanco: los operandos tienen dos cifras como mucho;
+  // un operando de una cifra, como el 5 de 83 + 5, deja en blanco las decenas)
   const cell = (n: number, place: Place) =>
-    place === 'hundreds' ? '' : place === 'tens' ? Math.floor(n / 10) : n % 10
+    place === 'hundreds' || (place === 'tens' && n < 10) ? '' : place === 'tens' ? Math.floor(n / 10) : n % 10
   const blank = (key: string) => <span key={key} aria-hidden="true" />
   const row = (render: (place: Place) => React.ReactNode, first: React.ReactNode = blank('first')) => [first, ...places.map(render)]
 

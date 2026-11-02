@@ -20,8 +20,10 @@ function number(e: Exercise) {
 }
 
 // Lo que debe cumplir todo ejercicio, sea cual sea la plantilla
-function esValido(e: Exercise) {
+function esValido(e: Exercise, spec?: BlockSpec) {
   expect(e.question.trim(), 'enunciado').not.toBe('')
+  // Con `oneDigit` el segundo número es de una cifra (83 + 5)
+  const unaCifra = spec?.kind === 'column' && spec.oneDigit === true
   if (e.type === 'choice') {
     expect(e.options, e.question).toContain(e.answer)
     expect(new Set(e.options).size, e.question).toBe(e.options.length)
@@ -39,8 +41,8 @@ function esValido(e: Exercise) {
     const nombre = `${e.top} ${e.operator} ${e.bottom}`
     expect(e.top, nombre).toBeGreaterThanOrEqual(10)
     expect(e.top, nombre).toBeLessThanOrEqual(99)
-    expect(e.bottom, nombre).toBeGreaterThanOrEqual(10)
-    expect(e.bottom, nombre).toBeLessThanOrEqual(99)
+    expect(e.bottom, nombre).toBeGreaterThanOrEqual(unaCifra ? 1 : 10)
+    expect(e.bottom, nombre).toBeLessThanOrEqual(unaCifra ? 9 : 99)
     expect(e.answer, nombre).toBe(e.operator === '+' ? e.top + e.bottom : e.top - e.bottom)
     expect(e.answer, nombre).toBeGreaterThan(0)
     expect(e.answer, nombre).toBeLessThanOrEqual(e.carry ? 199 : 99)
@@ -86,8 +88,18 @@ const SPECS: BlockSpec[] = [
   { kind: 'compare', mode: 'sign' },
   { kind: 'compare', mode: 'statement' },
   { kind: 'compare', mode: 'order' },
+  { kind: 'compare', mode: 'complete' },
+  { kind: 'compare', mode: 'context' },
   { kind: 'column', operator: '+' },
   { kind: 'column', operator: '−' },
+  { kind: 'column', operator: '+', oneDigit: true },
+  { kind: 'column', operator: '−', oneDigit: true },
+  { kind: 'problem-step', ask: 'operation' },
+  { kind: 'problem-step', ask: 'calculate' },
+  { kind: 'two-steps', mode: 'add-sub' },
+  { kind: 'two-steps', mode: 'sub-add' },
+  { kind: 'mental', mode: 'add-small' },
+  { kind: 'mental', mode: 'sub-small' },
   { kind: 'column', operator: '+', carry: true },
   { kind: 'word-problem', operator: '+' },
   { kind: 'word-problem', operator: '−' },
@@ -123,7 +135,7 @@ const ORDINALES = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto',
 
 describe('generate: todo ejercicio generado es válido', () => {
   it.each(SPECS.map((spec) => [JSON.stringify(spec), spec] as const))('%s', (_nombre, spec) => {
-    for (const e of muchos(spec)) esValido(e)
+    for (const e of muchos(spec)) esValido(e, spec)
   })
 
   it('con la misma semilla sale el mismo ejercicio y con otras salen distintos', () => {
@@ -329,6 +341,122 @@ describe('generate: reglas de cada plantilla', () => {
       vistos.add(e.answer)
     }
     expect(vistos).toEqual(new Set(['+', '−']))
+  })
+
+  it('completar una desigualdad: solo una de las tres opciones hace cierta la comparación, en las cuatro formas', () => {
+    const formas = new Set<string>()
+    for (const e of muchos({ kind: 'compare', mode: 'complete' }).map(choice)) {
+      const m = e.visual!.match(/^(\d+|❓)\s+([<>])\s+(\d+|❓)$/)
+      expect(m, e.visual).not.toBeNull()
+      const [, izquierda, signo, derecha] = m!
+      formas.add(`${izquierda === '❓' ? 'hueco' : 'número'}${signo}`)
+      const cumple = (x: number) => {
+        const [l, r] = [izquierda === '❓' ? x : Number(izquierda), derecha === '❓' ? x : Number(derecha)]
+        return signo === '>' ? l > r : l < r
+      }
+      expect(e.options.map(Number).filter(cumple), e.visual).toEqual([Number(e.answer)])
+      expect(e.options, e.visual).toHaveLength(3)
+      for (const opcion of e.options) {
+        expect(Number(opcion), e.visual).toBeGreaterThanOrEqual(10)
+        expect(Number(opcion), e.visual).toBeLessThanOrEqual(99)
+      }
+    }
+    expect(formas).toEqual(new Set(['número>', 'número<', 'hueco>', 'hueco<']))
+  })
+
+  it('comparar en contexto: pueblos, edades y mochilas; la respuesta es el nombre con el valor mayor o menor', () => {
+    const contextos = new Set<string>()
+    for (const e of muchos({ kind: 'compare', mode: 'context' }).map(choice)) {
+      expect(e.text, e.question).toBeTruthy()
+      expect(e.options, e.question).toHaveLength(3)
+      const valor = (nombre: string) => Number(e.text!.match(new RegExp(`${nombre} (\\d+)`))![1])
+      const valores = e.options.map(valor)
+      expect(new Set(valores).size, e.text).toBe(3)
+      const [mayor, menor] = [/más lejos|mayor|pesa más/.test(e.question), /más cerca|menor|pesa menos/.test(e.question)]
+      expect(mayor !== menor, e.question).toBe(true)
+      expect(valor(e.answer), e.question).toBe(mayor ? Math.max(...valores) : Math.min(...valores))
+      for (const v of valores) {
+        expect(v, e.text).toBeGreaterThanOrEqual(10)
+        expect(v, e.text).toBeLessThanOrEqual(99)
+      }
+      contextos.add(/pueblo/.test(e.question) ? 'pueblos' : /Quién/.test(e.question) ? 'edades' : 'mochilas')
+    }
+    expect(contextos).toEqual(new Set(['pueblos', 'edades', 'mochilas']))
+  })
+
+  it('un sumando de una cifra: sumas y restas sin llevar como 83 + 5 y 87 − 5', () => {
+    for (const operator of ['+', '−'] as const) {
+      for (const e of muchos({ kind: 'column', operator, oneDigit: true })) {
+        if (e.type !== 'column') throw new Error('se esperaba una columna')
+        expect(e.bottom, `${e.top} ${operator} ${e.bottom}`).toBeLessThan(10)
+        expect(e.carry, `${e.top} ${operator} ${e.bottom}`).toBeUndefined()
+        // el resultado sigue con dos cifras: las decenas del primer número no cambian
+        expect(e.answer, `${e.top} ${operator} ${e.bottom}`).toBeGreaterThanOrEqual(10)
+        expect(Math.floor(e.answer / 10), `${e.top} ${operator} ${e.bottom}`).toBe(Math.floor(e.top / 10))
+      }
+    }
+  })
+
+  it('pasos de un problema: elegir sumar o restar y el total o la diferencia a partir de un texto', () => {
+    for (const ask of ['operation', 'calculate'] as const) {
+      for (const e of muchos({ kind: 'problem-step', ask }).map(choice)) {
+        const texto = e.text!
+        const suma = /regalan|llegan|en total|por la tarde/.test(texto)
+        const resta = /Saco|me como|se bajan|se pinchan/.test(texto)
+        expect(suma !== resta, texto).toBe(true)
+        const [a, b] = texto.match(/\d+/g)!.map(Number)
+        expect(suma ? (a % 10) + (b % 10) < 10 : a % 10 >= b % 10 && a > b, texto).toBe(true)
+        if (ask === 'operation') {
+          expect(e.question).toBe('¿Hay que sumar o restar?')
+          expect([...e.options].sort()).toEqual(['restar', 'sumar'])
+          expect(e.answer, texto).toBe(suma ? 'sumar' : 'restar')
+        } else {
+          expect(e.question).toBe('¿Qué hay que calcular?')
+          expect([...e.options].sort()).toEqual(['el total', 'la diferencia'])
+          expect(e.answer, texto).toBe(suma ? 'el total' : 'la diferencia')
+        }
+      }
+    }
+  })
+
+  it('problemas de dos pasos: sumar y restar (o restar y sumar) sin llevar y sin salirse de 1 a 99', () => {
+    for (const mode of ['add-sub', 'sub-add'] as const) {
+      for (const e of muchos({ kind: 'two-steps', mode }).map(number)) {
+        const [a, b, c] = e.question.match(/\d+/g)!.map(Number)
+        const intermedio = mode === 'add-sub' ? a + b : a - b
+        expect(e.answer, e.question).toBe(mode === 'add-sub' ? a + b - c : a - b + c)
+        for (const n of [intermedio, e.answer]) {
+          expect(n, e.question).toBeGreaterThanOrEqual(1)
+          expect(n, e.question).toBeLessThanOrEqual(99)
+        }
+        if (mode === 'add-sub') {
+          expect((a % 10) + (b % 10), e.question).toBeLessThan(10)
+          expect(intermedio % 10, e.question).toBeGreaterThanOrEqual(c % 10)
+        } else {
+          expect(a % 10, e.question).toBeGreaterThanOrEqual(b % 10)
+          expect((intermedio % 10) + (c % 10), e.question).toBeLessThan(10)
+        }
+      }
+    }
+  })
+
+  it('cálculo mental fácil: sumas que no pasan de 10 y restas de números hasta el 10', () => {
+    for (const e of muchos({ kind: 'mental', mode: 'add-small' }).map(number)) {
+      const [a, b] = e.question.match(/\d+/g)!.map(Number)
+      expect(e.question).toMatch(/^\d \+ \d =$/)
+      expect(a, e.question).toBeGreaterThanOrEqual(1)
+      expect(b, e.question).toBeGreaterThanOrEqual(1)
+      expect(e.answer, e.question).toBe(a + b)
+      expect(e.answer, e.question).toBeLessThanOrEqual(10)
+    }
+    for (const e of muchos({ kind: 'mental', mode: 'sub-small' }).map(number)) {
+      const [a, b] = e.question.match(/\d+/g)!.map(Number)
+      expect(e.question).toMatch(/^\d+ − \d =$/)
+      expect(a, e.question).toBeLessThanOrEqual(10)
+      expect(b, e.question).toBeGreaterThanOrEqual(1)
+      expect(b, e.question).toBeLessThan(a)
+      expect(e.answer, e.question).toBe(a - b)
+    }
   })
 
   it('leer un número: la respuesta es su nombre y las otras dos opciones son nombres de otros números', () => {

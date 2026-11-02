@@ -15,7 +15,8 @@ export function exerciseKey(exercise: Exercise): string {
     case 'choice':
       // Con identidad de hecho, lo que cuenta es el hecho y no las opciones (así no se pregunta dos veces lo mismo en una sesión)
       if (exercise.fact !== undefined) return JSON.stringify([exercise.type, 'fact', exercise.fact])
-      return JSON.stringify([exercise.type, exercise.question, exercise.visual, exercise.answer, [...exercise.options].sort()])
+      // El texto de lectura (si lo hay) también cuenta: la misma pregunta con otro texto es otro ejercicio
+      return JSON.stringify([exercise.type, exercise.question, exercise.visual, exercise.answer, [...exercise.options].sort(), ...(exercise.text === undefined ? [] : [exercise.text])])
     case 'number':
       return JSON.stringify([exercise.type, exercise.question, exercise.visual, exercise.answer])
     case 'trace':
