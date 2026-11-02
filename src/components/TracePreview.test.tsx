@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import css from '../assets/theme.css?raw'
 import { TracePreview } from './TracePreview'
 
 vi.mock('../speak', () => ({ speak: vi.fn() }))
@@ -47,5 +48,104 @@ describe('TracePreview: hoja con el recorrido de cada cifra', () => {
     expect(cuatro.querySelectorAll('[data-start]')).toHaveLength(2)
     expect(cuatro.textContent).toContain('1')
     expect(cuatro.textContent).toContain('2')
+  })
+})
+
+describe('TracePreview: letras', () => {
+  it('muestra las 27 letras en mayúscula y en minúscula con su recorrido', () => {
+    render(<TracePreview onHome={vi.fn()} />)
+    for (const nombre of ['Letras en mayúscula', 'Letras en minúscula']) {
+      const lista = screen.getByRole('list', { name: nombre })
+      expect(within(lista).getAllByRole('listitem')).toHaveLength(27)
+    }
+    expect(screen.getByRole('img', { name: /^Letra B mayúscula: 2 trazos$/ })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /^Letra ñ minúscula: 2 trazos$/ })).toBeInTheDocument()
+  })
+})
+
+describe('TracePreview: colores de los trazos', () => {
+  it('cada trazo de una letra lleva su propio color (también del tercero en adelante)', () => {
+    render(<TracePreview onHome={vi.fn()} />)
+    for (const [nombre, trazos] of [['Letra H mayúscula', 3], ['Letra k minúscula', 2], ['Letra E mayúscula', 4]] as const) {
+      const letra = screen.getByRole('img', { name: new RegExp(`^${nombre}:`) })
+      const colores = [...letra.querySelectorAll('g[stroke]')].map((g) => g.getAttribute('stroke'))
+      expect(colores).toHaveLength(trazos)
+      expect(new Set(colores).size).toBe(trazos)
+    }
+  })
+})
+
+describe('TracePreview: probar el trazo de una mayúscula', () => {
+  it('cada mayúscula y cada minúscula tienen su botón «Probar»', () => {
+    render(<TracePreview onHome={vi.fn()} />)
+    const lista = screen.getByRole('list', { name: 'Letras en mayúscula' })
+    expect(within(lista).getAllByRole('button', { name: /^Probar la letra / })).toHaveLength(27)
+    const minusculas = screen.getByRole('list', { name: 'Letras en minúscula' })
+    expect(within(minusculas).getAllByRole('button', { name: /^Probar la letra / })).toHaveLength(27)
+  })
+
+  it('probar una minúscula abre su recorrido (el de la minúscula, no el de la mayúscula) y vuelve a la hoja', async () => {
+    const user = userEvent.setup()
+    render(<TracePreview onHome={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: 'Probar la letra ñ' }))
+    const superficie = screen.getByRole('img', { name: 'Repasa la letra ñ con el dedo' })
+    // la ñ minúscula tiene 2 trazos (cuerpo y tilde) y la mayúscula también: se distingue por el número de puntos de guía
+    expect(superficie.querySelectorAll('.trace-dots')).toHaveLength(2)
+    await user.click(screen.getByRole('button', { name: 'Ya lo he hecho' }))
+    await user.click(screen.getByRole('button', { name: /Volver a la hoja/ }))
+    expect(screen.getByRole('list', { name: 'Letras en minúscula' })).toBeInTheDocument()
+  })
+
+  it('probar la a minúscula usa su único trazo (la A mayúscula tiene dos)', async () => {
+    const user = userEvent.setup()
+    render(<TracePreview onHome={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: 'Probar la letra a' }))
+    expect(screen.getByRole('img', { name: 'Repasa la letra a con el dedo' }).querySelectorAll('.trace-dots')).toHaveLength(1)
+  })
+
+  it('abre el ejercicio de trazo de la letra y, al terminar, vuelve a la hoja', async () => {
+    const user = userEvent.setup()
+    render(<TracePreview onHome={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: 'Probar la letra Ñ' }))
+    expect(screen.getByRole('img', { name: 'Repasa la letra Ñ con el dedo' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Ya lo he hecho' }))
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Volver a la hoja/ }))
+    expect(screen.getByRole('list', { name: 'Letras en mayúscula' })).toBeInTheDocument()
+  })
+})
+
+describe('TracePreview: al volver a la hoja', () => {
+  it.each([['Probar el número 4'], ['Probar la letra a'], ['Probar la letra A']])('%s: vuelve a la misma posición de la página, no al principio', async (boton) => {
+    const user = userEvent.setup()
+    const scrollTo = vi.fn()
+    vi.stubGlobal('scrollTo', scrollTo)
+    Object.defineProperty(window, 'scrollY', { value: 1234, configurable: true })
+    render(<TracePreview onHome={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: boton }))
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true })
+    await user.click(screen.getByRole('button', { name: 'Ya lo he hecho' }))
+    await user.click(screen.getByRole('button', { name: /Volver a la hoja/ }))
+    expect(scrollTo).toHaveBeenLastCalledWith(0, 1234)
+    vi.unstubAllGlobals()
+  })
+
+  it('con la flecha de volver de la barra también recupera la posición', async () => {
+    const user = userEvent.setup()
+    const scrollTo = vi.fn()
+    vi.stubGlobal('scrollTo', scrollTo)
+    Object.defineProperty(window, 'scrollY', { value: 800, configurable: true })
+    render(<TracePreview onHome={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: 'Probar la letra z' }))
+    await user.click(screen.getByRole('button', { name: 'Volver atrás' }))
+    expect(scrollTo).toHaveBeenLastCalledWith(0, 800)
+    vi.unstubAllGlobals()
+  })
+})
+
+describe('TracePreview: separación entre bloques de la hoja', () => {
+  it('hay espacio por encima del título de las letras y entre las listas de mayúsculas y minúsculas', () => {
+    expect(css).toMatch(/[.]trace-grid [+] [.]trace-note[^{]*[{][^}]*margin-top: [1-9]/)
+    expect(css).toMatch(/[.]trace-grid [+] [.]trace-grid[^{]*[{][^}]*margin-top: [1-9]/)
   })
 })
