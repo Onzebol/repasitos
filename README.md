@@ -100,6 +100,6 @@ Las tareas se anotan como issues (con imagen aclaratoria cuando haga falta). Cad
 
 **Pendiente**
 - Matemáticas de 2º, unidades 4 a 9 (una issue por unidad); la siguiente es la unidad 4. Las demás unidades salen como "Muy pronto".
-- El resto de materias de 2º de Primaria (Lengua, Conocimiento del medio, Inglés, Música): abren "¡Muy pronto!".
+- El resto de materias de 2º de Primaria (Lengua, Conocimiento del medio, Inglés, Música): abren "¡Muy pronto!". De momento los botones de materias y unidades sin contenido están ocultos con CSS (#113); si más adelante no se hace nada con ellos, se quitarán.
 - Infantil: Letras (consonantes, mayúsculas y minúsculas en letra ligada, sílabas y trazo; hace falta el orden de consonantes del cuaderno) y el resto de materias de Infantil.
 - Diseño: estilo propio de Infantil, audio y pruebas en tablet real.

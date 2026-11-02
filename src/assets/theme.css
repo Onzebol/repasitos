@@ -364,6 +364,13 @@ body {
   box-shadow: 0 4px 0 var(--card-shadow);
 }
 
+/* PROVISIONAL (#113): las materias y unidades sin contenido (botón .subject desactivado, «Muy pronto») no se ven. Siguen en
+   el DOM y en los datos: para volver a mostrarlas basta con quitar esta regla; si no se hace nada con ellas, se quitarán
+   de los datos y de los componentes. */
+.subjects > li:has(> .subject:disabled) {
+  display: none;
+}
+
 .subject-note {
   font-size: 1rem;
   font-weight: 400;
