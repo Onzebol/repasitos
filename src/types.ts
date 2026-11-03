@@ -189,8 +189,12 @@ export type BlockSpec =
   // Programar a Repi con flechas para que llegue a un lugar del mapa de 4 × 5 (itinerarios)
   | { kind: 'route-program' }
   // Colorear tocando en la tabla del 0 al 99: los números con N unidades (`units`), con N decenas (`tens`) o el que tiene
-  // N decenas y M unidades (`both`, una sola casilla)
-  | { kind: 'table-paint'; ask: 'units' | 'tens' | 'both' }
+  // N decenas y M unidades (`both`, una sola casilla); en la unidad 2, `digit`: todos los números que incluyen una cifra del
+  // 1 al 9 en las decenas o en las unidades (19 casillas)
+  | { kind: 'table-paint'; ask: 'units' | 'tens' | 'both' | 'digit' }
+  // Estimar sin mirar la tabla cuántos números del 0 al 99 incluyen una cifra del 1 al 9 (elegir entre 10, 19 y 25; son 19);
+  // se comprueba después con `table-paint` y `digit`
+  | { kind: 'digit-count' }
   // La información oculta (elegir): cuatro deportes con un número cada uno y una resta sin llevar cuyo resultado es el
   // número de uno de ellos: se pregunta qué deporte practica quien la hace
   | { kind: 'hidden-info' }

@@ -104,6 +104,8 @@ const SPECS: BlockSpec[] = [
   { kind: 'table-paint', ask: 'units' },
   { kind: 'table-paint', ask: 'tens' },
   { kind: 'table-paint', ask: 'both' },
+  { kind: 'table-paint', ask: 'digit' },
+  { kind: 'digit-count' },
   { kind: 'hidden-info' },
   { kind: 'shape-sum', ask: 'sum' },
   { kind: 'shape-sum', ask: 'find' },
@@ -863,6 +865,46 @@ describe('generate: reglas de cada plantilla', () => {
       cifras.add(unidades)
     }
     expect(cifras.size).toBe(9)
+  })
+
+  describe('números del 0 al 99 que incluyen una cifra (rincón de la lógica)', () => {
+    // Tabla de verdad independiente: se escribe cada casilla tal como sale en la tabla (00, 01… 99) y se busca la cifra en el texto
+    const conLaCifra = (cifra: number) =>
+      Array.from({ length: 100 }, (_, i) => i).filter((i) => String(i).padStart(2, '0').includes(String(cifra)))
+
+    it('colorear: los 19 números que tienen la cifra en las decenas o en las unidades, y nada más', () => {
+      const cifras = new Set<number>()
+      for (const e of muchos({ kind: 'table-paint', ask: 'digit' })) {
+        if (e.type !== 'table-paint') throw new Error('se esperaba colorear la tabla')
+        const m = e.question.match(/^Toca todos los números que incluyen el ([1-9])$/)
+        expect(m, e.question).not.toBeNull()
+        const cifra = Number(m![1])
+        expect(e.targets, e.question).toEqual(conLaCifra(cifra))
+        expect(e.targets, e.question).toHaveLength(19)
+        expect(e.answer).toBe(`Hay 19 números con el ${cifra}`)
+        cifras.add(cifra)
+      }
+      // salen las nueve cifras (la 0 queda fuera: solo habría 10 y las otras reglas no valen)
+      expect(cifras).toEqual(new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]))
+    })
+
+    it('estimar sin mirar la tabla: 10, 19 o 25, y la respuesta es siempre 19 para las cifras del 1 al 9', () => {
+      const cifras = new Set<number>()
+      const posiciones = new Set<number>()
+      for (const e of muchos({ kind: 'digit-count' }).map(choice)) {
+        const m = e.question.match(/^Sin mirar la tabla: ¿cuántos números del 0 al 99 incluyen el ([1-9])\?$/)
+        expect(m, e.question).not.toBeNull()
+        const cifra = Number(m![1])
+        expect([...e.options].sort(), e.question).toEqual(['10', '19', '25'])
+        // coincide con la tabla de verdad: de verdad hay 19 números con esa cifra
+        expect(e.answer, e.question).toBe(String(conLaCifra(cifra).length))
+        expect(e.answer).toBe('19')
+        cifras.add(cifra)
+        posiciones.add(e.options.indexOf(e.answer))
+      }
+      expect(cifras.size).toBe(9)
+      expect(posiciones).toEqual(new Set([0, 1, 2]))
+    })
   })
 
   it('colorear en la tabla, decenas: los diez números de la fila de esa decena, y nada más', () => {

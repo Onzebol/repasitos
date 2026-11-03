@@ -119,4 +119,19 @@ export const temasUnidad2: Topic[] = [
       { spec: { kind: 'mental', mode: 'add-bridge' }, count: 2 },
     ],
   },
+  {
+    // Los rincones matemáticos del libro: el número que falta (desafíos) y las cifras de la tabla del 0 al 99 (lógica)
+    id: 'desafios-y-logica',
+    name: 'Desafíos y lógica',
+    icon: '🧩',
+    tint: '#d7f0c8',
+    plan: [
+      { spec: { kind: 'inverse', mode: 'missing', round: true }, count: 2 },
+      { spec: { kind: 'inverse', mode: 'missing-minuend', round: true }, count: 2 },
+      { spec: { kind: 'inverse', mode: 'missing' }, count: 1 },
+      { spec: { kind: 'inverse', mode: 'missing-minuend' }, count: 1 },
+      { spec: { kind: 'digit-count' }, count: 2 },
+      { spec: { kind: 'table-paint', ask: 'digit' }, count: 2 },
+    ],
+  },
 ]
