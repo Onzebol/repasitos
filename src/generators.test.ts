@@ -51,6 +51,13 @@ function esValido(e: Exercise, spec?: BlockSpec) {
     expect(e.blanks, e.question).toHaveLength(5)
     expect(new Set(e.blanks).size, e.question).toBe(5)
     for (const hueco of e.blanks) expect(Number.isInteger(hueco) && hueco >= 0 && hueco <= 9, e.question).toBe(true)
+  } else if (e.third !== undefined) {
+    // Tres sumandos de una o dos cifras, sin pasar de 99
+    const nombre = `${e.top} + ${e.bottom} + ${e.third}`
+    expect(e.operator, nombre).toBe('+')
+    for (const n of [e.top, e.bottom, e.third]) expect(Number.isInteger(n) && n >= 1 && n <= 99, nombre).toBe(true)
+    expect(e.answer, nombre).toBe(e.top + e.bottom + e.third)
+    expect(e.answer, nombre).toBeLessThanOrEqual(99)
   } else {
     const nombre = `${e.top} ${e.operator} ${e.bottom}`
     expect(e.top, nombre).toBeGreaterThanOrEqual(10)
@@ -130,6 +137,7 @@ const SPECS: BlockSpec[] = [
   { kind: 'mental', mode: 'add-small' },
   { kind: 'mental', mode: 'sub-small' },
   { kind: 'column', operator: '+', carry: true },
+  { kind: 'column', operator: '+', carry: true, addends: 3 },
   { kind: 'column', operator: '+', carry: true, oneDigit: true },
   { kind: 'carry-spot' },
   { kind: 'word-problem', operator: '+' },
@@ -1134,6 +1142,40 @@ describe('generate: reglas de cada plantilla', () => {
     })
     expect(resultados.some((r) => r < 100)).toBe(true)
     expect(resultados.some((r) => r >= 100)).toBe(true)
+  })
+
+  describe('tres sumandos en columna (15 + 14 + 7)', () => {
+    const tres = () =>
+      muchos({ kind: 'column', operator: '+', carry: true, addends: 3 }).map((e) => {
+        if (e.type !== 'column' || e.third === undefined) throw new Error('se esperaba una columna de tres sumandos')
+        return { ...e, third: e.third }
+      })
+    // Tabla de verdad independiente: lo que se lleva a las decenas es la suma de las unidades entre 10
+    const llevada = (e: { top: number; bottom: number; third: number }) => Math.floor(((e.top % 10) + (e.bottom % 10) + (e.third % 10)) / 10)
+
+    it('la respuesta es la suma de los tres, va marcada con llevada y las unidades suman 10 o más', () => {
+      for (const e of tres()) {
+        const nombre = `${e.top} + ${e.bottom} + ${e.third}`
+        expect(e.carry, nombre).toBe(true)
+        expect(e.answer, nombre).toBe(e.top + e.bottom + e.third)
+        expect(llevada(e), nombre).toBeGreaterThanOrEqual(1)
+      }
+    })
+
+    it('mezcla sumandos de una y de dos cifras, y se lleva una decena o dos', () => {
+      const todos = tres()
+      expect(todos.some((e) => [e.top, e.bottom, e.third].some((n) => n < 10))).toBe(true)
+      expect(todos.some((e) => [e.top, e.bottom, e.third].some((n) => n >= 10))).toBe(true)
+      expect(new Set(todos.map(llevada))).toEqual(new Set([1, 2]))
+    })
+
+    it('el resultado nunca llega a 100, así que no hace falta la centena', () => {
+      for (const e of tres()) expect(e.answer, `${e.top} + ${e.bottom} + ${e.third}`).toBeLessThanOrEqual(99)
+    })
+
+    it('las columnas de dos números no llevan tercer sumando', () => {
+      for (const e of muchos({ kind: 'column', operator: '+', carry: true })) expect(e.type === 'column' && e.third).toBeUndefined()
+    })
   })
 
   it('un sumando de una cifra llevando (87 + 9): las unidades suman 10 o más y a veces pasa de 99', () => {

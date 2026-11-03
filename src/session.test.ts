@@ -103,6 +103,12 @@ describe('exerciseKey: identifica un ejercicio por sus datos, no por el enunciad
     expect(exerciseKey(a)).not.toBe(exerciseKey(b))
   })
 
+  it('dos columnas que solo se diferencian en el tercer sumando son ejercicios distintos', () => {
+    const a: Exercise = { type: 'column', question: 'Suma en columna', operator: '+', top: 15, bottom: 14, third: 7, answer: 36, carry: true }
+    expect(exerciseKey(a)).not.toBe(exerciseKey({ ...a, third: 8, answer: 37 }))
+    expect(exerciseKey(a)).not.toBe(exerciseKey({ type: 'column', question: 'Suma en columna', operator: '+', top: 15, bottom: 14, answer: 29, carry: true }))
+  })
+
   it('dos coloreados de la tabla con otras casillas son ejercicios distintos', () => {
     const a: Exercise = { type: 'table-paint', question: 'Toca los números que tienen 2 unidades', targets: [2, 12, 22, 32, 42, 52, 62, 72, 82, 92], answer: 'Acaban en 2' }
     expect(exerciseKey(a)).not.toBe(exerciseKey({ ...a, question: 'Toca los números que tienen 3 unidades', targets: [3, 13, 23, 33, 43, 53, 63, 73, 83, 93], answer: 'Acaban en 3' }))
