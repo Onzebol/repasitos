@@ -142,6 +142,9 @@ const SPECS: BlockSpec[] = [
   { kind: 'column', operator: '−', oneDigit: true },
   { kind: 'problem-step', ask: 'operation' },
   { kind: 'problem-step', ask: 'calculate' },
+  { kind: 'problem-step', ask: 'operation', faltan: true },
+  { kind: 'problem-step', ask: 'calculate', faltan: true },
+  { kind: 'word-problem', operator: '−', faltan: true },
   { kind: 'two-steps', mode: 'add-sub' },
   { kind: 'two-steps', mode: 'sub-add' },
   { kind: 'mental', mode: 'add-small' },
@@ -606,6 +609,58 @@ describe('generate: reglas de cada plantilla', () => {
         }
       }
     }
+  })
+
+  describe('problemas de «¿cuántos faltan?» (faltan: true)', () => {
+    // El enunciado sin los números: así se cuentan las historias distintas
+    const plantilla = (texto: string) => texto.replace(/\d+/g, 'N')
+
+    it('el problema escrito es una resta de completar: el total, lo que ya hay y se pregunta cuántos faltan', () => {
+      const historias = new Set<string>()
+      for (const e of muchos({ kind: 'word-problem', operator: '−', faltan: true }).map(number)) {
+        const [a, b] = e.question.match(/\d+/g)!.map(Number)
+        expect(e.question, e.question).toMatch(/falta/)
+        expect(e.question, e.question).toMatch(/\?$/)
+        expect(a, e.question).toBeGreaterThan(b)
+        expect(e.answer, e.question).toBe(a - b)
+        // sin llevar, como el resto de problemas de restar
+        expect(a % 10, e.question).toBeGreaterThanOrEqual(b % 10)
+        historias.add(plantilla(e.question))
+      }
+      expect(historias.size).toBeGreaterThanOrEqual(4)
+    })
+
+    it('con llevada se pide una decena, como en las otras restas', () => {
+      for (const e of muchos({ kind: 'word-problem', operator: '−', carry: true, faltan: true }).map(number)) {
+        const [a, b] = e.question.match(/\d+/g)!.map(Number)
+        expect(e.question, e.question).toMatch(/falta/)
+        expect(e.answer, e.question).toBe(a - b)
+        expect(a % 10, e.question).toBeLessThan(b % 10)
+      }
+    })
+
+    it('los pasos del problema: hay que restar y se calcula la diferencia', () => {
+      for (const e of muchos({ kind: 'problem-step', ask: 'operation', faltan: true }).map(choice)) {
+        expect(e.text, e.question).toMatch(/falta/)
+        expect(e.question).toBe('¿Hay que sumar o restar?')
+        expect(e.answer, e.text).toBe('restar')
+      }
+      for (const e of muchos({ kind: 'problem-step', ask: 'calculate', faltan: true }).map(choice)) {
+        expect(e.text, e.question).toMatch(/falta/)
+        expect(e.question).toBe('¿Qué hay que calcular?')
+        expect(e.answer, e.text).toBe('la diferencia')
+      }
+    })
+
+    it('las historias de quitar de siempre no mencionan lo que falta (cada tipo de resta es distinto)', () => {
+      for (const e of muchos({ kind: 'word-problem', operator: '−' }).map(number)) expect(e.question, e.question).not.toMatch(/falta/)
+    })
+
+    it('hay también historias de juntar dos cantidades «en total» de otro mes o semana (al menos seis en total)', () => {
+      const historias = new Set(muchos({ kind: 'word-problem', operator: '+' }).map(number).map((e) => plantilla(e.question)))
+      expect(historias.size).toBeGreaterThanOrEqual(6)
+      expect([...historias].filter((h) => /en total/.test(h)).length).toBeGreaterThanOrEqual(3)
+    })
   })
 
   it('problemas de dos pasos: sumar y restar (o restar y sumar) sin llevar y sin salirse de 1 a 99', () => {

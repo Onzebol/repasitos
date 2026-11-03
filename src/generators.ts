@@ -230,8 +230,11 @@ const HISTORIAS_SUMA: ((a: number, b: number) => string)[] = [
   (a, b) => `En el parque hay ${a} niños y llegan ${b} más. ¿Cuántos hay ahora?`,
   (a, b) => `Una caja tiene ${a} lápices y otra tiene ${b}. ¿Cuántos lápices hay en total?`,
   (a, b) => `Leo ${a} páginas por la mañana y ${b} por la tarde. ¿Cuántas páginas leo?`,
+  (a, b) => `El mes pasado ahorré ${a} euros y este mes ${b}. ¿Cuántos euros tengo en total?`,
+  (a, b) => `El lunes recogí ${a} piñas y el martes ${b}. ¿Cuántas piñas tengo en total?`,
 ]
 
+// Restas de quitar: lo que queda
 const HISTORIAS_RESTA: ((a: number, b: number) => string)[] = [
   (a, b) => `En la bolsa hay ${a} canicas. Saco ${b}. ¿Cuántas quedan?`,
   (a, b) => `Tenía ${a} galletas y me como ${b}. ¿Cuántas me quedan?`,
@@ -239,9 +242,22 @@ const HISTORIAS_RESTA: ((a: number, b: number) => string)[] = [
   (a, b) => `Hay ${a} globos y se pinchan ${b}. ¿Cuántos globos quedan?`,
 ]
 
-const problema = (operator: '+' | '−', carry: boolean, rng: Rng): NumberExercise => {
+// Restas de completar: hace falta un total, ya hay una parte y se pregunta cuántos faltan (el error típico es sumar).
+// Siempre el total primero y lo que ya hay después
+const HISTORIAS_FALTAN: ((a: number, b: number) => string)[] = [
+  (a, b) => `Para llenar el álbum hacen falta ${a} cromos y ya tengo ${b}. ¿Cuántos cromos me faltan?`,
+  (a, b) => `En la excursión van ${a} niños y ya han subido ${b} al autobús. ¿Cuántos faltan por subir?`,
+  (a, b) => `Para completar el puzle hacen falta ${a} piezas y ya he puesto ${b}. ¿Cuántas piezas me faltan?`,
+  (a, b) => `La biblioteca quiere tener ${a} libros y ya tiene ${b}. ¿Cuántos libros le faltan?`,
+  (a, b) => `Para la fiesta hacen falta ${a} globos y ya hay ${b} hinchados. ¿Cuántos faltan por hinchar?`,
+]
+
+// Con `faltan` solo salen las restas de completar (nunca sumas)
+const historiasDe = (operator: '+' | '−', faltan: boolean) => (operator === '+' ? HISTORIAS_SUMA : faltan ? HISTORIAS_FALTAN : HISTORIAS_RESTA)
+
+const problema = (operator: '+' | '−', carry: boolean, rng: Rng, faltan = false): NumberExercise => {
   const [a, b] = carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
-  const historia = pick(rng, operator === '+' ? HISTORIAS_SUMA : HISTORIAS_RESTA)
+  const historia = pick(rng, historiasDe(operator, faltan))
   return numero(historia(a, b), operator === '+' ? a + b : a - b)
 }
 
@@ -275,10 +291,10 @@ function inversa(mode: 'subtract' | 'both' | 'missing' | 'missing-minuend' | 'op
 }
 
 // Los pasos de un problema: con el texto en la tarjeta de lectura, se elige qué operación hay que hacer o qué se calcula
-function pasoDeProblema(ask: 'operation' | 'calculate', rng: Rng): ChoiceExercise {
-  const operator = pick(rng, ['+', '−'] as const)
+function pasoDeProblema(ask: 'operation' | 'calculate', rng: Rng, faltan = false): ChoiceExercise {
+  const operator = faltan ? '−' : pick(rng, ['+', '−'] as const)
   const [a, b] = operandos(operator, rng)
-  const text = pick(rng, operator === '+' ? HISTORIAS_SUMA : HISTORIAS_RESTA)(a, b)
+  const text = pick(rng, historiasDe(operator, faltan))(a, b)
   const ejercicio =
     ask === 'operation'
       ? elegir('¿Hay que sumar o restar?', ['sumar', 'restar'], operator === '+' ? 'sumar' : 'restar')
@@ -736,13 +752,13 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       return sumaQueLleva(rng)
 
     case 'problem-step':
-      return pasoDeProblema(spec.ask, rng)
+      return pasoDeProblema(spec.ask, rng, spec.faltan ?? false)
 
     case 'two-steps':
       return dosPasos(spec.mode, rng)
 
     case 'word-problem':
-      return problema(spec.operator, spec.carry ?? false, rng)
+      return problema(spec.operator, spec.carry ?? false, rng, spec.faltan ?? false)
 
     case 'cdu': {
       if (spec.ask === 'compose') {

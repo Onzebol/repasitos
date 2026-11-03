@@ -10,9 +10,25 @@ describeUnit('Unidad 2 de Matemáticas', temasUnidad2)
 const sesion = (id: string) => buildSession(temasUnidad2.find((topic) => topic.id === id)!.plan, mulberry32(3))
 
 describe('Unidad 2 de Matemáticas: contenido', () => {
-  it('tiene los seis temas del índice y está registrada en la unidad 2', () => {
-    expect(temasUnidad2.map((topic) => topic.id)).toEqual(['sumas-llevando', 'suma-resta', 'ordinales', 'la-centena', 'del-100-al-199', 'calculo-mental'])
+  it('tiene los siete temas del índice y está registrada en la unidad 2', () => {
+    expect(temasUnidad2.map((topic) => topic.id)).toEqual(['sumas-llevando', 'suma-resta', 'ordinales', 'la-centena', 'del-100-al-199', 'problemas', 'calculo-mental'])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u2')!.topics).toBe(temasUnidad2)
+  })
+
+  it('"Problemas" mezcla los pasos (sumar o restar, qué se calcula) y problemas de sumar y de restar, con «¿cuántos faltan?»', () => {
+    const session = sesion('problemas')
+    expect(session).toHaveLength(10)
+    const pasos = session.filter((e) => e.type === 'choice')
+    expect(pasos.filter((e) => e.question === '¿Hay que sumar o restar?')).toHaveLength(3)
+    expect(pasos.filter((e) => e.question === '¿Qué hay que calcular?')).toHaveLength(2)
+    expect(pasos).toHaveLength(5)
+    const problemas = session.filter((e) => e.type === 'number')
+    expect(problemas).toHaveLength(5)
+    // de «cuántos faltan»: un paso y dos problemas escritos
+    expect(pasos.filter((e) => e.type === 'choice' && /falta/.test(e.text ?? ''))).toHaveLength(1)
+    expect(problemas.filter((e) => /falta/.test(e.question))).toHaveLength(2)
+    // de sumar con llevada (2) y de restar (1 de quitar): el resultado cuadra con la historia
+    expect(problemas.filter((e) => /falta/.test(e.question) === false)).toHaveLength(3)
   })
 
   it('"Sumas llevando" mezcla 6 columnas con llevada (2 con un sumando de una cifra y 2 de tres sumandos), 2 de elegir la que lleva y 2 problemas', () => {

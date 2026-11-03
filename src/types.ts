@@ -161,12 +161,14 @@ export type BlockSpec =
   // ¿Qué suma es llevando? (elegir): tres sumas de dos números de dos cifras, una lleva y las otras dos no
   | { kind: 'carry-spot' }
   // Pasos de un problema (elegir): a partir de un texto corto, ¿hay que sumar o restar? (`operation`) o ¿hay que calcular
-  // el total o la diferencia? (`calculate`). Sin llevar
-  | { kind: 'problem-step'; ask: 'operation' | 'calculate' }
+  // el total o la diferencia? (`calculate`). Sin llevar. Con `faltan` (unidad 2) solo salen restas de «¿cuántos faltan?»:
+  // hace falta un total, ya hay una parte y se pregunta cuántos faltan
+  | { kind: 'problem-step'; ask: 'operation' | 'calculate'; faltan?: boolean }
   // Problema de dos pasos (escribir): sumar y restar (`add-sub`) o restar y sumar (`sub-add`), sin llevar y entre 1 y 99
   | { kind: 'two-steps'; mode: 'add-sub' | 'sub-add' }
-  // Problema de suma o resta con un enunciado corto (escribir): sin llevar, o con `carry` (como en `column`)
-  | { kind: 'word-problem'; operator: '+' | '−'; carry?: boolean }
+  // Problema de suma o resta con un enunciado corto (escribir): sin llevar, o con `carry` (como en `column`). Con `faltan`
+  // (solo restas) el enunciado es de «¿cuántos faltan?» y no de quitar
+  | { kind: 'word-problem'; operator: '+' | '−'; carry?: boolean; faltan?: boolean }
   // Centenas, decenas y unidades de números de 3 cifras: leer (elegir), componer, contar con piezas 🟥🟦🟨 o contar un lugar (escribir)
   | { kind: 'cdu'; ask: 'read' | 'compose' | 'blocks' | 'count' }
   // El litro: qué recipiente tiene más o menos capacidad de tres (elegir)
