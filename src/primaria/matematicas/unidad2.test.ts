@@ -27,11 +27,20 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(session.filter((e) => e.type === 'number')).toHaveLength(2)
   })
 
-  it('"La suma y la resta" tiene 5 restas de comprobación, 3 huecos y 2 de elegir', () => {
+  it('"La suma y la resta" tiene 4 restas de una suma, 2 sumandos que faltan, 2 minuendos que faltan y 2 de elegir', () => {
     const session = sesion('suma-resta')
-    expect(session.filter((e) => e.type === 'number' && e.question.includes('Entonces'))).toHaveLength(5)
-    expect(session.filter((e) => e.type === 'number' && e.question.startsWith('Completa'))).toHaveLength(3)
+    expect(session.filter((e) => e.type === 'number' && e.question.includes('Entonces'))).toHaveLength(4)
+    expect(session.filter((e) => e.type === 'number' && /^Completa: \d+ \+ ▢/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number' && e.question.startsWith('Completa: ▢ −'))).toHaveLength(2)
     expect(session.filter((e) => e.type === 'choice')).toHaveLength(2)
+  })
+
+  it('"La suma y la resta" empieza con sumas pequeñas, hasta 20', () => {
+    const [primero, segundo] = sesion('suma-resta')
+    for (const e of [primero, segundo]) {
+      if (e.type !== 'number') throw new Error('se esperaba escribir un número')
+      expect(Math.max(...e.question.match(/\d+/g)!.map(Number)), e.question).toBeLessThanOrEqual(20)
+    }
   })
 
   it('"Ordinales" combina la fila de dibujos y los nombres', () => {

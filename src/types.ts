@@ -189,9 +189,11 @@ export type BlockSpec =
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
   // sumas que no pasan de 10 y restas de números hasta el 10
   | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' | 'add-small' | 'sub-small' }
-  // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
-  // o qué resta comprueba una suma (elegir)
-  | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }
+  // La suma y la resta se relacionan (escribir): restar para comprobar (`subtract`: c − b), las dos restas de una suma
+  // (`both`: c − a o c − b), sumando que falta (`missing`: a + ▢ = c), minuendo que falta (`missing-minuend`: ▢ − b = a)
+  // o qué resta comprueba una suma (`operation`, elegir). Con `small`, números pequeños (hasta 20); con `round`,
+  // decenas redondas (hasta 90); `operation` ignora los dos
+  | { kind: 'inverse'; mode: 'subtract' | 'both' | 'missing' | 'missing-minuend' | 'operation'; small?: boolean; round?: boolean }
   // ¿Cuántos hay? (Infantil): contar un grupo de animales dibujados y elegir la cifra (por defecto, del 1 al 7)
   | { kind: 'how-many'; min?: number; max?: number; tap?: boolean }
   // Conocimiento del medio: preguntas generadas a partir de tablas cerradas. Las opciones equivocadas salen de la propia
