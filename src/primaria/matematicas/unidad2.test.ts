@@ -144,8 +144,12 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     }
   })
 
-  it('"Cálculo mental" suma tres números y pasando la decena', () => {
+  it('"Cálculo mental" suma tres números, busca el sumando que falta, compara con 10 y suma pasando la decena', () => {
     const session = sesion('calculo-mental')
-    expect(session.filter((e) => e.type === 'number' && /^\d \+ \d \+ \d =$/.test(e.question))).toHaveLength(6)
+    expect(session).toHaveLength(10)
+    expect(session.filter((e) => e.type === 'number' && /^\d \+ \d \+ \d =$/.test(e.question))).toHaveLength(3)
+    expect(session.filter((e) => e.type === 'number' && /^Completa: .*▢/.test(e.question) && e.question.split('+').length === 3)).toHaveLength(3)
+    expect(session.filter((e) => e.type === 'choice' && /^\d \+ \d \+ \d  ❓  10$/.test(e.visual ?? ''))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number' && /^\d \+ \d =$/.test(e.question))).toHaveLength(2)
   })
 })

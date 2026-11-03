@@ -195,6 +195,8 @@ const SPECS: BlockSpec[] = [
   { kind: 'hundreds', ask: 'read' },
   { kind: 'hundreds', ask: 'compose' },
   { kind: 'mental', mode: 'add-three' },
+  { kind: 'mental', mode: 'missing-three' },
+  { kind: 'mental', mode: 'compare-ten' },
 ]
 
 const ORDINALES = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno', 'décimo']
@@ -1689,6 +1691,75 @@ describe('generate: reglas de cada plantilla', () => {
         expect(e.type === 'column' && e.carry).toBeFalsy()
       }
     }
+  })
+
+  describe('cálculo mental con tres sumandos (unidad 2)', () => {
+    describe('missing-three: el sumando que falta', () => {
+      // «5 + 1 + ▢ = 10», «4 + ▢ + 3 = 11» o al revés, «12 = 6 + 5 + ▢»
+      const NORMAL = /^Completa: (\d+|▢) \+ (\d+|▢) \+ (\d+|▢) = (\d+)$/
+      const AL_REVES = /^Completa: (\d+) = (\d+|▢) \+ (\d+|▢) \+ (\d+|▢)$/
+      const leer = (pregunta: string) => {
+        const normal = pregunta.match(NORMAL)
+        const reves = pregunta.match(AL_REVES)
+        expect(normal !== null || reves !== null, pregunta).toBe(true)
+        const [terminos, total] = normal ? [normal.slice(1, 4), normal[4]] : [reves!.slice(2, 5), reves![1]]
+        return { terminos, total: Number(total), alReves: reves !== null }
+      }
+
+      it('hay un solo hueco, los sumandos y el total son del libro (total de 10 a 13) y la respuesta completa la suma', () => {
+        const huecos = new Set<number>()
+        const direcciones = new Set<boolean>()
+        const totales = new Set<number>()
+        for (const e of muchos({ kind: 'mental', mode: 'missing-three' }).map(number)) {
+          const { terminos, total, alReves } = leer(e.question)
+          expect(terminos.filter((t) => t === '▢'), e.question).toHaveLength(1)
+          expect(total, e.question).toBeGreaterThanOrEqual(10)
+          expect(total, e.question).toBeLessThanOrEqual(13)
+          const conocidos = terminos.filter((t) => t !== '▢').map(Number)
+          expect(conocidos, e.question).toHaveLength(2)
+          for (const n of conocidos) expect(n >= 1 && n <= 9, e.question).toBe(true)
+          expect(e.answer, e.question).toBe(total - conocidos[0] - conocidos[1])
+          expect(e.answer, e.question).toBeGreaterThanOrEqual(1)
+          expect(e.answer, e.question).toBeLessThanOrEqual(9)
+          huecos.add(terminos.indexOf('▢'))
+          direcciones.add(alReves)
+          totales.add(total)
+        }
+        // el hueco sale en las tres posiciones, de las dos maneras y con los cuatro totales
+        expect(huecos).toEqual(new Set([0, 1, 2]))
+        expect(direcciones).toEqual(new Set([true, false]))
+        expect(totales).toEqual(new Set([10, 11, 12, 13]))
+      })
+    })
+
+    describe('compare-ten: el resultado, ¿menor o mayor que 10?', () => {
+      it('de tres números del 1 al 6, nunca da 10 y la respuesta es el signo correcto', () => {
+        const signos = new Set<string>()
+        for (const e of muchos({ kind: 'mental', mode: 'compare-ten' }).map(choice)) {
+          expect(e.question).toBe('¿Qué signo va en el recuadro?')
+          const m = e.visual!.match(/^(\d+) \+ (\d+) \+ (\d+)  ❓  10$/)
+          expect(m, e.visual).not.toBeNull()
+          const numeros = m!.slice(1, 4).map(Number)
+          for (const n of numeros) expect(n >= 1 && n <= 6, e.visual).toBe(true)
+          const suma = numeros[0] + numeros[1] + numeros[2]
+          expect(suma, e.visual).not.toBe(10)
+          expect([...e.options].sort(), e.visual).toEqual(['<', '>'])
+          expect(e.answer, e.visual).toBe(suma > 10 ? '>' : '<')
+          signos.add(e.answer)
+        }
+        expect(signos).toEqual(new Set(['<', '>']))
+      })
+
+      it('salen sumas que se quedan cerca de 10 por los dos lados (9 y 11) y lejos (6 y 15)', () => {
+        const sumas = new Set(
+          muchos({ kind: 'mental', mode: 'compare-ten' }).map(choice).map((e) => e.visual!.match(/\d+/g)!.slice(0, 3).map(Number).reduce((a, b) => a + b, 0)),
+        )
+        expect(sumas.has(9)).toBe(true)
+        expect(sumas.has(11)).toBe(true)
+        expect(Math.min(...sumas)).toBeLessThanOrEqual(6)
+        expect(Math.max(...sumas)).toBeGreaterThanOrEqual(15)
+      })
+    })
   })
 
   it('el cálculo mental da el resultado correcto', () => {

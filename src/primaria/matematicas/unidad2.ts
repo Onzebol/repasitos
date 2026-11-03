@@ -113,8 +113,10 @@ export const temasUnidad2: Topic[] = [
     icon: '🧠',
     tint: '#ffd2b0',
     plan: [
-      { spec: { kind: 'mental', mode: 'add-three' }, count: 6 },
-      { spec: { kind: 'mental', mode: 'add-bridge' }, count: 4 },
+      { spec: { kind: 'mental', mode: 'add-three' }, count: 3 },
+      { spec: { kind: 'mental', mode: 'missing-three' }, count: 3 },
+      { spec: { kind: 'mental', mode: 'compare-ten' }, count: 2 },
+      { spec: { kind: 'mental', mode: 'add-bridge' }, count: 2 },
     ],
   },
 ]
