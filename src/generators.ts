@@ -187,6 +187,48 @@ const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = fal
   }
 }
 
+// La lista de llegada de nueve animales (en la tarjeta de lectura) y una de tres preguntas: quién llegó en un puesto, en qué
+// puesto llegó un animal o cuántos llegaron después de uno (el total menos el puesto, del 1º al 8º)
+function clasificacion(rng: Rng): ChoiceExercise {
+  const fila = shuffle(rng, ANIMALES).slice(0, 9)
+  const text = `Llegada: ${fila.map((animal, i) => `${i + 1}º ${animal}`).join(' · ')}`
+  const tipo = int(rng, 0, 2)
+  if (tipo === 0) {
+    const lugar = int(rng, 0, 8)
+    const otros = shuffle(rng, fila.filter((_, i) => i !== lugar)).slice(0, 2)
+    return { ...elegir(`¿Quién llegó el ${lugar + 1}º?`, [fila[lugar], ...otros], fila[lugar]), text }
+  }
+  const lugar = int(rng, 1, tipo === 1 ? 9 : 8)
+  const animal = fila[lugar - 1]
+  if (tipo === 1) {
+    // Los puestos de al lado
+    const cerca = shuffle(rng, [lugar - 1, lugar + 1, lugar - 2, lugar + 2].filter((n) => n >= 1 && n <= 9)).slice(0, 2)
+    return { ...elegir(`¿En qué puesto llegó el ${animal}?`, [lugar, ...cerca].map((n) => `${n}º`), `${lugar}º`), text }
+  }
+  // Después = 9 − puesto. La trampa: contestar con el propio puesto
+  const despues = 9 - lugar
+  const falsas = [lugar, despues + 1, despues - 1, lugar - 1, lugar + 1].filter((n, i, todas) => n >= 1 && n !== despues && todas.indexOf(n) === i).slice(0, 2)
+  return { ...elegir(`Si el ${animal} llegó el ${lugar}º, ¿cuántos llegaron después?`, shuffle(rng, [despues, ...falsas]), despues), text }
+}
+
+// Los pisos de un edificio: «¿Qué piso está dos pisos por debajo del 7º?» (un o dos pisos, por encima o por debajo, del 1º al
+// 10º). Las opciones equivocadas son el lado contrario y la otra distancia
+function pisos(rng: Rng): ChoiceExercise {
+  for (;;) {
+    const base = int(rng, 1, 10)
+    const distancia = pick(rng, [1, 2])
+    const arriba = pick(rng, [true, false])
+    const piso = (n: number, d: number, sube: boolean) => (sube ? n + d : n - d)
+    const respuesta = piso(base, distancia, arriba)
+    if (respuesta < 1 || respuesta > 10) continue
+    const candidatas = [piso(base, distancia, !arriba), piso(base, distancia === 1 ? 2 : 1, arriba), base, respuesta - 1, respuesta + 1]
+    const falsas = candidatas.filter((n, i, todas) => n >= 1 && n <= 10 && n !== respuesta && todas.indexOf(n) === i).slice(0, 2)
+    if (falsas.length < 2) continue
+    const pregunta = `¿Qué piso está ${distancia === 1 ? 'un piso' : 'dos pisos'} por ${arriba ? 'encima' : 'debajo'} del ${base}º?`
+    return elegir(pregunta, shuffle(rng, [respuesta, ...falsas]).map((n) => `${n}º`), `${respuesta}º`)
+  }
+}
+
 const TERMINOS_RESTA = ['minuendo', 'sustraendo', 'diferencia']
 
 // Una resta de dos cifras con los tres números distintos (a − b = c, con b y c de dos cifras como mínimo)
@@ -1006,6 +1048,9 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'ordinal': {
+      // Razonar con ordinales: la lista de llegada y los pisos de un edificio
+      if (spec.mode === 'ranking') return clasificacion(rng)
+      if (spec.mode === 'floors') return pisos(rng)
       const lugar = int(rng, 0, 9)
       if (spec.mode === 'position') {
         const fila = shuffle(rng, ANIMALES).slice(0, 10)

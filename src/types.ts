@@ -248,8 +248,10 @@ export type BlockSpec =
   | { kind: 'initial-sound' }
   // Ordinales hasta el 10º (elegir): qué dibujo ocupa un lugar en una fila (`position`; con `noun`, «el tercer dibujo» o
   // «la tercera figura»), cómo se escribe un ordinal («tercero» → 3º, `name`) o cómo se lee («3º» → tercero, `read`).
-  // Con `feminine`, `name` y `read` van en femenino: «tercera» ↔ 3ª
-  | { kind: 'ordinal'; mode: 'position' | 'name' | 'read'; feminine?: boolean; noun?: boolean }
+  // Con `feminine`, `name` y `read` van en femenino: «tercera» ↔ 3ª. Para razonar (unidad 2): `ranking` enseña una lista de
+  // llegada de nueve animales (en el texto de lectura) y pregunta quién llegó en un puesto, en qué puesto llegó un animal o
+  // cuántos llegaron después de él; `floors` pregunta qué piso está uno o dos pisos por encima o por debajo de otro
+  | { kind: 'ordinal'; mode: 'position' | 'name' | 'read' | 'ranking' | 'floors'; feminine?: boolean; noun?: boolean }
 
 // Un bloque del plan: cuántos ejercicios de esa plantilla entran en cada sesión
 export type PlanBlock = { spec: BlockSpec; count: number }

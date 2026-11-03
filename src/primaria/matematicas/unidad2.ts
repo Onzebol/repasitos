@@ -45,12 +45,14 @@ export const temasUnidad2: Topic[] = [
     icon: '🥇',
     tint: '#ffe9a8',
     plan: [
-      { spec: { kind: 'ordinal', mode: 'position' }, count: 4 },
-      { spec: { kind: 'ordinal', mode: 'position', noun: true }, count: 2 },
+      { spec: { kind: 'ordinal', mode: 'position' }, count: 2 },
+      { spec: { kind: 'ordinal', mode: 'position', noun: true }, count: 1 },
       { spec: { kind: 'ordinal', mode: 'read' }, count: 1 },
       { spec: { kind: 'ordinal', mode: 'read', feminine: true }, count: 1 },
       { spec: { kind: 'ordinal', mode: 'name' }, count: 1 },
       { spec: { kind: 'ordinal', mode: 'name', feminine: true }, count: 1 },
+      { spec: { kind: 'ordinal', mode: 'ranking' }, count: 2 },
+      { spec: { kind: 'ordinal', mode: 'floors' }, count: 1 },
     ],
   },
   {
