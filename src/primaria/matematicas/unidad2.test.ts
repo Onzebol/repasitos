@@ -15,13 +15,16 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(unidadesMatematicas.find((unit) => unit.id === 'u2')!.topics).toBe(temasUnidad2)
   })
 
-  it('"Sumas llevando" mezcla 6 columnas con llevada (2 de tres sumandos) y 4 problemas', () => {
+  it('"Sumas llevando" mezcla 6 columnas con llevada (2 con un sumando de una cifra y 2 de tres sumandos), 2 de elegir la que lleva y 2 problemas', () => {
     const session = sesion('sumas-llevando')
     const columnas = session.filter((e) => e.type === 'column')
     expect(columnas).toHaveLength(6)
     for (const e of columnas) expect(e.carry).toBe(true)
     expect(columnas.filter((e) => e.third !== undefined)).toHaveLength(2)
-    expect(session.filter((e) => e.type === 'number')).toHaveLength(4)
+    // los de tres sumandos pueden tener un segundo sumando de una cifra: solo cuentan los de dos números
+    expect(columnas.filter((e) => e.third === undefined && e.bottom < 10)).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && e.question === '¿Qué suma es llevando?')).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number')).toHaveLength(2)
   })
 
   it('"La suma y la resta" tiene 5 restas de comprobación, 3 huecos y 2 de elegir', () => {

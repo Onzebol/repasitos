@@ -138,6 +138,8 @@ const SPECS: BlockSpec[] = [
   { kind: 'mental', mode: 'sub-small' },
   { kind: 'column', operator: '+', carry: true },
   { kind: 'column', operator: '+', carry: true, addends: 3 },
+  { kind: 'column', operator: '+', carry: true, oneDigit: true },
+  { kind: 'carry-spot' },
   { kind: 'word-problem', operator: '+' },
   { kind: 'word-problem', operator: '−' },
   { kind: 'word-problem', operator: '+', carry: true },
@@ -1173,6 +1175,53 @@ describe('generate: reglas de cada plantilla', () => {
 
     it('las columnas de dos números no llevan tercer sumando', () => {
       for (const e of muchos({ kind: 'column', operator: '+', carry: true })) expect(e.type === 'column' && e.third).toBeUndefined()
+    })
+  })
+
+  it('un sumando de una cifra llevando (87 + 9): las unidades suman 10 o más y a veces pasa de 99', () => {
+    const resultados = muchos({ kind: 'column', operator: '+', carry: true, oneDigit: true }).map((e) => {
+      if (e.type !== 'column') throw new Error('se esperaba una columna')
+      const nombre = `${e.top} + ${e.bottom}`
+      expect(e.carry, nombre).toBe(true)
+      expect(e.bottom, nombre).toBeGreaterThanOrEqual(1)
+      expect(e.bottom, nombre).toBeLessThan(10)
+      expect(e.top, nombre).toBeGreaterThanOrEqual(10)
+      expect((e.top % 10) + e.bottom, nombre).toBeGreaterThanOrEqual(10)
+      expect(e.answer, nombre).toBe(e.top + e.bottom)
+      return e.answer
+    })
+    expect(resultados.some((r) => r < 100)).toBe(true)
+    expect(resultados.some((r) => r >= 100)).toBe(true)
+  })
+
+  describe('carry-spot: elegir la suma que lleva', () => {
+    // Tabla de verdad independiente del generador: una suma lleva si las unidades suman 10 o más
+    const lleva = (suma: string) => {
+      const [a, b] = suma.split(' + ').map(Number)
+      return (a % 10) + (b % 10) >= 10
+    }
+
+    it('de tres sumas lleva exactamente una y esa es la respuesta', () => {
+      for (const e of muchos({ kind: 'carry-spot' }).map(choice)) {
+        expect(e.question).toBe('¿Qué suma es llevando?')
+        expect(e.options, e.question).toHaveLength(3)
+        for (const opcion of e.options) expect(opcion, e.question).toMatch(/^\d\d \+ \d\d$/)
+        expect(e.options.filter(lleva), e.options.join(' | ')).toEqual([e.answer])
+      }
+    })
+
+    it('ninguna suma pasa de 99, así que el tamaño del resultado no delata cuál lleva', () => {
+      for (const e of muchos({ kind: 'carry-spot' }).map(choice)) {
+        for (const opcion of e.options) {
+          const [a, b] = opcion.split(' + ').map(Number)
+          expect(a + b, opcion).toBeLessThanOrEqual(99)
+        }
+      }
+    })
+
+    it('la suma que lleva sale en las tres posiciones', () => {
+      const posiciones = new Set(muchos({ kind: 'carry-spot' }).map(choice).map((e) => e.options.indexOf(e.answer)))
+      expect(posiciones).toEqual(new Set([0, 1, 2]))
     })
   })
 
