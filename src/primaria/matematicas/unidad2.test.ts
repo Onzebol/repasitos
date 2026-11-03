@@ -54,13 +54,17 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
 
   it('"La centena" pasa de centenas a decenas y unidades, lee y escribe las centenas y recoge las preguntas sobre el 100', () => {
     const plan = temasUnidad2.find((topic) => topic.id === 'la-centena')!.plan
-    expect(plan.map((bloque) => bloque.spec.kind)).toEqual(['hundred-units', 'hundred-units', 'hundred-units', 'hundred-units', 'bag', 'number-name', 'number-name'])
+    expect(plan.map((bloque) => bloque.spec.kind)).toEqual(['hundred-units', 'hundred-units', 'hundred-units', 'hundred-units', 'bag', 'number-name', 'number-name', 'compare'])
     const session = sesion('la-centena')
     expect(session).toHaveLength(10)
     expect(session.filter((e) => e.type === 'number' && /decenas$/.test(e.question))).toHaveLength(2)
     expect(session.filter((e) => e.type === 'number' && /unidades$/.test(e.question))).toHaveLength(1)
     expect(session.filter((e) => e.type === 'number' && e.visual?.includes('🟥'))).toHaveLength(2)
-    expect(session.filter((e) => e.type === 'choice' && /^¿Qué número es \d+ (decenas|centenas)\?$/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && /^¿Qué número es \d+ (decenas|centenas)\?$/.test(e.question))).toHaveLength(1)
+    // ordenar seis centenas de menor a mayor
+    const ordenar = session.filter((e) => e.type === 'choice' && e.question.startsWith('Ordena de menor a mayor: '))
+    expect(ordenar).toHaveLength(1)
+    expect(ordenar[0].question.match(/\d+/g)).toHaveLength(6)
     expect(session.filter((e) => e.type === 'choice' && /^(10 decenas forman|¿Qué número va después del 99|El 100 es igual)/.test(e.question))).toHaveLength(1)
     // las centenas redondas se leen (elegir) y se escriben (cien, doscientos…)
     const leer = session.filter((e) => e.type === 'choice' && /^¿Cómo se lee el número \d+\?$/.test(e.question))
@@ -82,6 +86,15 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(escribir).toHaveLength(1)
     expect(escribir[0].type === 'number' && escribir[0].answer).toBeGreaterThanOrEqual(100)
     expect(escribir[0].question).toMatch(/ciento|cien$/)
+  })
+
+  it('"Del 100 al 199" compara alturas que cruzan el 99 → 100 (monumentos de 96 y 101 m)', () => {
+    const plan = temasUnidad2.find((topic) => topic.id === 'del-100-al-199')!.plan
+    expect(plan.filter((bloque) => bloque.spec.kind === 'compare' && bloque.spec.mode === 'height').map((bloque) => bloque.count)).toEqual([1])
+    const session = sesion('del-100-al-199')
+    const alturas = session.filter((e) => e.type === 'choice' && /^¿Qué monumento es más (alto|bajo)\?$/.test(e.question))
+    expect(alturas).toHaveLength(1)
+    expect(session).toHaveLength(10)
   })
 
   it('"Del 100 al 199" ya no lleva las preguntas sobre la centena (están en "La centena")', () => {
