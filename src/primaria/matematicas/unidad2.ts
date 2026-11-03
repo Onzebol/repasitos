@@ -94,6 +94,20 @@ export const temasUnidad2: Topic[] = [
     ],
   },
   {
+    id: 'problemas',
+    name: 'Problemas',
+    icon: '🔍',
+    tint: '#c9e7f5',
+    plan: [
+      { spec: { kind: 'problem-step', ask: 'operation' }, count: 2 },
+      { spec: { kind: 'problem-step', ask: 'operation', faltan: true }, count: 1 },
+      { spec: { kind: 'problem-step', ask: 'calculate' }, count: 2 },
+      { spec: { kind: 'word-problem', operator: '+', carry: true }, count: 2 },
+      { spec: { kind: 'word-problem', operator: '−', faltan: true }, count: 2 },
+      { spec: { kind: 'word-problem', operator: '−' }, count: 1 },
+    ],
+  },
+  {
     id: 'calculo-mental',
     name: 'Cálculo mental',
     icon: '🧠',
