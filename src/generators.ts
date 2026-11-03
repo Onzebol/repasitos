@@ -559,12 +559,24 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'number-name': {
-      const n = int(rng, 10, 99)
+      // Rango por defecto: 10 a 99. Con `step: 100` solo salen las centenas redondas (100, 200… 900)
+      const min = spec.min ?? 10
+      const max = spec.max ?? 99
+      const paso = spec.step ?? 1
+      const n = min + paso * int(rng, 0, (max - min) / paso)
       if (spec.ask === 'write') return numero(`Escribe con cifras: ${nombreNumero(n)}`, n)
-      // Los números vecinos y, si las cifras son distintas, el de las cifras cambiadas (86 → 68)
-      const cambiado = (n % 10) * 10 + Math.floor(n / 10)
-      const cambiadoVale = n % 10 !== 0 && n % 10 !== Math.floor(n / 10)
-      const vecinos = shuffle(rng, [n - 10, n - 1, n + 1, n + 10].filter((m) => m >= 10 && m <= 99))
+      const dentro = (m: number) => m >= min && m <= max
+      if (paso > 1) {
+        // Centenas: se confunde con las centenas de al lado
+        const otras = shuffle(rng, [n - paso, n + paso, n - 2 * paso, n + 2 * paso].filter(dentro)).slice(0, 2)
+        return elegir(`¿Cómo se lee el número ${n}?`, [n, ...otras].map(nombreNumero), nombreNumero(n))
+      }
+      // Los números vecinos y, si las cifras son distintas, el de las cifras cambiadas (86 → 68, 117 → 171, 105 → 150)
+      const base = Math.floor(n / 100) * 100
+      const resto = n - base
+      const cambiado = base + (resto % 10) * 10 + Math.floor(resto / 10)
+      const cambiadoVale = resto % 10 !== 0 && resto % 10 !== Math.floor(resto / 10) && dentro(cambiado)
+      const vecinos = shuffle(rng, [n - 10, n - 1, n + 1, n + 10].filter(dentro))
       const otros = cambiadoVale ? [cambiado, vecinos[0]] : vecinos.slice(0, 2)
       return elegir(`¿Cómo se lee el número ${n}?`, [n, ...otros].map(nombreNumero), nombreNumero(n))
     }

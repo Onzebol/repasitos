@@ -56,7 +56,7 @@ export const temasUnidad2: Topic[] = [
     tint: '#ffc9c2',
     plan: [
       { spec: { kind: 'hundred-units', ask: 'to-tens' }, count: 2 },
-      { spec: { kind: 'hundred-units', ask: 'to-units' }, count: 2 },
+      { spec: { kind: 'hundred-units', ask: 'to-units' }, count: 1 },
       { spec: { kind: 'hundred-units', ask: 'blocks' }, count: 2 },
       { spec: { kind: 'hundred-units', ask: 'match' }, count: 2 },
       {
@@ -68,8 +68,10 @@ export const temasUnidad2: Topic[] = [
             elegir('El 100 es igual a 10…', ['decenas', 'unidades', 'centenas'], 'decenas'),
           ],
         },
-        count: 2,
+        count: 1,
       },
+      { spec: { kind: 'number-name', ask: 'read', min: 100, max: 900, step: 100 }, count: 1 },
+      { spec: { kind: 'number-name', ask: 'write', min: 100, max: 900, step: 100 }, count: 1 },
     ],
   },
   {
@@ -84,8 +86,10 @@ export const temasUnidad2: Topic[] = [
       { spec: { kind: 'extreme', mode: 'greatest', min: 100, max: 199 }, count: 1 },
       { spec: { kind: 'compare', mode: 'sign', min: 100, max: 199 }, count: 1 },
       { spec: { kind: 'series', step: 1, min: 100, max: 199 }, count: 1 },
-      { spec: { kind: 'hundreds', ask: 'read' }, count: 3 },
+      { spec: { kind: 'hundreds', ask: 'read' }, count: 1 },
       { spec: { kind: 'hundreds', ask: 'compose' }, count: 1 },
+      { spec: { kind: 'number-name', ask: 'read', min: 100, max: 199 }, count: 1 },
+      { spec: { kind: 'number-name', ask: 'write', min: 100, max: 199 }, count: 1 },
     ],
   },
   {

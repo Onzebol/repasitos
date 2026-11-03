@@ -52,16 +52,36 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(session.filter((e) => e.type === 'choice' && !e.visual)).toHaveLength(4)
   })
 
-  it('"La centena" pasa de centenas a decenas y unidades y recoge las tres preguntas sobre el 100', () => {
+  it('"La centena" pasa de centenas a decenas y unidades, lee y escribe las centenas y recoge las preguntas sobre el 100', () => {
     const plan = temasUnidad2.find((topic) => topic.id === 'la-centena')!.plan
-    expect(plan.map((bloque) => bloque.spec.kind)).toEqual(['hundred-units', 'hundred-units', 'hundred-units', 'hundred-units', 'bag'])
+    expect(plan.map((bloque) => bloque.spec.kind)).toEqual(['hundred-units', 'hundred-units', 'hundred-units', 'hundred-units', 'bag', 'number-name', 'number-name'])
     const session = sesion('la-centena')
     expect(session).toHaveLength(10)
     expect(session.filter((e) => e.type === 'number' && /decenas$/.test(e.question))).toHaveLength(2)
-    expect(session.filter((e) => e.type === 'number' && /unidades$/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number' && /unidades$/.test(e.question))).toHaveLength(1)
     expect(session.filter((e) => e.type === 'number' && e.visual?.includes('🟥'))).toHaveLength(2)
     expect(session.filter((e) => e.type === 'choice' && /^¿Qué número es \d+ (decenas|centenas)\?$/.test(e.question))).toHaveLength(2)
-    expect(session.filter((e) => e.type === 'choice' && /^(10 decenas forman|¿Qué número va después del 99|El 100 es igual)/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && /^(10 decenas forman|¿Qué número va después del 99|El 100 es igual)/.test(e.question))).toHaveLength(1)
+    // las centenas redondas se leen (elegir) y se escriben (cien, doscientos…)
+    const leer = session.filter((e) => e.type === 'choice' && /^¿Cómo se lee el número \d+\?$/.test(e.question))
+    expect(leer).toHaveLength(1)
+    expect(Number(leer[0].question.match(/\d+/)![0]) % 100).toBe(0)
+    const escribir = session.filter((e) => e.type === 'number' && e.question.startsWith('Escribe con cifras: '))
+    expect(escribir).toHaveLength(1)
+    expect(escribir[0].type === 'number' && escribir[0].answer % 100).toBe(0)
+  })
+
+  it('"Del 100 al 199" lee y escribe con letras números de 100 a 199 (ciento…)', () => {
+    const plan = temasUnidad2.find((topic) => topic.id === 'del-100-al-199')!.plan
+    expect(plan.filter((bloque) => bloque.spec.kind === 'number-name').map((bloque) => bloque.count)).toEqual([1, 1])
+    const session = sesion('del-100-al-199')
+    const leer = session.filter((e) => e.type === 'choice' && /^¿Cómo se lee el número \d+\?$/.test(e.question))
+    expect(leer).toHaveLength(1)
+    expect(Number(leer[0].question.match(/\d+/)![0])).toBeGreaterThanOrEqual(100)
+    const escribir = session.filter((e) => e.type === 'number' && e.question.startsWith('Escribe con cifras: '))
+    expect(escribir).toHaveLength(1)
+    expect(escribir[0].type === 'number' && escribir[0].answer).toBeGreaterThanOrEqual(100)
+    expect(escribir[0].question).toMatch(/ciento|cien$/)
   })
 
   it('"Del 100 al 199" ya no lleva las preguntas sobre la centena (están en "La centena")', () => {
