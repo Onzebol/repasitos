@@ -10,8 +10,17 @@ describeUnit('Unidad 2 de Matemáticas', temasUnidad2)
 const sesion = (id: string) => buildSession(temasUnidad2.find((topic) => topic.id === id)!.plan, mulberry32(3))
 
 describe('Unidad 2 de Matemáticas: contenido', () => {
-  it('tiene los siete temas del índice y está registrada en la unidad 2', () => {
-    expect(temasUnidad2.map((topic) => topic.id)).toEqual(['sumas-llevando', 'suma-resta', 'ordinales', 'la-centena', 'del-100-al-199', 'problemas', 'calculo-mental'])
+  it('tiene los ocho temas del índice y está registrada en la unidad 2', () => {
+    expect(temasUnidad2.map((topic) => topic.id)).toEqual([
+      'sumas-llevando',
+      'suma-resta',
+      'ordinales',
+      'la-centena',
+      'del-100-al-199',
+      'problemas',
+      'calculo-mental',
+      'desafios-y-logica',
+    ])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u2')!.topics).toBe(temasUnidad2)
   })
 
@@ -151,5 +160,22 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(session.filter((e) => e.type === 'number' && /^Completa: .*▢/.test(e.question) && e.question.split('+').length === 3)).toHaveLength(3)
     expect(session.filter((e) => e.type === 'choice' && /^\d \+ \d \+ \d  ❓  10$/.test(e.visual ?? ''))).toHaveLength(2)
     expect(session.filter((e) => e.type === 'number' && /^\d \+ \d =$/.test(e.question))).toHaveLength(2)
+  })
+
+  it('"Desafíos y lógica" busca el número que falta (con decenas redondas y normal) y razona sobre las cifras de la tabla', () => {
+    const session = sesion('desafios-y-logica')
+    expect(session).toHaveLength(10)
+    // el número que falta en una suma o en una resta: seis ejercicios escritos, al menos cuatro con decenas redondas
+    const faltan = session.filter((e) => e.type === 'number' && e.question.startsWith('Completa: '))
+    expect(faltan).toHaveLength(6)
+    const redondos = faltan.filter((e) => e.question.match(/\d+/g)!.every((n) => Number(n) % 10 === 0) && e.type === 'number' && e.answer % 10 === 0)
+    expect(redondos.length).toBeGreaterThanOrEqual(4)
+    expect(faltan.filter((e) => e.question.startsWith('Completa: ▢ −'))).toHaveLength(3)
+    // estimar sin mirar la tabla (elegir) y después comprobarlo tocando en la tabla
+    expect(session.filter((e) => e.type === 'choice' && e.question.startsWith('Sin mirar la tabla: '))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'table-paint' && e.question.startsWith('Toca todos los números que incluyen el '))).toHaveLength(2)
+    // en el plan, estimar va antes que comprobar
+    const tipos = temasUnidad2.find((topic) => topic.id === 'desafios-y-logica')!.plan.map((bloque) => bloque.spec.kind)
+    expect(tipos.indexOf('digit-count')).toBeLessThan(tipos.indexOf('table-paint'))
   })
 })

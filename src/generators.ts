@@ -548,8 +548,21 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
         const n = int(rng, 1, 9)
         return { type: 'table-paint', question: `Toca los números que tienen ${decenas(n)}`, targets: Array.from({ length: 10 }, (_, u) => n * 10 + u), answer: `Empiezan por ${n}` }
       }
+      if (spec.ask === 'digit') {
+        // Los números que incluyen la cifra: en las decenas o en las unidades. Son 19 para cualquier cifra del 1 al 9
+        // (10 + 10 y uno repetido, el 11 o el 99); la 0 queda fuera porque la tabla enseña 00, 01… y no vale la misma regla
+        const cifra = int(rng, 1, 9)
+        const targets = Array.from({ length: 100 }, (_, n) => n).filter((n) => Math.floor(n / 10) === cifra || n % 10 === cifra)
+        return { type: 'table-paint', question: `Toca todos los números que incluyen el ${cifra}`, targets, answer: `Hay ${targets.length} números con el ${cifra}` }
+      }
       const [d, u] = [int(rng, 1, 9), int(rng, 1, 9)]
       return { type: 'table-paint', question: `Toca el número que tiene ${decenas(d)} y ${unidades(u)}`, targets: [d * 10 + u], answer: String(d * 10 + u) }
+    }
+
+    case 'digit-count': {
+      // Estimar sin mirar la tabla (antes de comprobarlo tocando): 10, 19 o 25, y son 19 para cualquier cifra del 1 al 9
+      const cifra = int(rng, 1, 9)
+      return elegir(`Sin mirar la tabla: ¿cuántos números del 0 al 99 incluyen el ${cifra}?`, shuffle(rng, [10, 19, 25]), 19)
     }
 
     case 'table-fill': {
