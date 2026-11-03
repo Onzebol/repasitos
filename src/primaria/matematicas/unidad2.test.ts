@@ -15,11 +15,12 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(unidadesMatematicas.find((unit) => unit.id === 'u2')!.topics).toBe(temasUnidad2)
   })
 
-  it('"Sumas llevando" mezcla 6 columnas con llevada y 4 problemas', () => {
+  it('"Sumas llevando" mezcla 6 columnas con llevada (2 de tres sumandos) y 4 problemas', () => {
     const session = sesion('sumas-llevando')
     const columnas = session.filter((e) => e.type === 'column')
     expect(columnas).toHaveLength(6)
     for (const e of columnas) expect(e.carry).toBe(true)
+    expect(columnas.filter((e) => e.third !== undefined)).toHaveLength(2)
     expect(session.filter((e) => e.type === 'number')).toHaveLength(4)
   })
 

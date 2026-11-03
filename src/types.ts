@@ -64,12 +64,14 @@ export type NumberExercise = {
 
 // Suma o resta en columna: el resultado se escribe cifra a cifra (unidades, decenas y, en las sumas,
 // centenas: siempre visible, obligatoria solo si el resultado llega a 100). Con `carry` las unidades llevan y se muestra un cuadro de llevada opcional (no se comprueba).
+// Con `third` (solo sumas) hay un tercer sumando debajo de los otros dos: 15 + 14 + 7
 export type ColumnExercise = {
   type: 'column'
   question: string
   operator: '+' | '−'
   top: number
   bottom: number
+  third?: number
   answer: number
   carry?: boolean
 }
@@ -144,7 +146,8 @@ export type BlockSpec =
   | { kind: 'hundreds'; ask: 'read' | 'compose' }
   // Suma o resta en columna: sin llevar, o con `carry` (sumas: las unidades pasan de 9; restas: se pide una decena).
   // Con `oneDigit` el segundo número tiene una cifra (83 + 5, 87 − 5), sin llevar
-  | { kind: 'column'; operator: '+' | '−'; carry?: boolean; oneDigit?: boolean }
+  // Con `addends: 3` (solo sumas) hay tres sumandos de una o dos cifras que siempre llevan, con resultado de hasta 99: 15 + 14 + 7
+  | { kind: 'column'; operator: '+' | '−'; carry?: boolean; oneDigit?: boolean; addends?: 2 | 3 }
   // Pasos de un problema (elegir): a partir de un texto corto, ¿hay que sumar o restar? (`operation`) o ¿hay que calcular
   // el total o la diferencia? (`calculate`). Sin llevar
   | { kind: 'problem-step'; ask: 'operation' | 'calculate' }

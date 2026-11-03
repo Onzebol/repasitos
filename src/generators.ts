@@ -153,7 +153,20 @@ function operandosUnaCifra(operator: '+' | '−', rng: Rng): [number, number] {
   return [topTens * 10 + topUnits, int(rng, 1, topUnits)]
 }
 
-const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = false): ColumnExercise => {
+// Tres sumandos de una o dos cifras (decenas de 0 a 3) cuyas unidades suman 10 o más, así que se lleva una decena o dos,
+// y que no pasan de 99: 15 + 14 + 7, 23 + 9 + 11
+function tresSumandos(rng: Rng): [number, number, number] {
+  for (;;) {
+    const [a, b, c] = [0, 1, 2].map(() => int(rng, 0, 3) * 10 + int(rng, 1, 9))
+    if ((a % 10) + (b % 10) + (c % 10) >= 10 && a + b + c <= 99) return [a, b, c]
+  }
+}
+
+const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = false, addends: 2 | 3 = 2): ColumnExercise => {
+  if (addends === 3) {
+    const [top, bottom, third] = tresSumandos(rng)
+    return { type: 'column', question: 'Suma en columna', operator: '+', top, bottom, third, answer: top + bottom + third, carry: true }
+  }
   const [top, bottom] = oneDigit ? operandosUnaCifra(operator, rng) : carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
   return {
     type: 'column',
@@ -559,7 +572,7 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'column':
-      return columna(spec.operator, spec.carry ?? false, rng, spec.oneDigit ?? false)
+      return columna(spec.operator, spec.carry ?? false, rng, spec.oneDigit ?? false, spec.addends ?? 2)
 
     case 'problem-step':
       return pasoDeProblema(spec.ask, rng)
