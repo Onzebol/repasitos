@@ -145,7 +145,10 @@ export type BlockSpec =
   // Comparar números: signo > o <, frase correcta u ordenar tres números (elegir). Rango por defecto: 10 a 99.
   // `complete`: qué número va en «48 > ❓» (o «❓ < 37»); `context`: quién o qué tiene el valor mayor o menor entre
   // pueblos (km), edades y mochilas (kilos), con los datos en el texto de lectura. Ambos ignoran min y max.
-  | { kind: 'compare'; mode: 'sign' | 'statement' | 'order' | 'complete' | 'context'; min?: number; max?: number }
+  // `height` (unidad 2): qué monumento es el más alto o el más bajo, con alturas de 80 a 199 m en el texto de lectura y
+  // siempre números de dos y de tres cifras mezclados (96 y 101): ignora min y max.
+  // En `order`, `count` (por defecto 3) es cuántos números se ordenan y `step` de cuánto en cuánto se eligen (100: centenas)
+  | { kind: 'compare'; mode: 'sign' | 'statement' | 'order' | 'complete' | 'context' | 'height'; min?: number; max?: number; step?: number; count?: number }
   // Centenas (de 100 a 199): leer un número con centena, decenas y unidades (elegir) o componerlo (escribir)
   | { kind: 'hundreds'; ask: 'read' | 'compose' }
   // Suma o resta en columna: sin llevar, o con `carry` (sumas: las unidades pasan de 9; restas: se pide una decena).

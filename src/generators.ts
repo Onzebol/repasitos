@@ -360,6 +360,41 @@ function compararEnContexto(rng: Rng): ChoiceExercise {
   }
 }
 
+// Monumentos (todos «el/la … más alto»: la pregunta usa «monumento», sin género) con alturas que cruzan el 99 → 100:
+// al menos un número de dos cifras y otro de tres, para la trampa de «el 9 es mayor que el 1» (96 m frente a 101 m)
+const MONUMENTOS = ['La torre', 'La catedral', 'El faro', 'El puente', 'La pirámide', 'El castillo']
+
+function compararAlturas(rng: Rng): ChoiceExercise {
+  const nombres = shuffle(rng, MONUMENTOS).slice(0, 3)
+  const alturas = new Set<number>()
+  const bajos = pick(rng, [1, 2])
+  while (alturas.size < bajos) alturas.add(int(rng, 80, 99))
+  while (alturas.size < 3) alturas.add(int(rng, 100, 199))
+  const valores = shuffle(rng, [...alturas])
+  const alto = pick(rng, [true, false])
+  const elegido = alto ? Math.max(...valores) : Math.min(...valores)
+  return {
+    ...elegir(alto ? '¿Qué monumento es más alto?' : '¿Qué monumento es más bajo?', nombres, nombres[valores.indexOf(elegido)]),
+    text: `Alturas: ${nombres.map((nombre, i) => `${nombre} ${valores[i]} m`).join(', ')}.`,
+  }
+}
+
+// Ordenar de menor a mayor varios números (por ejemplo seis centenas): el enunciado nunca sale ya ordenado y de las tres
+// opciones solo una está ordenada (las otras son el orden inverso y el ordenado con dos vecinos cambiados)
+function ordenarVarios(rng: Rng, min: number, max: number, paso: number, cuantos: number): ChoiceExercise {
+  const posibles = Array.from({ length: (max - min) / paso + 1 }, (_, i) => min + i * paso)
+  const elegidos = shuffle(rng, posibles).slice(0, cuantos)
+  const ordenados = [...elegidos].sort((a, b) => a - b)
+  let enunciado = elegidos
+  while (enunciado.every((n, i) => n === ordenados[i])) enunciado = shuffle(rng, elegidos)
+  const alReves = [...ordenados].reverse()
+  const cambiado = [...ordenados]
+  const i = int(rng, 0, cuantos - 2)
+  ;[cambiado[i], cambiado[i + 1]] = [cambiado[i + 1], cambiado[i]]
+  const lista = `${enunciado.slice(0, -1).join(', ')} y ${enunciado[enunciado.length - 1]}`
+  return elegir(`Ordena de menor a mayor: ${lista}`, [ordenados, alReves, cambiado].map((o) => o.join(', ')), ordenados.join(', '))
+}
+
 // Qué número va en «48 > ❓», «48 < ❓», «❓ > 48» o «❓ < 37»: solo una de las tres opciones hace cierta la comparación
 function completarDesigualdad(rng: Rng): ChoiceExercise {
   const a = int(rng, 20, 90)
@@ -660,6 +695,11 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     case 'compare': {
       if (spec.mode === 'complete') return completarDesigualdad(rng)
       if (spec.mode === 'context') return compararEnContexto(rng)
+      if (spec.mode === 'height') return compararAlturas(rng)
+      // Más de tres números, o de cien en cien (centenas): ordenarVarios; si no, los tres números de siempre
+      if (spec.mode === 'order' && ((spec.count ?? 3) !== 3 || (spec.step ?? 1) !== 1)) {
+        return ordenarVarios(rng, spec.min ?? 10, spec.max ?? 99, spec.step ?? 1, spec.count ?? 3)
+      }
       const [a, b, c] = tresDistintos(rng, spec.min, spec.max)
       if (spec.mode === 'sign') {
         return elegir('¿Qué signo va en el recuadro?', ['>', '<'], a > b ? '>' : '<', `${a}  ❓  ${b}`)

@@ -134,6 +134,8 @@ const SPECS: BlockSpec[] = [
   { kind: 'compare', mode: 'order' },
   { kind: 'compare', mode: 'complete' },
   { kind: 'compare', mode: 'context' },
+  { kind: 'compare', mode: 'height' },
+  { kind: 'compare', mode: 'order', min: 100, max: 900, step: 100, count: 6 },
   { kind: 'column', operator: '+' },
   { kind: 'column', operator: '−' },
   { kind: 'column', operator: '+', oneDigit: true },
@@ -437,6 +439,65 @@ describe('generate: reglas de cada plantilla', () => {
       contextos.add(/pueblo/.test(e.question) ? 'pueblos' : /Quién/.test(e.question) ? 'edades' : 'mochilas')
     }
     expect(contextos).toEqual(new Set(['pueblos', 'edades', 'mochilas']))
+  })
+
+  describe('compare height: alturas que cruzan el 99 → 100', () => {
+    it('la respuesta es el monumento más alto o más bajo y siempre se mezclan números de dos y de tres cifras', () => {
+      const preguntas = new Set<string>()
+      for (const e of muchos({ kind: 'compare', mode: 'height' }).map(choice)) {
+        expect(e.text, e.question).toMatch(/^Alturas: .+ \d+ m, .+ \d+ m, .+ \d+ m\.$/)
+        expect(e.options, e.question).toHaveLength(3)
+        const valor = (nombre: string) => Number(e.text!.match(new RegExp(`${nombre} (\\d+) m`))![1])
+        const valores = e.options.map(valor)
+        expect(new Set(valores).size, e.text).toBe(3)
+        for (const v of valores) {
+          expect(v, e.text).toBeGreaterThanOrEqual(80)
+          expect(v, e.text).toBeLessThanOrEqual(199)
+        }
+        // la trampa de «el 9 es mayor que el 1»: al menos un número de dos cifras y otro de tres
+        expect(valores.some((v) => v < 100), e.text).toBe(true)
+        expect(valores.some((v) => v >= 100), e.text).toBe(true)
+        const alto = e.question === '¿Qué monumento es más alto?'
+        const bajo = e.question === '¿Qué monumento es más bajo?'
+        expect(alto !== bajo, e.question).toBe(true)
+        expect(valor(e.answer), e.text).toBe(alto ? Math.max(...valores) : Math.min(...valores))
+        preguntas.add(e.question)
+      }
+      expect(preguntas.size).toBe(2)
+    })
+
+    it('el más bajo tiene dos cifras y el más alto tres: la respuesta cruza el 99 → 100 en las dos preguntas', () => {
+      for (const e of muchos({ kind: 'compare', mode: 'height' }).map(choice)) {
+        const respuesta = Number(e.text!.match(new RegExp(`${e.answer} (\\d+) m`))![1])
+        // el más bajo siempre es de dos cifras (hay al menos uno) y el más alto siempre de tres
+        expect(respuesta < 100, e.question).toBe(e.question.endsWith('más bajo?'))
+      }
+    })
+  })
+
+  describe('compare order con seis centenas (400, 900, 700, 100, 500 y 300)', () => {
+    const spec = { kind: 'compare', mode: 'order', min: 100, max: 900, step: 100, count: 6 } as const
+    const creciente = (numeros: number[]) => numeros.every((n, i) => i === 0 || numeros[i - 1] < n)
+
+    it('seis centenas redondas distintas, con tres opciones de las que solo una está ordenada de menor a mayor', () => {
+      for (const e of muchos(spec).map(choice)) {
+        const numeros = e.question.match(/\d+/g)!.map(Number)
+        expect(numeros, e.question).toHaveLength(6)
+        expect(new Set(numeros).size, e.question).toBe(6)
+        for (const n of numeros) expect(n % 100 === 0 && n >= 100 && n <= 900, e.question).toBe(true)
+        expect(e.options, e.question).toHaveLength(3)
+        const ordenadas = e.options.filter((opcion) => creciente(opcion.split(', ').map(Number)))
+        expect(ordenadas, e.options.join(' | ')).toEqual([e.answer])
+        for (const opcion of e.options) {
+          expect(opcion.split(', ').map(Number).sort((a, b) => a - b), `${e.question} → ${opcion}`).toEqual([...numeros].sort((a, b) => a - b))
+        }
+      }
+    })
+
+    it('el enunciado desordenado no sale ya ordenado y menciona los seis números', () => {
+      const desordenados = muchos(spec).map(choice).filter((e) => !creciente(e.question.match(/\d+/g)!.map(Number)))
+      expect(desordenados.length).toBeGreaterThan(SEMILLAS * 0.9)
+    })
   })
 
   it('un sumando de una cifra: sumas y restas sin llevar como 83 + 5 y 87 − 5', () => {

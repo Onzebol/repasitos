@@ -58,7 +58,7 @@ export const temasUnidad2: Topic[] = [
       { spec: { kind: 'hundred-units', ask: 'to-tens' }, count: 2 },
       { spec: { kind: 'hundred-units', ask: 'to-units' }, count: 1 },
       { spec: { kind: 'hundred-units', ask: 'blocks' }, count: 2 },
-      { spec: { kind: 'hundred-units', ask: 'match' }, count: 2 },
+      { spec: { kind: 'hundred-units', ask: 'match' }, count: 1 },
       {
         spec: {
           kind: 'bag',
@@ -72,6 +72,7 @@ export const temasUnidad2: Topic[] = [
       },
       { spec: { kind: 'number-name', ask: 'read', min: 100, max: 900, step: 100 }, count: 1 },
       { spec: { kind: 'number-name', ask: 'write', min: 100, max: 900, step: 100 }, count: 1 },
+      { spec: { kind: 'compare', mode: 'order', min: 100, max: 900, step: 100, count: 6 }, count: 1 },
     ],
   },
   {
@@ -83,7 +84,7 @@ export const temasUnidad2: Topic[] = [
       { spec: { kind: 'neighbor', mode: 'after', min: 100, max: 199 }, count: 1 },
       { spec: { kind: 'neighbor', mode: 'before', min: 100, max: 199 }, count: 1 },
       { spec: { kind: 'neighbor', mode: 'between', min: 100, max: 199 }, count: 1 },
-      { spec: { kind: 'extreme', mode: 'greatest', min: 100, max: 199 }, count: 1 },
+      { spec: { kind: 'compare', mode: 'height' }, count: 1 },
       { spec: { kind: 'compare', mode: 'sign', min: 100, max: 199 }, count: 1 },
       { spec: { kind: 'series', step: 1, min: 100, max: 199 }, count: 1 },
       { spec: { kind: 'hundreds', ask: 'read' }, count: 1 },
