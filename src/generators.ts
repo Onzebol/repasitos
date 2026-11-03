@@ -25,6 +25,9 @@ const numero = (question: string, answer: number, visual?: string): NumberExerci
 })
 
 const ORDINALES = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno', 'décimo']
+const ORDINALES_FEMENINOS = ['primera', 'segunda', 'tercera', 'cuarta', 'quinta', 'sexta', 'séptima', 'octava', 'novena', 'décima']
+// Delante de un sustantivo masculino, «primero» y «tercero» pierden la -o: el primer dibujo, el tercer dibujo
+const ORDINALES_ANTE_SUSTANTIVO = ORDINALES.map((o) => (o === 'primero' ? 'primer' : o === 'tercero' ? 'tercer' : o))
 
 // Un solo carácter cada uno (sin variantes), para poder dibujar una fila de 10 y contarlos
 const ANIMALES = ['🐘', '🐢', '🐰', '🐸', '🐱', '🐶', '🐟', '🐧', '🐮', '🐷', '🦁', '🐵', '🐻', '🦊']
@@ -1007,10 +1010,22 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       if (spec.mode === 'position') {
         const fila = shuffle(rng, ANIMALES).slice(0, 10)
         const otros = shuffle(rng, fila.filter((_, i) => i !== lugar)).slice(0, 2)
-        return elegir(`Desde la izquierda, ¿cuál es el ${ORDINALES[lugar]}?`, [fila[lugar], ...otros], fila[lugar], fila.join(''))
+        // Con sustantivo (`noun`): «el tercer dibujo» o «la tercera figura», con su concordancia y el apócope
+        const cual = spec.noun
+          ? pick(rng, [true, false])
+            ? `la ${ORDINALES_FEMENINOS[lugar]} figura`
+            : `el ${ORDINALES_ANTE_SUSTANTIVO[lugar]} dibujo`
+          : `el ${ORDINALES[lugar]}`
+        return elegir(`Desde la izquierda, ¿cuál es ${cual}?`, [fila[lugar], ...otros], fila[lugar], fila.join(''))
       }
+      // Femenino (`feminine`): tercera ↔ 3ª; masculino: tercero ↔ 3º. Las opciones son los ordinales de al lado, del mismo género
+      const palabras = spec.feminine ? ORDINALES_FEMENINOS : ORDINALES
+      const marca = spec.feminine ? 'ª' : 'º'
       const cerca = shuffle(rng, [lugar - 1, lugar + 1, lugar - 2, lugar + 2].filter((n) => n >= 0 && n <= 9)).slice(0, 2)
-      return elegir(`¿Cómo se escribe "${ORDINALES[lugar]}"?`, [lugar, ...cerca].map((n) => `${n + 1}.º`), `${lugar + 1}.º`)
+      if (spec.mode === 'read') {
+        return elegir(`¿Cómo se lee ${lugar + 1}${marca}?`, [lugar, ...cerca].map((n) => palabras[n]), palabras[lugar])
+      }
+      return elegir(`¿Cómo se escribe "${palabras[lugar]}"?`, [lugar, ...cerca].map((n) => `${n + 1}${marca}`), `${lugar + 1}${marca}`)
     }
 
     case 'subtraction-terms':

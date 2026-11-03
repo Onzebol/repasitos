@@ -11,14 +11,14 @@ Las 9 unidades se agrupan en 3 bloques de 3, cada uno cerrado por un "Reto" (pro
 | Unidad | Pág. | Saberes básicos |
 |---|---|---|
 | 1. Vamos de excursión | 12 | Decenas y unidades · Los signos > y < (completar «48 > ❓», comparar pueblos, edades y mochilas) · Los números hasta el 99 · Sumas y restas sin llevar · La decena más cercana |
-| 2. Una carrera ciclista | 32 | Sumas llevando · Relación entre la suma y la resta · Ordinales hasta el 10.º · El número 100, la centena · Los números del 100 al 199 |
+| 2. Una carrera ciclista | 32 | Sumas llevando · Relación entre la suma y la resta · Ordinales hasta el 10º · El número 100, la centena · Los números del 100 al 199 |
 | 3. Una visita al acuario | 52 | Restas llevando · Centenas, decenas y unidades · Instrumentos y unidades de medida · La capacidad, el litro |
 
 ## Bloque 2 · Reto: ahorrar agua
 
 | Unidad | Pág. | Saberes básicos |
 |---|---|---|
-| 4. La revisión médica | 78 | Números del 200 al 399 · Los signos = y ≠ · La longitud: centímetro y metro · Ordinales hasta el 29.º |
+| 4. La revisión médica | 78 | Números del 200 al 399 · Los signos = y ≠ · La longitud: centímetro y metro · Ordinales hasta el 29º |
 | 5. En el mercado | 98 | Números del 400 al 799 · Sumas y restas de tres cifras sin llevar · La masa, el kilogramo |
 | 6. Una tarde de juegos | 118 | Números del 800 al 999 · Sumas llevando con tres cifras · Punto, recta y segmento · Polígonos: lados y vértices · El círculo y la circunferencia |
 
@@ -66,7 +66,7 @@ Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el 
 | Unidad | Estado | Temas |
 |---|---|---|
 | 1 | Hecha (sesiones de 10 ejercicios aleatorios por tema) | Números hasta el 99 (leer y escribir cualquier número, decenas y unidades de un número) · La tabla del 0 al 99 (su fila, su columna y el número que falta; completar una fila o columna con el teclado; colorear tocando los números con N unidades o N decenas) · Decenas y unidades (descomponer, decenas ↔ unidades) · Los signos > y < · Sumas y restas sin llevar (en columna, con cuadros de decenas y unidades; elegir el signo + o −; la información oculta: restar para averiguar qué deporte practica cada uno) · La decena más cercana (entre qué decenas está, la regla del 5, «más o menos») · Resolvemos problemas (sumar o restar, total o diferencia, problemas de dos pasos) · Cálculo mental (sumas y restas hasta 10, series +4 y −3, sumar figuras con valores) · Planos e itinerarios (seguir las flechas, elegir el itinerario, por qué sitio pasa Repi, programar a Repi con flechas) |
-| 2 | Hecha (sesiones de 10 ejercicios aleatorios por tema) | Sumas llevando (columna con llevada opcional y cuadro de centenas, también con un sumando de una cifra y de tres sumandos; elegir la suma que lleva) · La suma y la resta se relacionan (las dos restas de una suma, sumando o minuendo que falta, con números pequeños y decenas redondas; también los términos de la resta —minuendo, sustraendo y diferencia— y comprobar una resta con una suma) · Ordinales hasta el 10.º · La centena (centenas, decenas y unidades, cómo se leen cien, doscientos… novecientos, ordenar centenas) · Del 100 al 199 (también cómo se leen y se escriben, «ciento…», comparar alturas y series y vecinos que cruzan el 99 → 100) · Problemas (sumar o restar, también «¿cuántos faltan?») · Cálculo mental (tres sumandos, el sumando que falta, menor o mayor que 10) · Desafíos y lógica (el número que falta, los números con una cifra en la tabla del 0 al 99) |
+| 2 | Hecha (sesiones de 10 ejercicios aleatorios por tema) | Sumas llevando (columna con llevada opcional y cuadro de centenas, también con un sumando de una cifra y de tres sumandos; elegir la suma que lleva) · La suma y la resta se relacionan (las dos restas de una suma, sumando o minuendo que falta, con números pequeños y decenas redondas; también los términos de la resta —minuendo, sustraendo y diferencia— y comprobar una resta con una suma) · Ordinales hasta el 10º (de símbolo a palabra y al revés, en masculino y en femenino, y «el tercer dibujo») · La centena (centenas, decenas y unidades, cómo se leen cien, doscientos… novecientos, ordenar centenas) · Del 100 al 199 (también cómo se leen y se escriben, «ciento…», comparar alturas y series y vecinos que cruzan el 99 → 100) · Problemas (sumar o restar, también «¿cuántos faltan?») · Cálculo mental (tres sumandos, el sumando que falta, menor o mayor que 10) · Desafíos y lógica (el número que falta, los números con una cifra en la tabla del 0 al 99) |
 | 3 | Hecha (sesiones de 10 ejercicios aleatorios por tema) | Restas llevando (columna con llevada opcional) · Centenas, decenas y unidades (números de tres cifras, piezas 🟥🟦🟨) · El litro (qué recipiente cabe más o menos, litros) · Cálculo mental (sumar un dígito) |
 | 4 a 9 | Muy pronto | |
 

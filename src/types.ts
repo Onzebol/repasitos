@@ -246,8 +246,10 @@ export type BlockSpec =
   | { kind: 'rhyme' }
   // Sonido inicial (Infantil): «¿Cuál empieza igual que mono?» entre tres dibujos (uno con el mismo sonido y dos con otros distintos)
   | { kind: 'initial-sound' }
-  // Ordinales hasta el 10.º: qué dibujo ocupa un lugar en una fila, o cómo se escribe un ordinal (elegir)
-  | { kind: 'ordinal'; mode: 'position' | 'name' }
+  // Ordinales hasta el 10º (elegir): qué dibujo ocupa un lugar en una fila (`position`; con `noun`, «el tercer dibujo» o
+  // «la tercera figura»), cómo se escribe un ordinal («tercero» → 3º, `name`) o cómo se lee («3º» → tercero, `read`).
+  // Con `feminine`, `name` y `read` van en femenino: «tercera» ↔ 3ª
+  | { kind: 'ordinal'; mode: 'position' | 'name' | 'read'; feminine?: boolean; noun?: boolean }
 
 // Un bloque del plan: cuántos ejercicios de esa plantilla entran en cada sesión
 export type PlanBlock = { spec: BlockSpec; count: number }

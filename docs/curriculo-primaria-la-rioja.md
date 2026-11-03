@@ -37,7 +37,7 @@ Qué cubre la web (unidades 1 a 3 hechas) y qué falta respecto al decreto:
 
 | Del decreto | En la web |
 |---|---|
-| Números hasta 999, ordinales, comparar, `=` y `≠` | Hasta el 199 y ordinales hasta el 10.º; el resto, en las unidades 4 a 6 |
+| Números hasta 999, ordinales, comparar, `=` y `≠` | Hasta el 199 y ordinales hasta el 10º; el resto, en las unidades 4 a 6 |
 | Series de 2, 5 y 10 | Solo de 1 en 1 y de 10 en 10 |
 | Pares e impares | Pendiente (no aparece en el índice del libro) |
 | Cálculo mental, suma y resta, relación suma-resta | Hecho (unidades 1 a 3) |
