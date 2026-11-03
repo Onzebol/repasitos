@@ -136,6 +136,9 @@ export type BlockSpec =
   | { kind: 'decompose'; ask: 'sum' | 'pieces' | 'words' }
   // Decenas ↔ unidades: «3 decenas = ❓ unidades» y «30 unidades = ❓ decenas» (escribir)
   | { kind: 'tens-units'; ask: 'to-units' | 'to-tens' }
+  // Centenas ↔ decenas y unidades (1 C = 10 D = 100 U), de 1 C a 9 C: «4 centenas = ❓ decenas» y «= ❓ unidades» (escribir),
+  // «🟥🟥🟥 … ¿cuántas unidades son?» con placas (escribir) y «¿Qué número es 70 decenas?» / «…9 centenas?» (elegir entre tres)
+  | { kind: 'hundred-units'; ask: 'to-tens' | 'to-units' | 'blocks' | 'match' }
   // «¿Qué número tiene 3 decenas?» / «…7 unidades?»: elegir entre tres números de dos cifras
   | { kind: 'digit-clue'; ask: 'tens' | 'units' }
   // Comparar números: signo > o <, frase correcta u ordenar tres números (elegir). Rango por defecto: 10 a 99.

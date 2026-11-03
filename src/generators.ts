@@ -604,6 +604,28 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
         : numero(`${unidades(d * 10)} = ❓ decenas`, d)
     }
 
+    case 'hundred-units': {
+      if (spec.ask === 'to-tens') {
+        const c = int(rng, 1, 9)
+        return numero(`${centenas(c)} = ❓ decenas`, c * 10)
+      }
+      if (spec.ask === 'to-units') {
+        const c = int(rng, 1, 9)
+        return numero(`${centenas(c)} = ❓ unidades`, c * 100)
+      }
+      if (spec.ask === 'blocks') {
+        const c = int(rng, 2, 9)
+        return numero('🟥 es una centena. ¿Cuántas unidades son?', c * 100, '🟥'.repeat(c))
+      }
+      // Elegir el número: 70 decenas → 700. Las equivocadas son los errores típicos: repetir la cantidad (70) o dar las centenas (7)
+      const c = int(rng, 2, 9)
+      const enDecenas = pick(rng, [true, false])
+      const cantidad = enDecenas ? c * 10 : c
+      const respuesta = c * 100
+      const equivocadas = [...new Set([cantidad, c, cantidad * 10])].filter((n) => n !== respuesta).slice(0, 2)
+      return elegir(`¿Qué número es ${cantidad} ${enDecenas ? 'decenas' : 'centenas'}?`, [respuesta, ...equivocadas], respuesta)
+    }
+
     case 'digit-clue': {
       const cifra = int(rng, 1, 9)
       const cumple = (m: number) => (spec.ask === 'tens' ? Math.floor(m / 10) : m % 10) === cifra

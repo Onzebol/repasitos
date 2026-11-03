@@ -8,7 +8,7 @@ const elegir = (question: string, options: string[], answer: string): ChoiceExer
 })
 
 // Unidad 2: sumas llevando, relación entre la suma y la resta, ordinales hasta el 10.º,
-// el 100 y los números del 100 al 199, y cálculo mental con tres sumandos.
+// la centena (el 100 y las centenas redondas), los números del 100 al 199 y cálculo mental con tres sumandos.
 // Como en la unidad 1, cada tema es un plan de 10 ejercicios por sesión.
 export const temasUnidad2: Topic[] = [
   {
@@ -50,6 +50,29 @@ export const temasUnidad2: Topic[] = [
     ],
   },
   {
+    id: 'la-centena',
+    name: 'La centena',
+    icon: '🟥',
+    tint: '#ffc9c2',
+    plan: [
+      { spec: { kind: 'hundred-units', ask: 'to-tens' }, count: 2 },
+      { spec: { kind: 'hundred-units', ask: 'to-units' }, count: 2 },
+      { spec: { kind: 'hundred-units', ask: 'blocks' }, count: 2 },
+      { spec: { kind: 'hundred-units', ask: 'match' }, count: 2 },
+      {
+        spec: {
+          kind: 'bag',
+          items: [
+            elegir('10 decenas forman 1…', ['centena', 'unidad', 'decena'], 'centena'),
+            elegir('¿Qué número va después del 99?', ['100', '98', '101'], '100'),
+            elegir('El 100 es igual a 10…', ['decenas', 'unidades', 'centenas'], 'decenas'),
+          ],
+        },
+        count: 2,
+      },
+    ],
+  },
+  {
     id: 'del-100-al-199',
     name: 'Del 100 al 199',
     icon: '💯',
@@ -61,19 +84,8 @@ export const temasUnidad2: Topic[] = [
       { spec: { kind: 'extreme', mode: 'greatest', min: 100, max: 199 }, count: 1 },
       { spec: { kind: 'compare', mode: 'sign', min: 100, max: 199 }, count: 1 },
       { spec: { kind: 'series', step: 1, min: 100, max: 199 }, count: 1 },
-      { spec: { kind: 'hundreds', ask: 'read' }, count: 2 },
+      { spec: { kind: 'hundreds', ask: 'read' }, count: 3 },
       { spec: { kind: 'hundreds', ask: 'compose' }, count: 1 },
-      {
-        spec: {
-          kind: 'bag',
-          items: [
-            elegir('10 decenas forman 1…', ['centena', 'unidad', 'decena'], 'centena'),
-            elegir('¿Qué número va después del 99?', ['100', '98', '101'], '100'),
-            elegir('El 100 es igual a 10…', ['decenas', 'unidades', 'centenas'], 'decenas'),
-          ],
-        },
-        count: 1,
-      },
     ],
   },
   {

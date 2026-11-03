@@ -114,6 +114,10 @@ const SPECS: BlockSpec[] = [
   { kind: 'decompose', ask: 'words' },
   { kind: 'tens-units', ask: 'to-units' },
   { kind: 'tens-units', ask: 'to-tens' },
+  { kind: 'hundred-units', ask: 'to-tens' },
+  { kind: 'hundred-units', ask: 'to-units' },
+  { kind: 'hundred-units', ask: 'blocks' },
+  { kind: 'hundred-units', ask: 'match' },
   { kind: 'digit-clue', ask: 'tens' },
   { kind: 'digit-clue', ask: 'units' },
   { kind: 'place-value', ask: 'read' },
@@ -838,6 +842,63 @@ describe('generate: reglas de cada plantilla', () => {
       expect(e.question, e.question).toMatch(/decenas/)
       expect(e.answer, e.question).toBe(u / 10)
     }
+  })
+
+  describe('hundred-units: centenas ↔ decenas ↔ unidades (1 C = 10 D = 100 U)', () => {
+    const cantidad = (texto: string) => Number(texto.match(/\d+/)![0])
+
+    it('to-tens: n centenas son 10·n decenas, con singular y plural', () => {
+      for (const e of muchos({ kind: 'hundred-units', ask: 'to-tens' }).map(number)) {
+        const n = cantidad(e.question)
+        expect(n, e.question).toBeGreaterThanOrEqual(1)
+        expect(n, e.question).toBeLessThanOrEqual(9)
+        expect(e.question, e.question).toBe(`${n} ${n === 1 ? 'centena' : 'centenas'} = ❓ decenas`)
+        expect(e.answer, e.question).toBe(n * 10)
+      }
+    })
+
+    it('to-units: n centenas son 100·n unidades', () => {
+      for (const e of muchos({ kind: 'hundred-units', ask: 'to-units' }).map(number)) {
+        const n = cantidad(e.question)
+        expect(n, e.question).toBeGreaterThanOrEqual(1)
+        expect(n, e.question).toBeLessThanOrEqual(9)
+        expect(e.question, e.question).toBe(`${n} ${n === 1 ? 'centena' : 'centenas'} = ❓ unidades`)
+        expect(e.answer, e.question).toBe(n * 100)
+      }
+    })
+
+    it('blocks: cada 🟥 es una centena y se pregunta por las unidades', () => {
+      for (const e of muchos({ kind: 'hundred-units', ask: 'blocks' }).map(number)) {
+        expect(e.question, e.question).toBe('🟥 es una centena. ¿Cuántas unidades son?')
+        const placas = [...(e.visual ?? '')].filter((c) => c === '🟥').length
+        expect(e.visual, e.question).toBe('🟥'.repeat(placas))
+        expect(placas, e.question).toBeGreaterThanOrEqual(2)
+        expect(placas, e.question).toBeLessThanOrEqual(9)
+        expect(e.answer, e.question).toBe(placas * 100)
+      }
+    })
+
+    it('match: elegir el número entre tres (la respuesta, el de las decenas o centenas contadas y el de las centenas)', () => {
+      const preguntas = new Set<string>()
+      for (const e of muchos({ kind: 'hundred-units', ask: 'match' }).map(choice)) {
+        const [, n, unidad] = e.question.match(/^¿Qué número es (\d+) (decenas|centenas)\?$/) ?? []
+        expect(n, e.question).toBeDefined()
+        preguntas.add(unidad)
+        // Tabla de verdad: 9 centenas = 90 decenas = 900 unidades
+        const unidades = unidad === 'centenas' ? Number(n) * 100 : Number(n) * 10
+        expect(e.answer, e.question).toBe(String(unidades))
+        expect(e.options, e.question).toHaveLength(3)
+        // las equivocadas son los errores típicos: repetir la cantidad o contar centenas
+        expect(e.options, e.question).toContain(n)
+        expect(e.options, e.question).toContain(String(unidades / 100))
+      }
+      expect(preguntas).toEqual(new Set(['decenas', 'centenas']))
+    })
+
+    it('las centenas van de 1 a 9 y salen todas', () => {
+      const vistas = new Set(muchos({ kind: 'hundred-units', ask: 'to-units' }).map(number).map((e) => e.answer / 100))
+      expect(vistas).toEqual(new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]))
+    })
   })
 
   it('«¿Qué número tiene 3 decenas?» y «…7 unidades?»: solo la respuesta cumple la condición', () => {
