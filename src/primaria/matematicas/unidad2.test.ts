@@ -10,8 +10,8 @@ describeUnit('Unidad 2 de Matemáticas', temasUnidad2)
 const sesion = (id: string) => buildSession(temasUnidad2.find((topic) => topic.id === id)!.plan, mulberry32(3))
 
 describe('Unidad 2 de Matemáticas: contenido', () => {
-  it('tiene los cinco temas del índice y está registrada en la unidad 2', () => {
-    expect(temasUnidad2.map((topic) => topic.id)).toEqual(['sumas-llevando', 'suma-resta', 'ordinales', 'del-100-al-199', 'calculo-mental'])
+  it('tiene los seis temas del índice y está registrada en la unidad 2', () => {
+    expect(temasUnidad2.map((topic) => topic.id)).toEqual(['sumas-llevando', 'suma-resta', 'ordinales', 'la-centena', 'del-100-al-199', 'calculo-mental'])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u2')!.topics).toBe(temasUnidad2)
   })
 
@@ -34,6 +34,24 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     const session = sesion('ordinales')
     expect(session.filter((e) => e.type === 'choice' && e.visual)).toHaveLength(6)
     expect(session.filter((e) => e.type === 'choice' && !e.visual)).toHaveLength(4)
+  })
+
+  it('"La centena" pasa de centenas a decenas y unidades y recoge las tres preguntas sobre el 100', () => {
+    const plan = temasUnidad2.find((topic) => topic.id === 'la-centena')!.plan
+    expect(plan.map((bloque) => bloque.spec.kind)).toEqual(['hundred-units', 'hundred-units', 'hundred-units', 'hundred-units', 'bag'])
+    const session = sesion('la-centena')
+    expect(session).toHaveLength(10)
+    expect(session.filter((e) => e.type === 'number' && /decenas$/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number' && /unidades$/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number' && e.visual?.includes('🟥'))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && /^¿Qué número es \d+ (decenas|centenas)\?$/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && /^(10 decenas forman|¿Qué número va después del 99|El 100 es igual)/.test(e.question))).toHaveLength(2)
+  })
+
+  it('"Del 100 al 199" ya no lleva las preguntas sobre la centena (están en "La centena")', () => {
+    const plan = temasUnidad2.find((topic) => topic.id === 'del-100-al-199')!.plan
+    expect(plan.some((bloque) => bloque.spec.kind === 'bag')).toBe(false)
+    expect(plan.reduce((suma, bloque) => suma + bloque.count, 0)).toBe(10)
   })
 
   it('"Del 100 al 199" solo trabaja con números de 100 a 199', () => {
