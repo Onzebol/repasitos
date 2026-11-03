@@ -97,6 +97,23 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(session).toHaveLength(10)
   })
 
+  it('"Del 100 al 199" cruza el 99 → 100: después del 98, 99 o 100, antes del 99, 100 o 101 y una serie que pasa por el 100', () => {
+    const plan = temasUnidad2.find((topic) => topic.id === 'del-100-al-199')!.plan
+    const cruzan = plan.filter((bloque) => ('cross' in bloque.spec && bloque.spec.cross) === true)
+    expect(cruzan.map((bloque) => bloque.spec.kind).sort()).toEqual(['neighbor', 'neighbor', 'series'])
+    const session = sesion('del-100-al-199')
+    expect(session).toHaveLength(10)
+    const despues = session.filter((e) => e.type === 'choice' && /^¿Qué número va después del (98|99|100)\?$/.test(e.question))
+    const antes = session.filter((e) => e.type === 'choice' && /^¿Qué número va antes del (99|100|101)\?$/.test(e.question))
+    expect(despues).toHaveLength(1)
+    expect(antes).toHaveLength(1)
+    const series = session.filter((e) => e.type === 'number' && e.question.startsWith('Completa la serie: '))
+    expect(series).toHaveLength(1)
+    const terminos = [...series[0].question.match(/\d+/g)!.map(Number), series[0].type === 'number' ? series[0].answer : -1]
+    expect(terminos).toContain(99)
+    expect(terminos).toContain(100)
+  })
+
   it('"Del 100 al 199" ya no lleva las preguntas sobre la centena (están en "La centena")', () => {
     const plan = temasUnidad2.find((topic) => topic.id === 'del-100-al-199')!.plan
     expect(plan.some((bloque) => bloque.spec.kind === 'bag')).toBe(false)

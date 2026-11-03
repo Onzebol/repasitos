@@ -183,6 +183,12 @@ const SPECS: BlockSpec[] = [
   { kind: 'compare', mode: 'order', min: 100, max: 199 },
   { kind: 'series', step: 1, min: 100, max: 199 },
   { kind: 'series', step: 10, min: 100, max: 199 },
+  { kind: 'series', step: 1, cross: true },
+  { kind: 'series', step: 10, cross: true },
+  { kind: 'series', step: 1, cross: true, down: true },
+  { kind: 'neighbor', mode: 'after', min: 90, max: 110, cross: true },
+  { kind: 'neighbor', mode: 'before', min: 90, max: 110, cross: true },
+  { kind: 'neighbor', mode: 'between', min: 90, max: 110, cross: true },
   { kind: 'hundreds', ask: 'read' },
   { kind: 'hundreds', ask: 'compose' },
   { kind: 'mental', mode: 'add-three' },
@@ -199,7 +205,9 @@ describe('generate: todo ejercicio generado es válido', () => {
     for (const spec of SPECS) {
       expect(generate(spec, mulberry32(11))).toEqual(generate(spec, mulberry32(11)))
       const distintos = new Set(muchos(spec).map((e) => JSON.stringify(e)))
-      expect(distintos.size, JSON.stringify(spec)).toBeGreaterThan(5)
+      // Cruzar el 99 → 100 (`cross`) tiene por diseño pocas variantes: después del 98, 99 o 100, entre el 99 y el 101…
+      const minimo = 'cross' in spec && spec.cross ? 1 : 5
+      expect(distintos.size, JSON.stringify(spec)).toBeGreaterThan(minimo)
     }
   })
 
@@ -472,6 +480,71 @@ describe('generate: reglas de cada plantilla', () => {
         // el más bajo siempre es de dos cifras (hay al menos uno) y el más alto siempre de tres
         expect(respuesta < 100, e.question).toBe(e.question.endsWith('más bajo?'))
       }
+    })
+  })
+
+  describe('cruzar el 99 → 100 (cross: true)', () => {
+    const numeros = (texto: string) => texto.match(/\d+/g)!.map(Number)
+
+    describe('series', () => {
+      const serie = (spec: BlockSpec) => muchos(spec).map(number).map((e) => ({ e, termino: [...numeros(e.question), e.answer] }))
+
+      it('con salto 1 la serie contiene siempre el 99 y el 100 seguidos y es consecutiva', () => {
+        const empiezan = new Set<number>()
+        for (const { e, termino } of serie({ kind: 'series', step: 1, cross: true })) {
+          expect(termino, e.question).toHaveLength(4)
+          expect(termino, e.question).toContain(99)
+          expect(termino, e.question).toContain(100)
+          termino.forEach((n, i) => i === 0 || expect(n - termino[i - 1], e.question).toBe(1))
+          empiezan.add(termino[0])
+        }
+        expect(empiezan).toEqual(new Set([97, 98, 99]))
+      })
+
+      it('hacia atrás: baja de uno en uno por el 100 y el 99', () => {
+        const empiezan = new Set<number>()
+        for (const { e, termino } of serie({ kind: 'series', step: 1, cross: true, down: true })) {
+          expect(termino, e.question).toContain(99)
+          expect(termino, e.question).toContain(100)
+          termino.forEach((n, i) => i === 0 || expect(termino[i - 1] - n, e.question).toBe(1))
+          empiezan.add(termino[0])
+        }
+        expect(empiezan).toEqual(new Set([100, 101, 102]))
+      })
+
+      it('de 10 en 10 pasa de menos de 100 a 100 o más y es consecutiva', () => {
+        for (const { e, termino } of serie({ kind: 'series', step: 10, cross: true })) {
+          expect(Math.min(...termino), e.question).toBeLessThan(100)
+          expect(Math.max(...termino), e.question).toBeGreaterThanOrEqual(100)
+          termino.forEach((n, i) => i === 0 || expect(n - termino[i - 1], e.question).toBe(10))
+        }
+      })
+
+      it('sin cross las series de siempre no cambian (siguen dentro del rango)', () => {
+        for (const e of muchos({ kind: 'series', step: 1, min: 100, max: 199 } as BlockSpec).map(number)) {
+          expect(e.answer, e.question).toBeGreaterThanOrEqual(100)
+        }
+      })
+    })
+
+    describe('vecinos', () => {
+      it.each(['after', 'before', 'between'] as const)('%s: el 99 o el 100 aparece siempre en la pregunta o en la respuesta y es correcta', (mode) => {
+        const respuestas = new Set<number>()
+        for (const e of muchos({ kind: 'neighbor', mode, min: 90, max: 110, cross: true }).map(choice)) {
+          const preguntados = numeros(e.question)
+          const respuesta = Number(e.answer)
+          respuestas.add(respuesta)
+          expect([...preguntados, respuesta].some((n) => n === 99 || n === 100), e.question).toBe(true)
+          if (mode === 'after') expect(respuesta, e.question).toBe(preguntados[0] + 1)
+          if (mode === 'before') expect(respuesta, e.question).toBe(preguntados[0] - 1)
+          if (mode === 'between') expect(respuesta, e.question).toBe((preguntados[0] + preguntados[1]) / 2)
+          expect(e.options, e.question).toHaveLength(3)
+        }
+        // sale la pregunta de cada lado de la frontera
+        if (mode === 'after') expect(respuestas).toEqual(new Set([99, 100, 101]))
+        if (mode === 'before') expect(respuestas).toEqual(new Set([98, 99, 100]))
+        if (mode === 'between') expect(respuestas).toEqual(new Set([99, 100]))
+      })
     })
   })
 

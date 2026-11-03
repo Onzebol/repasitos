@@ -425,15 +425,17 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       throw new Error('Las listas fijas no se generan: las reparte buildSession')
 
     case 'neighbor': {
+      // Con `cross` (ignora min y max) el 99 o el 100 salen siempre, en la pregunta o en la respuesta: después del 98, 99 o 100,
+      // antes del 99, 100 o 101 y entre el 98 y el 100 o entre el 99 y el 101
       if (spec.mode === 'after') {
-        const n = int(rng, spec.min, spec.max - 1)
+        const n = spec.cross ? int(rng, 98, 100) : int(rng, spec.min, spec.max - 1)
         return elegir(`¿Qué número va después del ${n}?`, [n + 1, n - 1, n + 10], n + 1)
       }
       if (spec.mode === 'before') {
-        const n = int(rng, spec.min + 1, spec.max)
+        const n = spec.cross ? int(rng, 99, 101) : int(rng, spec.min + 1, spec.max)
         return elegir(`¿Qué número va antes del ${n}?`, [n - 1, n + 1, n - 10], n - 1)
       }
-      const n = int(rng, spec.min + 1, spec.max - 1)
+      const n = spec.cross ? int(rng, 99, 100) : int(rng, spec.min + 1, spec.max - 1)
       return elegir(`¿Qué número va entre el ${n - 1} y el ${n + 1}?`, [n - 2, n, n + 2], n)
     }
 
@@ -452,7 +454,14 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       const max = spec.max ?? 99
       // Hacia atrás: se empieza arriba y siempre queda sitio para bajar tres veces sin salirse del rango
       const salto = spec.down ? -spec.step : spec.step
-      const inicio = spec.down ? int(rng, min + 3 * spec.step, max) : int(rng, min, max - 3 * spec.step)
+      // Con `cross` (ignora min y max) la serie pasa de menos de 100 a 100 o más (97, 98, 99, 100…; hacia atrás 101, 100, 99…)
+      const inicio = spec.cross
+        ? spec.down
+          ? int(rng, 100, 99 + 3 * spec.step)
+          : int(rng, 100 - 3 * spec.step, 99)
+        : spec.down
+          ? int(rng, min + 3 * spec.step, max)
+          : int(rng, min, max - 3 * spec.step)
       const mostrados = [0, 1, 2].map((i) => inicio + i * salto)
       return numero(`Completa la serie: ${mostrados.join(', ')}, …`, inicio + 3 * salto)
     }
