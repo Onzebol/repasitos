@@ -7,7 +7,7 @@ const elegir = (question: string, options: string[], answer: string): ChoiceExer
   answer,
 })
 
-// Unidad 2: sumas llevando, relación entre la suma y la resta, ordinales hasta el 10.º,
+// Unidad 2: sumas llevando, relación entre la suma y la resta, ordinales hasta el 10º,
 // la centena (el 100 y las centenas redondas), los números del 100 al 199 y cálculo mental con tres sumandos.
 // Como en la unidad 1, cada tema es un plan de 10 ejercicios por sesión.
 export const temasUnidad2: Topic[] = [
@@ -45,8 +45,12 @@ export const temasUnidad2: Topic[] = [
     icon: '🥇',
     tint: '#ffe9a8',
     plan: [
-      { spec: { kind: 'ordinal', mode: 'position' }, count: 6 },
-      { spec: { kind: 'ordinal', mode: 'name' }, count: 4 },
+      { spec: { kind: 'ordinal', mode: 'position' }, count: 4 },
+      { spec: { kind: 'ordinal', mode: 'position', noun: true }, count: 2 },
+      { spec: { kind: 'ordinal', mode: 'read' }, count: 1 },
+      { spec: { kind: 'ordinal', mode: 'read', feminine: true }, count: 1 },
+      { spec: { kind: 'ordinal', mode: 'name' }, count: 1 },
+      { spec: { kind: 'ordinal', mode: 'name', feminine: true }, count: 1 },
     ],
   },
   {

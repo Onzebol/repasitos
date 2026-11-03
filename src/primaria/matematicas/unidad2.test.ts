@@ -71,10 +71,22 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     }
   })
 
-  it('"Ordinales" combina la fila de dibujos y los nombres', () => {
+  it('"Ordinales" combina la fila de dibujos (sola y con «el tercer dibujo»), leer símbolos y escribir nombres, en masculino y femenino', () => {
     const session = sesion('ordinales')
     expect(session.filter((e) => e.type === 'choice' && e.visual)).toHaveLength(6)
     expect(session.filter((e) => e.type === 'choice' && !e.visual)).toHaveLength(4)
+    const preguntas = session.map((e) => e.question)
+    // la fila de dibujos: 4 con «el quinto» y 2 con sustantivo
+    expect(preguntas.filter((q) => /^Desde la izquierda, ¿cuál es el \S+\?$/.test(q))).toHaveLength(4)
+    expect(preguntas.filter((q) => /^Desde la izquierda, ¿cuál es (el|la) \S+ (dibujo|figura)\?$/.test(q))).toHaveLength(2)
+    // símbolo → palabra: uno en masculino y otro en femenino
+    expect(preguntas.filter((q) => /^¿Cómo se lee \d+º\?$/.test(q))).toHaveLength(1)
+    expect(preguntas.filter((q) => /^¿Cómo se lee \d+ª\?$/.test(q))).toHaveLength(1)
+    // palabra → símbolo: uno en masculino y otro en femenino
+    const escribir = session.filter((e) => e.type === 'choice' && e.question.startsWith('¿Cómo se escribe'))
+    expect(escribir).toHaveLength(2)
+    expect(escribir.filter((e) => e.type === 'choice' && e.answer.endsWith('º'))).toHaveLength(1)
+    expect(escribir.filter((e) => e.type === 'choice' && e.answer.endsWith('ª'))).toHaveLength(1)
   })
 
   it('"La centena" pasa de centenas a decenas y unidades, lee y escribe las centenas y recoge las preguntas sobre el 100', () => {

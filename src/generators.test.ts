@@ -179,6 +179,10 @@ const SPECS: BlockSpec[] = [
   { kind: 'inverse', mode: 'missing-minuend', round: true },
   { kind: 'ordinal', mode: 'position' },
   { kind: 'ordinal', mode: 'name' },
+  { kind: 'ordinal', mode: 'read' },
+  { kind: 'ordinal', mode: 'read', feminine: true },
+  { kind: 'ordinal', mode: 'name', feminine: true },
+  { kind: 'ordinal', mode: 'position', noun: true },
   { kind: 'neighbor', mode: 'after', min: 100, max: 199 },
   { kind: 'neighbor', mode: 'before', min: 100, max: 199 },
   { kind: 'neighbor', mode: 'between', min: 100, max: 199 },
@@ -1556,13 +1560,93 @@ describe('generate: reglas de cada plantilla', () => {
     for (const e of muchos({ kind: 'ordinal', mode: 'name' }).map(choice)) {
       const lugar = ORDINALES.findIndex((palabra) => e.question.includes(`"${palabra}"`))
       expect(lugar, e.question).toBeGreaterThanOrEqual(0)
-      expect(e.answer, e.question).toBe(`${lugar + 1}.º`)
+      expect(e.answer, e.question).toBe(`${lugar + 1}º`)
       for (const opcion of e.options) {
-        const n = Number(opcion.replace('.º', ''))
+        const n = Number(opcion.replace('º', ''))
         expect(n).toBeGreaterThanOrEqual(1)
         expect(n).toBeLessThanOrEqual(10)
       }
     }
+  })
+
+  describe('ordinales: de símbolo a palabra, femenino y «el tercer…»', () => {
+    // Tablas escritas a mano, independientes del generador (masculino y femenino, 1º a 10º)
+    const MASCULINO = ['primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno', 'décimo']
+    const FEMENINO = ['primera', 'segunda', 'tercera', 'cuarta', 'quinta', 'sexta', 'séptima', 'octava', 'novena', 'décima']
+
+    it('leer, masculino: «¿Cómo se lee 8º?» → octavo, con otras palabras del mismo género y sin formas también válidas (tercer)', () => {
+      const vistos = new Set<number>()
+      for (const e of muchos({ kind: 'ordinal', mode: 'read' }).map(choice)) {
+        const m = e.question.match(/^¿Cómo se lee (\d+)º\?$/)
+        expect(m, e.question).not.toBeNull()
+        const n = Number(m![1])
+        vistos.add(n)
+        expect(e.answer, e.question).toBe(MASCULINO[n - 1])
+        expect(e.options, e.question).toHaveLength(3)
+        for (const opcion of e.options) expect(MASCULINO, `${e.question} → ${opcion}`).toContain(opcion)
+        expect(e.options.some((o) => o === 'tercer' || o === 'primer'), e.question).toBe(false)
+      }
+      expect(vistos.size).toBe(10)
+    })
+
+    it('leer, femenino: «¿Cómo se lee 3ª?» → tercera, con las otras opciones también en femenino', () => {
+      const vistos = new Set<number>()
+      for (const e of muchos({ kind: 'ordinal', mode: 'read', feminine: true }).map(choice)) {
+        const m = e.question.match(/^¿Cómo se lee (\d+)ª\?$/)
+        expect(m, e.question).not.toBeNull()
+        const n = Number(m![1])
+        vistos.add(n)
+        expect(e.answer, e.question).toBe(FEMENINO[n - 1])
+        expect(e.options, e.question).toHaveLength(3)
+        for (const opcion of e.options) expect(FEMENINO, `${e.question} → ${opcion}`).toContain(opcion)
+      }
+      expect(vistos.size).toBe(10)
+    })
+
+    it('escribir, femenino: «¿Cómo se escribe "novena"?» → 9ª y todas las opciones llevan la ª', () => {
+      for (const e of muchos({ kind: 'ordinal', mode: 'name', feminine: true }).map(choice)) {
+        const palabra = e.question.match(/^¿Cómo se escribe "([a-zéáíóú]+)"\?$/)![1]
+        const n = FEMENINO.indexOf(palabra) + 1
+        expect(n, e.question).toBeGreaterThanOrEqual(1)
+        expect(e.answer, e.question).toBe(`${n}ª`)
+        for (const opcion of e.options) expect(opcion, e.question).toMatch(/^(10|[1-9])ª$/)
+      }
+    })
+
+    it('el nombre masculino de siempre sigue con la º', () => {
+      for (const e of muchos({ kind: 'ordinal', mode: 'name' }).map(choice)) {
+        for (const opcion of e.options) expect(opcion, e.question).toMatch(/º$/)
+      }
+    })
+
+    it('con sustantivo: «el tercer dibujo» y «la tercera figura» (apócope primer y tercer solo delante de un masculino)', () => {
+      const vistos = new Set<string>()
+      for (const e of muchos({ kind: 'ordinal', mode: 'position', noun: true }).map(choice)) {
+        const m = e.question.match(/^Desde la izquierda, ¿cuál es (el|la) ([a-zéáíóú]+) (dibujo|figura)\?$/)
+        expect(m, e.question).not.toBeNull()
+        const [, articulo, palabra, sustantivo] = m!
+        // concordancia: el … dibujo y la … figura
+        expect(sustantivo, e.question).toBe(articulo === 'el' ? 'dibujo' : 'figura')
+        const lugar = articulo === 'el' ? [...MASCULINO.map((p) => (p === 'primero' ? 'primer' : p === 'tercero' ? 'tercer' : p))].indexOf(palabra) : FEMENINO.indexOf(palabra)
+        expect(lugar, e.question).toBeGreaterThanOrEqual(0)
+        // el apócope solo delante de un sustantivo masculino: nunca «primero dibujo» ni «tercer figura»
+        expect(e.question).not.toMatch(/ (primero|tercero) (dibujo)/)
+        expect(e.question).not.toMatch(/ (primer|tercer) figura/)
+        // la respuesta es el dibujo de ese lugar de la fila de diez
+        const fila = [...e.visual!]
+        expect(fila, e.question).toHaveLength(10)
+        expect(new Set(fila).size, e.question).toBe(10)
+        expect(e.answer, e.question).toBe(fila[lugar])
+        for (const opcion of e.options) expect(fila, e.question).toContain(opcion)
+        vistos.add(`${articulo} ${palabra}`)
+      }
+      // salen las dos concordancias y las dos formas con apócope
+      expect(vistos.has('el primer')).toBe(true)
+      expect(vistos.has('el tercer')).toBe(true)
+      expect(vistos.has('la primera')).toBe(true)
+      expect(vistos.has('la tercera')).toBe(true)
+      expect(vistos.has('el segundo')).toBe(true)
+    })
   })
 
   it('la decena más cercana es la más cercana y nunca hay empate', () => {
