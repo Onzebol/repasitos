@@ -129,8 +129,9 @@ export type BlockSpec =
   | { kind: 'series'; step: 1 | 2 | 3 | 4 | 5 | 10; down?: boolean; min?: number; max?: number }
   // Decenas y unidades: leer un número, contar decenas o unidades, componerlo con cifras o con piezas
   | { kind: 'place-value'; ask: 'read' | 'tens' | 'units' | 'compose' | 'blocks' }
-  // Cómo se lee un número de 10 a 99 (elegir) o escribirlo con cifras a partir de su nombre (escribir)
-  | { kind: 'number-name'; ask: 'read' | 'write' }
+  // Cómo se lee un número (elegir) o escribirlo con cifras a partir de su nombre (escribir). Rango por defecto: 10 a 99;
+  // con `min`/`max` hasta el 999 (ciento…) y con `step: 100` solo las centenas redondas (cien, doscientos… novecientos)
+  | { kind: 'number-name'; ask: 'read' | 'write'; min?: number; max?: number; step?: number }
   // Descomponer un número de dos cifras: la suma que falta, «4 decenas y 3 unidades» ↔ 40 + 3 (elegir)
   // y 30 + 4 ↔ «treinta y cuatro» (elegir)
   | { kind: 'decompose'; ask: 'sum' | 'pieces' | 'words' }

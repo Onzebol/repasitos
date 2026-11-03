@@ -109,6 +109,10 @@ const SPECS: BlockSpec[] = [
   { kind: 'shape-sum', ask: 'find' },
   { kind: 'number-name', ask: 'read' },
   { kind: 'number-name', ask: 'write' },
+  { kind: 'number-name', ask: 'read', min: 100, max: 199 },
+  { kind: 'number-name', ask: 'write', min: 100, max: 199 },
+  { kind: 'number-name', ask: 'read', min: 100, max: 900, step: 100 },
+  { kind: 'number-name', ask: 'write', min: 100, max: 900, step: 100 },
   { kind: 'decompose', ask: 'sum' },
   { kind: 'decompose', ask: 'pieces' },
   { kind: 'decompose', ask: 'words' },
@@ -778,6 +782,74 @@ describe('generate: reglas de cada plantilla', () => {
       const nombre = e.question.replace('Escribe con cifras: ', '')
       expect(nombreNumero(e.answer), e.question).toBe(nombre)
     }
+  })
+
+  describe('number-name de 100 a 199 (ciento…)', () => {
+    const rango = { min: 100, max: 199 } as const
+    // Tabla independiente: una opción equivocada es el nombre de un número cercano, nunca una palabra inventada
+    const parecidos = (n: number) => {
+      const base = Math.floor(n / 100) * 100
+      const resto = n % 100
+      const cambiado = base + (resto % 10) * 10 + Math.floor(resto / 10)
+      return [n - 10, n - 1, n + 1, n + 10, cambiado]
+    }
+
+    it('leer: la respuesta es el nombre del número y las otras dos son nombres de números parecidos del mismo rango', () => {
+      const numeros = new Set<number>()
+      for (const e of muchos({ kind: 'number-name', ask: 'read', ...rango }).map(choice)) {
+        const n = Number(e.question.match(/\d+/)![0])
+        numeros.add(n)
+        expect(n, e.question).toBeGreaterThanOrEqual(100)
+        expect(n, e.question).toBeLessThanOrEqual(199)
+        expect(e.answer, e.question).toBe(nombreNumero(n))
+        expect(e.options, e.question).toHaveLength(3)
+        for (const opcion of e.options.filter((o) => o !== e.answer)) {
+          const otro = parecidos(n).find((m) => m >= 100 && m <= 199 && nombreNumero(m) === opcion)
+          expect(otro, `${e.question} → ${opcion}`).toBeDefined()
+        }
+      }
+      // salen números de todas las decenas, también el 100 y los de 101 a 109
+      expect(new Set([...numeros].map((n) => Math.floor((n % 100) / 10))).size).toBe(10)
+      expect(numeros.has(100) || [...numeros].some((n) => n < 110)).toBe(true)
+    })
+
+    it('escribir: la respuesta es el número que dice el nombre, entre 100 y 199', () => {
+      for (const e of muchos({ kind: 'number-name', ask: 'write', ...rango }).map(number)) {
+        const nombre = e.question.replace('Escribe con cifras: ', '')
+        expect(nombreNumero(e.answer), e.question).toBe(nombre)
+        expect(e.answer, e.question).toBeGreaterThanOrEqual(100)
+        expect(e.answer, e.question).toBeLessThanOrEqual(199)
+      }
+    })
+  })
+
+  describe('number-name de centenas redondas (cien, doscientos… novecientos)', () => {
+    const centenas = { min: 100, max: 900, step: 100 } as const
+    const NOMBRES = ['cien', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos', 'ochocientos', 'novecientos']
+
+    it('leer: la respuesta es el nombre de la centena y las otras dos son nombres de otras centenas', () => {
+      const vistos = new Set<number>()
+      for (const e of muchos({ kind: 'number-name', ask: 'read', ...centenas }).map(choice)) {
+        const n = Number(e.question.match(/\d+/)![0])
+        vistos.add(n)
+        expect(n % 100, e.question).toBe(0)
+        expect(e.answer, e.question).toBe(NOMBRES[n / 100 - 1])
+        expect(e.options, e.question).toHaveLength(3)
+        for (const opcion of e.options) expect(NOMBRES, `${e.question} → ${opcion}`).toContain(opcion)
+      }
+      expect(vistos).toEqual(new Set([100, 200, 300, 400, 500, 600, 700, 800, 900]))
+    })
+
+    it('escribir: la respuesta es la centena que dice el nombre', () => {
+      const vistos = new Set<number>()
+      for (const e of muchos({ kind: 'number-name', ask: 'write', ...centenas }).map(number)) {
+        const nombre = e.question.replace('Escribe con cifras: ', '')
+        expect(e.answer % 100, e.question).toBe(0)
+        expect(nombre, e.question).toBe(NOMBRES[e.answer / 100 - 1])
+        vistos.add(e.answer)
+      }
+      expect(vistos.size).toBe(9)
+    })
   })
 
   it('descomponer en una suma: falta la decena o la unidad y se escribe con cifras', () => {

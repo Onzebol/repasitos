@@ -41,14 +41,65 @@ const TABLA: Record<number, string> = {
   99: 'noventa y nueve',
 }
 
-describe('nombreNumero: cómo se lee un número del 10 al 99', () => {
+// Del 100 al 999, también escrita a mano: «cien» solo para el 100 y «ciento» del 101 al 199; las centenas irregulares
+// (quinientos, setecientos, novecientos) y los casos de una sola palabra con tilde (dieciséis, veintidós…)
+const TABLA_CENTENAS: Record<number, string> = {
+  100: 'cien',
+  101: 'ciento uno',
+  102: 'ciento dos',
+  109: 'ciento nueve',
+  110: 'ciento diez',
+  111: 'ciento once',
+  115: 'ciento quince',
+  116: 'ciento dieciséis',
+  120: 'ciento veinte',
+  121: 'ciento veintiuno',
+  122: 'ciento veintidós',
+  126: 'ciento veintiséis',
+  130: 'ciento treinta',
+  131: 'ciento treinta y uno',
+  143: 'ciento cuarenta y tres',
+  150: 'ciento cincuenta',
+  157: 'ciento cincuenta y siete',
+  170: 'ciento setenta',
+  183: 'ciento ochenta y tres',
+  199: 'ciento noventa y nueve',
+  200: 'doscientos',
+  201: 'doscientos uno',
+  300: 'trescientos',
+  345: 'trescientos cuarenta y cinco',
+  400: 'cuatrocientos',
+  500: 'quinientos',
+  512: 'quinientos doce',
+  600: 'seiscientos',
+  700: 'setecientos',
+  777: 'setecientos setenta y siete',
+  800: 'ochocientos',
+  900: 'novecientos',
+  999: 'novecientos noventa y nueve',
+}
+
+describe('nombreNumero: cómo se lee un número del 10 al 999', () => {
   it.each(Object.entries(TABLA))('%s se lee «%s»', (n, nombre) => {
     expect(nombreNumero(Number(n))).toBe(nombre)
   })
 
+  it.each(Object.entries(TABLA_CENTENAS))('%s se lee «%s»', (n, nombre) => {
+    expect(nombreNumero(Number(n))).toBe(nombre)
+  })
+
   it('no hay dos números con el mismo nombre', () => {
-    const nombres = Array.from({ length: 90 }, (_, i) => nombreNumero(i + 10))
-    expect(new Set(nombres).size).toBe(90)
+    const nombres = Array.from({ length: 990 }, (_, i) => nombreNumero(i + 10))
+    expect(new Set(nombres).size).toBe(990)
+  })
+
+  it('«cien» es solo el 100 y todo lo demás de 101 a 199 empieza por «ciento»', () => {
+    expect(nombreNumero(100)).toBe('cien')
+    for (let n = 101; n <= 199; n++) expect(nombreNumero(n), String(n)).toMatch(/^ciento /)
+  })
+
+  it('las centenas redondas del 200 al 900 son una sola palabra que acaba en «ientos» (quinientos es la irregular)', () => {
+    for (let c = 2; c <= 9; c++) expect(nombreNumero(c * 100), String(c * 100)).toMatch(/^[a-z]+ientos$/)
   })
 
   it('de treinta en adelante, las decenas con unidades se escriben «decena y unidad» en minúsculas y sin tildes sobrantes', () => {
@@ -58,9 +109,9 @@ describe('nombreNumero: cómo se lee un número del 10 al 99', () => {
     }
   })
 
-  it('solo admite números de dos cifras', () => {
+  it('solo admite números enteros del 10 al 999', () => {
     expect(() => nombreNumero(9)).toThrow()
-    expect(() => nombreNumero(100)).toThrow()
+    expect(() => nombreNumero(1000)).toThrow()
     expect(() => nombreNumero(12.5)).toThrow()
   })
 })
