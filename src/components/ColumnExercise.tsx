@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import type { ColumnExercise as ColumnExerciseData } from '../types'
 import { Keypad } from './Keypad'
 
@@ -64,22 +64,28 @@ export function ColumnExercise({ exercise, onCheck }: ColumnExerciseProps) {
     place === 'hundreds' || (place === 'tens' && n < 10) ? '' : place === 'tens' ? Math.floor(n / 10) : n % 10
   const blank = (key: string) => <span key={key} aria-hidden="true" />
   const row = (render: (place: Place) => React.ReactNode, first: React.ReactNode = blank('first')) => [first, ...places.map(render)]
+  // Dos sumandos o restandos, o tres sumandos (15 + 14 + 7)
+  const addends = exercise.third === undefined ? [exercise.top, exercise.bottom] : [exercise.top, exercise.bottom, exercise.third]
 
   return (
     <>
       <div
         className="column"
         role="group"
-        aria-label={`${exercise.top} ${exercise.operator} ${exercise.bottom}`}
+        aria-label={addends.join(` ${exercise.operator} `)}
         style={{ '--places': places.length } as React.CSSProperties}
       >
         {exercise.carry && row((place) => (place === 'tens' ? box('carry') : blank(place)))}
         {row((place) => <span key={place} className="column-head" aria-hidden="true">{HEADS[place]}</span>)}
-        {row((place) => <span key={place} className="column-cell" aria-hidden="true">{cell(exercise.top, place)}</span>)}
-        {row(
-          (place) => <span key={place} className="column-cell" aria-hidden="true">{cell(exercise.bottom, place)}</span>,
-          <span key="sign" className="column-sign" aria-hidden="true">{exercise.operator}</span>,
-        )}
+        {/* Un número debajo de otro; el signo va en la última fila */}
+        {addends.map((n, i) => (
+          <Fragment key={i}>
+            {row(
+              (place) => <span key={place} className="column-cell" aria-hidden="true">{cell(n, place)}</span>,
+              i === addends.length - 1 ? <span key="sign" className="column-sign" aria-hidden="true">{exercise.operator}</span> : blank('first'),
+            )}
+          </Fragment>
+        ))}
         <span className="column-line" aria-hidden="true" />
         {row((place) => box(place))}
       </div>

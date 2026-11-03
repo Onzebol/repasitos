@@ -50,9 +50,10 @@ export function describeUnit(name: string, topics: Topic[]) {
             expect(exercise.question.trim()).not.toBe('')
             expect(new Set(exercise.blanks).size, exercise.question).toBe(exercise.blanks.length)
           } else {
-            const nombre = `${exercise.top} ${exercise.operator} ${exercise.bottom}`
-            expect(exercise.answer, nombre).toBe(exercise.operator === '+' ? exercise.top + exercise.bottom : exercise.top - exercise.bottom)
-            const unidades = (exercise.top % 10) + (exercise.bottom % 10)
+            const tercero = exercise.third ?? 0
+            const nombre = `${exercise.top} ${exercise.operator} ${exercise.bottom}${exercise.third === undefined ? '' : ` + ${exercise.third}`}`
+            expect(exercise.answer, nombre).toBe(exercise.operator === '+' ? exercise.top + exercise.bottom + tercero : exercise.top - exercise.bottom)
+            const unidades = (exercise.top % 10) + (exercise.bottom % 10) + (tercero % 10)
             // sumas: con llevada las unidades suman 10 o más, sin ella cada columna se resuelve por separado
             // restas: con llevada las unidades del minuendo son menores que las del sustraendo
             if (exercise.operator === '+') {

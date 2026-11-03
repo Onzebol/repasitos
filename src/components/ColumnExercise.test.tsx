@@ -284,3 +284,57 @@ describe('Ejercicio en columna: estilos', () => {
     expect(regla('.column-box.active')).toMatch(/border-color|background/)
   })
 })
+
+describe('Ejercicio en columna: tres sumandos', () => {
+  const tres: Exercise = { type: 'column', question: 'Suma en columna', operator: '+', top: 15, bottom: 14, third: 7, answer: 36, carry: true }
+  const dosLlevadas: Exercise = { type: 'column', question: 'Suma en columna', operator: '+', top: 29, bottom: 8, third: 25, answer: 62, carry: true }
+  const comprobar = () => screen.getByRole('button', { name: 'Comprobar' })
+
+  it('pone los tres números uno debajo de otro con un solo signo +, y el grupo los nombra', () => {
+    abrir(tres)
+    const columna = screen.getByRole('group', { name: '15 + 14 + 7' })
+    expect(within(columna).getAllByText('+')).toHaveLength(1)
+    for (const cifra of ['1', '5', '4', '7']) expect(within(columna).getAllByText(cifra).length).toBeGreaterThan(0)
+    expect(within(columna).getAllByText('1').length).toBeGreaterThanOrEqual(2) // las decenas de 15 y de 14
+  })
+
+  it('el sumando de una cifra deja en blanco las decenas, sin un 0 delante', () => {
+    abrir(tres)
+    expect(within(screen.getByRole('group', { name: '15 + 14 + 7' })).queryByText('0')).not.toBeInTheDocument()
+  })
+
+  it('tiene cuadro de llevada y se contesta como una suma llevando: unidades, decenas', async () => {
+    const user = abrir(tres)
+    expect(screen.getByRole('button', { name: /Llevada/ })).toBeInTheDocument()
+    await tecla(user, '63')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+
+  it('la llevada puede ser 2 y es opcional', async () => {
+    const user = abrir(dosLlevadas)
+    await tecla(user, '2')
+    await user.click(screen.getByRole('button', { name: /Llevada/ }))
+    await tecla(user, '2')
+    expect(screen.getByRole('button', { name: /Llevada/ })).toHaveTextContent('2')
+    await tecla(user, '6')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+
+  it('con una cifra mal anima y deja reintentar', async () => {
+    const user = abrir(tres)
+    await tecla(user, '53') // unidades mal: se olvida el tercer sumando
+    await user.click(comprobar())
+    expect(screen.getByText('¡Casi! Inténtalo otra vez')).toBeInTheDocument()
+    expect(unidades()).toHaveTextContent('?')
+    await tecla(user, '63')
+    await user.click(comprobar())
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+  })
+
+  it('las columnas de dos números siguen sin tercera fila', () => {
+    abrir(suma)
+    expect(screen.getByRole('group', { name: '23 + 14' })).toBeInTheDocument()
+  })
+})

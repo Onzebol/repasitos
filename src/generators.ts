@@ -142,10 +142,15 @@ function sumandosLlevando(rng: Rng): [number, number] {
 
 const operandosLlevando = (operator: '+' | '−', rng: Rng) => (operator === '+' ? sumandosLlevando(rng) : restandosLlevando(rng))
 
-// Un número de dos cifras y otro de una, sin llevar: 83 + 5 (las unidades suman menos de 10) o 87 − 5 (las unidades alcanzan)
-function operandosUnaCifra(operator: '+' | '−', rng: Rng): [number, number] {
+// Un número de dos cifras y otro de una: 83 + 5 (las unidades suman menos de 10) o 87 − 5 (las unidades alcanzan).
+// Con `carry` (solo sumas) las unidades suman 10 o más: 87 + 9
+function operandosUnaCifra(operator: '+' | '−', rng: Rng, carry = false): [number, number] {
   const topTens = int(rng, 1, 9)
   if (operator === '+') {
+    if (carry) {
+      const topUnits = int(rng, 1, 9)
+      return [topTens * 10 + topUnits, int(rng, 10 - topUnits, 9)]
+    }
     const topUnits = int(rng, 0, 8)
     return [topTens * 10 + topUnits, int(rng, 1, 9 - topUnits)]
   }
@@ -153,8 +158,21 @@ function operandosUnaCifra(operator: '+' | '−', rng: Rng): [number, number] {
   return [topTens * 10 + topUnits, int(rng, 1, topUnits)]
 }
 
-const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = false): ColumnExercise => {
-  const [top, bottom] = oneDigit ? operandosUnaCifra(operator, rng) : carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
+// Tres sumandos de una o dos cifras (decenas de 0 a 3) cuyas unidades suman 10 o más, así que se lleva una decena o dos,
+// y que no pasan de 99: 15 + 14 + 7, 23 + 9 + 11
+function tresSumandos(rng: Rng): [number, number, number] {
+  for (;;) {
+    const [a, b, c] = [0, 1, 2].map(() => int(rng, 0, 3) * 10 + int(rng, 1, 9))
+    if ((a % 10) + (b % 10) + (c % 10) >= 10 && a + b + c <= 99) return [a, b, c]
+  }
+}
+
+const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = false, addends: 2 | 3 = 2): ColumnExercise => {
+  if (addends === 3) {
+    const [top, bottom, third] = tresSumandos(rng)
+    return { type: 'column', question: 'Suma en columna', operator: '+', top, bottom, third, answer: top + bottom + third, carry: true }
+  }
+  const [top, bottom] = oneDigit ? operandosUnaCifra(operator, rng, carry) : carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
   return {
     type: 'column',
     question: operator === '+' ? 'Suma en columna' : 'Resta en columna',
@@ -164,6 +182,18 @@ const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = fal
     answer: operator === '+' ? top + bottom : top - bottom,
     ...(carry && { carry }),
   }
+}
+
+// ¿Qué suma es llevando? Tres sumas de dos números de dos cifras: una lleva (las unidades suman 10 o más) y las otras dos no.
+// Ninguna pasa de 99, para que el tamaño del resultado no delate cuál es
+function sumaQueLleva(rng: Rng): ChoiceExercise {
+  const escrita = ([a, b]: [number, number]) => `${a} + ${b}`
+  let llevando = sumandosLlevando(rng)
+  while (llevando[0] + llevando[1] > 99) llevando = sumandosLlevando(rng)
+  const respuesta = escrita(llevando)
+  const otras = new Set<string>()
+  while (otras.size < 2) otras.add(escrita(sumandos(rng)))
+  return elegir('¿Qué suma es llevando?', shuffle(rng, [respuesta, ...otras]), respuesta)
 }
 
 const HISTORIAS_SUMA: ((a: number, b: number) => string)[] = [
@@ -588,7 +618,10 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'column':
-      return columna(spec.operator, spec.carry ?? false, rng, spec.oneDigit ?? false)
+      return columna(spec.operator, spec.carry ?? false, rng, spec.oneDigit ?? false, spec.addends ?? 2)
+
+    case 'carry-spot':
+      return sumaQueLleva(rng)
 
     case 'problem-step':
       return pasoDeProblema(spec.ask, rng)
