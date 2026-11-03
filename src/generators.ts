@@ -142,10 +142,15 @@ function sumandosLlevando(rng: Rng): [number, number] {
 
 const operandosLlevando = (operator: '+' | '−', rng: Rng) => (operator === '+' ? sumandosLlevando(rng) : restandosLlevando(rng))
 
-// Un número de dos cifras y otro de una, sin llevar: 83 + 5 (las unidades suman menos de 10) o 87 − 5 (las unidades alcanzan)
-function operandosUnaCifra(operator: '+' | '−', rng: Rng): [number, number] {
+// Un número de dos cifras y otro de una: 83 + 5 (las unidades suman menos de 10) o 87 − 5 (las unidades alcanzan).
+// Con `carry` (solo sumas) las unidades suman 10 o más: 87 + 9
+function operandosUnaCifra(operator: '+' | '−', rng: Rng, carry = false): [number, number] {
   const topTens = int(rng, 1, 9)
   if (operator === '+') {
+    if (carry) {
+      const topUnits = int(rng, 1, 9)
+      return [topTens * 10 + topUnits, int(rng, 10 - topUnits, 9)]
+    }
     const topUnits = int(rng, 0, 8)
     return [topTens * 10 + topUnits, int(rng, 1, 9 - topUnits)]
   }
@@ -153,8 +158,21 @@ function operandosUnaCifra(operator: '+' | '−', rng: Rng): [number, number] {
   return [topTens * 10 + topUnits, int(rng, 1, topUnits)]
 }
 
-const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = false): ColumnExercise => {
-  const [top, bottom] = oneDigit ? operandosUnaCifra(operator, rng) : carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
+// Tres sumandos de una o dos cifras (decenas de 0 a 3) cuyas unidades suman 10 o más, así que se lleva una decena o dos,
+// y que no pasan de 99: 15 + 14 + 7, 23 + 9 + 11
+function tresSumandos(rng: Rng): [number, number, number] {
+  for (;;) {
+    const [a, b, c] = [0, 1, 2].map(() => int(rng, 0, 3) * 10 + int(rng, 1, 9))
+    if ((a % 10) + (b % 10) + (c % 10) >= 10 && a + b + c <= 99) return [a, b, c]
+  }
+}
+
+const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = false, addends: 2 | 3 = 2): ColumnExercise => {
+  if (addends === 3) {
+    const [top, bottom, third] = tresSumandos(rng)
+    return { type: 'column', question: 'Suma en columna', operator: '+', top, bottom, third, answer: top + bottom + third, carry: true }
+  }
+  const [top, bottom] = oneDigit ? operandosUnaCifra(operator, rng, carry) : carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
   return {
     type: 'column',
     question: operator === '+' ? 'Suma en columna' : 'Resta en columna',
@@ -164,6 +182,47 @@ const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = fal
     answer: operator === '+' ? top + bottom : top - bottom,
     ...(carry && { carry }),
   }
+}
+
+const TERMINOS_RESTA = ['minuendo', 'sustraendo', 'diferencia']
+
+// Una resta de dos cifras con los tres números distintos (a − b = c, con b y c de dos cifras como mínimo)
+function restaDeTresNumeros(rng: Rng): [number, number, number] {
+  for (;;) {
+    const a = int(rng, 30, 99)
+    const b = int(rng, 10, a - 10)
+    if (b !== a - b) return [a, b, a - b]
+  }
+}
+
+// En «38 − 13 = 25», ¿cuál es el sustraendo? (se elige un número) o ¿cómo se llama el 13? (se elige el término)
+function terminosDeLaResta(rng: Rng): ChoiceExercise {
+  const numeros = restaDeTresNumeros(rng)
+  const lugar = int(rng, 0, 2)
+  const resta = `En ${numeros[0]} − ${numeros[1]} = ${numeros[2]}`
+  if (pick(rng, [true, false])) return elegir(`${resta}, ¿cuál es el ${TERMINOS_RESTA[lugar]}?`, numeros, numeros[lugar])
+  return elegir(`${resta}, ¿cómo se llama el ${numeros[lugar]}?`, TERMINOS_RESTA, TERMINOS_RESTA[lugar])
+}
+
+// ¿Está bien hecha la resta? A veces el resultado está cambiado (una decena o una unidad de más o de menos, o se ha sumado en
+// vez de restar); nunca coincide con el bueno
+function restaBienHecha(rng: Rng): ChoiceExercise {
+  const [a, b, c] = restaDeTresNumeros(rng)
+  const bien = pick(rng, [true, false])
+  const mal = pick(rng, [c + 10, c - 10, c + 1, c - 1, a + b].filter((n) => n >= 1 && n <= 99 && n !== c))
+  return elegir('¿Está bien hecha la resta?', ['Sí', 'No'], bien ? 'Sí' : 'No', `${a} − ${b} = ${bien ? c : mal}`)
+}
+
+// ¿Qué suma es llevando? Tres sumas de dos números de dos cifras: una lleva (las unidades suman 10 o más) y las otras dos no.
+// Ninguna pasa de 99, para que el tamaño del resultado no delate cuál es
+function sumaQueLleva(rng: Rng): ChoiceExercise {
+  const escrita = ([a, b]: [number, number]) => `${a} + ${b}`
+  let llevando = sumandosLlevando(rng)
+  while (llevando[0] + llevando[1] > 99) llevando = sumandosLlevando(rng)
+  const respuesta = escrita(llevando)
+  const otras = new Set<string>()
+  while (otras.size < 2) otras.add(escrita(sumandos(rng)))
+  return elegir('¿Qué suma es llevando?', shuffle(rng, [respuesta, ...otras]), respuesta)
 }
 
 const HISTORIAS_SUMA: ((a: number, b: number) => string)[] = [
@@ -184,6 +243,35 @@ const problema = (operator: '+' | '−', carry: boolean, rng: Rng): NumberExerci
   const [a, b] = carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
   const historia = pick(rng, operator === '+' ? HISTORIAS_SUMA : HISTORIAS_RESTA)
   return numero(historia(a, b), operator === '+' ? a + b : a - b)
+}
+
+// Los dos sumandos de a + b = c. Por defecto a mayor que b y c menor que 100; con `small`, números pequeños (c hasta 20,
+// como 7 + 4 = 11); con `round`, decenas redondas (c hasta 90, como 40 + 30 = 70). `round` manda sobre `small`
+function terminosInversos(rng: Rng, small = false, round = false): [number, number] {
+  if (round) {
+    const a = int(rng, 1, 8)
+    return [a * 10, int(rng, 1, 9 - a) * 10]
+  }
+  if (small) {
+    const a = int(rng, 3, 15)
+    return [a, int(rng, 2, 20 - a)]
+  }
+  const a = int(rng, 20, 89)
+  return [a, int(rng, 10, Math.min(a - 1, 99 - a))]
+}
+
+// La suma y la resta se relacionan: de a + b = c salen c − b (`subtract`), c − a o c − b (`both`), el sumando que falta
+// (`missing`), el minuendo que falta en ▢ − b = a (`missing-minuend`) y qué resta comprueba la suma (`operation`)
+function inversa(mode: 'subtract' | 'both' | 'missing' | 'missing-minuend' | 'operation', a: number, b: number, rng: Rng): Exercise {
+  const c = a + b
+  if (mode === 'subtract') return numero(`${a} + ${b} = ${c}. Entonces, ${c} − ${b} =`, a)
+  if (mode === 'both') {
+    const [quitado, queda] = pick(rng, [[b, a], [a, b]])
+    return numero(`${a} + ${b} = ${c}. Entonces, ${c} − ${quitado} =`, queda)
+  }
+  if (mode === 'missing') return numero(`Completa: ${a} + ▢ = ${c}`, b)
+  if (mode === 'missing-minuend') return numero(`Completa: ▢ − ${b} = ${a}`, c)
+  return elegir(`¿Qué resta comprueba que ${a} + ${b} = ${c}?`, [`${c} − ${b}`, `${a} − ${b}`, `${c} + ${b}`], `${c} − ${b}`)
 }
 
 // Los pasos de un problema: con el texto en la tarjeta de lectura, se elige qué operación hay que hacer o qué se calcula
@@ -581,7 +669,10 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'column':
-      return columna(spec.operator, spec.carry ?? false, rng, spec.oneDigit ?? false)
+      return columna(spec.operator, spec.carry ?? false, rng, spec.oneDigit ?? false, spec.addends ?? 2)
+
+    case 'carry-spot':
+      return sumaQueLleva(rng)
 
     case 'problem-step':
       return pasoDeProblema(spec.ask, rng)
@@ -832,14 +923,16 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       return elegir(`¿Cómo se escribe "${ORDINALES[lugar]}"?`, [lugar, ...cerca].map((n) => `${n + 1}.º`), `${lugar + 1}.º`)
     }
 
+    case 'subtraction-terms':
+      return terminosDeLaResta(rng)
+
+    case 'check-subtraction':
+      return restaBienHecha(rng)
+
     case 'inverse': {
-      // a + b = c, con a mayor que b y c menor que 100
-      const a = int(rng, 20, 89)
-      const b = int(rng, 10, Math.min(a - 1, 99 - a))
-      const c = a + b
-      if (spec.mode === 'subtract') return numero(`${a} + ${b} = ${c}. Entonces, ${c} − ${b} =`, a)
-      if (spec.mode === 'missing') return numero(`Completa: ${a} + ▢ = ${c}`, b)
-      return elegir(`¿Qué resta comprueba que ${a} + ${b} = ${c}?`, [`${c} − ${b}`, `${a} − ${b}`, `${c} + ${b}`], `${c} − ${b}`)
+      // `operation` usa siempre el rango por defecto: sus opciones equivocadas (a − b) lo necesitan
+      const [a, b] = spec.mode === 'operation' ? terminosInversos(rng) : terminosInversos(rng, spec.small, spec.round)
+      return inversa(spec.mode, a, b, rng)
     }
 
     case 'hundreds': {

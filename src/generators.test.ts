@@ -51,6 +51,13 @@ function esValido(e: Exercise, spec?: BlockSpec) {
     expect(e.blanks, e.question).toHaveLength(5)
     expect(new Set(e.blanks).size, e.question).toBe(5)
     for (const hueco of e.blanks) expect(Number.isInteger(hueco) && hueco >= 0 && hueco <= 9, e.question).toBe(true)
+  } else if (e.third !== undefined) {
+    // Tres sumandos de una o dos cifras, sin pasar de 99
+    const nombre = `${e.top} + ${e.bottom} + ${e.third}`
+    expect(e.operator, nombre).toBe('+')
+    for (const n of [e.top, e.bottom, e.third]) expect(Number.isInteger(n) && n >= 1 && n <= 99, nombre).toBe(true)
+    expect(e.answer, nombre).toBe(e.top + e.bottom + e.third)
+    expect(e.answer, nombre).toBeLessThanOrEqual(99)
   } else {
     const nombre = `${e.top} ${e.operator} ${e.bottom}`
     expect(e.top, nombre).toBeGreaterThanOrEqual(10)
@@ -134,6 +141,9 @@ const SPECS: BlockSpec[] = [
   { kind: 'mental', mode: 'add-small' },
   { kind: 'mental', mode: 'sub-small' },
   { kind: 'column', operator: '+', carry: true },
+  { kind: 'column', operator: '+', carry: true, addends: 3 },
+  { kind: 'column', operator: '+', carry: true, oneDigit: true },
+  { kind: 'carry-spot' },
   { kind: 'word-problem', operator: '+' },
   { kind: 'word-problem', operator: '−' },
   { kind: 'word-problem', operator: '+', carry: true },
@@ -148,6 +158,14 @@ const SPECS: BlockSpec[] = [
   { kind: 'inverse', mode: 'subtract' },
   { kind: 'inverse', mode: 'missing' },
   { kind: 'inverse', mode: 'operation' },
+  { kind: 'subtraction-terms' },
+  { kind: 'check-subtraction' },
+  { kind: 'inverse', mode: 'both' },
+  { kind: 'inverse', mode: 'both', small: true },
+  { kind: 'inverse', mode: 'missing', small: true },
+  { kind: 'inverse', mode: 'missing', round: true },
+  { kind: 'inverse', mode: 'missing-minuend' },
+  { kind: 'inverse', mode: 'missing-minuend', round: true },
   { kind: 'ordinal', mode: 'position' },
   { kind: 'ordinal', mode: 'name' },
   { kind: 'neighbor', mode: 'after', min: 100, max: 199 },
@@ -994,12 +1012,140 @@ describe('generate: reglas de cada plantilla', () => {
     }
   })
 
+  it('both: de a + b = c salen las dos restas, c − a o c − b', () => {
+    const quitados = new Set<'primero' | 'segundo'>()
+    for (const e of muchos({ kind: 'inverse', mode: 'both' }).map(number)) {
+      const [a, b, c, c2, x] = e.question.match(/\d+/g)!.map(Number)
+      expect(a + b, e.question).toBe(c)
+      expect(c2, e.question).toBe(c)
+      expect([a, b], e.question).toContain(x)
+      expect(e.answer, e.question).toBe(c - x)
+      // la respuesta es el otro sumando
+      expect(e.answer, e.question).toBe(x === a ? b : a)
+      quitados.add(x === a ? 'primero' : 'segundo')
+    }
+    expect(quitados).toEqual(new Set(['primero', 'segundo']))
+  })
+
+  it('small: los números de la suma no pasan de 20, como 7 + 4 = 11', () => {
+    for (const e of muchos({ kind: 'inverse', mode: 'both', small: true }).map(number)) {
+      const [a, b, c] = e.question.match(/\d+/g)!.map(Number)
+      expect(a + b, e.question).toBe(c)
+      expect(Math.min(a, b), e.question).toBeGreaterThanOrEqual(2)
+      expect(c, e.question).toBeLessThanOrEqual(20)
+    }
+    for (const modo of ['missing', 'missing-minuend'] as const) {
+      for (const e of muchos({ kind: 'inverse', mode: modo, small: true }).map(number)) {
+        for (const n of [...e.question.match(/\d+/g)!.map(Number), e.answer]) expect(n, e.question).toBeLessThanOrEqual(20)
+      }
+    }
+  })
+
+  it('round: con decenas redondas todos los números son múltiplos de 10', () => {
+    for (const modo of ['both', 'missing', 'missing-minuend'] as const) {
+      for (const e of muchos({ kind: 'inverse', mode: modo, round: true }).map(number)) {
+        for (const n of [...e.question.match(/\d+/g)!.map(Number), e.answer]) {
+          expect(n % 10, e.question).toBe(0)
+          expect(n, e.question).toBeGreaterThanOrEqual(10)
+          expect(n, e.question).toBeLessThanOrEqual(90)
+        }
+      }
+    }
+  })
+
+  it('missing-minuend: el minuendo que falta es el resultado más el sustraendo (▢ − 10 = 20)', () => {
+    for (const e of muchos({ kind: 'inverse', mode: 'missing-minuend' }).map(number)) {
+      const m = e.question.match(/^Completa: ▢ − (\d+) = (\d+)$/)
+      expect(m, e.question).not.toBeNull()
+      const [b, resultado] = [Number(m![1]), Number(m![2])]
+      expect(e.answer - b, e.question).toBe(resultado)
+      expect(e.answer, e.question).toBeLessThanOrEqual(99)
+      expect(b, e.question).toBeGreaterThanOrEqual(10)
+      expect(resultado, e.question).toBeGreaterThanOrEqual(10)
+    }
+  })
+
   it('el sumando que falta completa la suma', () => {
     for (const e of muchos({ kind: 'inverse', mode: 'missing' }).map(number)) {
       const [a, c] = e.question.match(/\d+/g)!.map(Number)
       expect(a + e.answer, e.question).toBe(c)
       expect(e.answer, e.question).toBeGreaterThanOrEqual(10)
     }
+  })
+
+  describe('subtraction-terms: minuendo, sustraendo y diferencia', () => {
+    // Tabla independiente del generador: en a − b = c, a es el minuendo, b el sustraendo y c la diferencia
+    const TERMINOS = ['minuendo', 'sustraendo', 'diferencia']
+    const leer = (pregunta: string) => {
+      const m = pregunta.match(/^En (\d+) − (\d+) = (\d+), (?:¿cuál es el (\w+)\?|¿cómo se llama el (\d+)\?)$/)
+      if (!m) throw new Error(`pregunta inesperada: ${pregunta}`)
+      return { numeros: [Number(m[1]), Number(m[2]), Number(m[3])], termino: m[4], numero: m[5] === undefined ? undefined : Number(m[5]) }
+    }
+
+    it('la resta está bien hecha, sus tres números son distintos y la respuesta es el término correcto', () => {
+      for (const e of muchos({ kind: 'subtraction-terms' }).map(choice)) {
+        const { numeros, termino, numero } = leer(e.question)
+        const [a, b, c] = numeros
+        expect(a - b, e.question).toBe(c)
+        expect(new Set(numeros).size, e.question).toBe(3)
+        for (const n of numeros) expect(n, e.question).toBeGreaterThanOrEqual(10)
+        if (termino !== undefined) {
+          // por el nombre: se elige uno de los tres números
+          expect([...e.options].sort(), e.question).toEqual(numeros.map(String).sort())
+          expect(e.answer, e.question).toBe(String(numeros[TERMINOS.indexOf(termino)]))
+        } else {
+          // por el número: se elige uno de los tres nombres
+          expect([...e.options].sort(), e.question).toEqual([...TERMINOS].sort())
+          expect(e.answer, e.question).toBe(TERMINOS[numeros.indexOf(numero!)])
+        }
+      }
+    })
+
+    it('se pregunta en las dos direcciones y por los tres términos', () => {
+      const lecturas = muchos({ kind: 'subtraction-terms' }).map(choice).map((e) => leer(e.question))
+      expect(lecturas.some((l) => l.termino !== undefined)).toBe(true)
+      expect(lecturas.some((l) => l.numero !== undefined)).toBe(true)
+      // el término por el que se pregunta: el que nombra la pregunta o el que es la respuesta
+      const terminos = new Set(muchos({ kind: 'subtraction-terms' }).map(choice).map((e) => leer(e.question).termino ?? e.answer))
+      expect(terminos).toEqual(new Set(TERMINOS))
+    })
+  })
+
+  describe('check-subtraction: ¿está bien hecha la resta?', () => {
+    const leer = (visual: string | undefined) => {
+      const m = visual?.match(/^(\d+) − (\d+) = (\d+)$/)
+      if (!m) throw new Error(`resta inesperada: ${visual}`)
+      return { a: Number(m[1]), b: Number(m[2]), resultado: Number(m[3]) }
+    }
+
+    it('responde Sí solo si la resta está bien: el resultado más el sustraendo da el minuendo', () => {
+      for (const e of muchos({ kind: 'check-subtraction' }).map(choice)) {
+        const { a, b, resultado } = leer(e.visual)
+        expect(e.question).toBe('¿Está bien hecha la resta?')
+        expect([...e.options].sort()).toEqual(['No', 'Sí'])
+        expect(a, e.visual).toBeGreaterThan(b)
+        expect(resultado, e.visual).toBeGreaterThanOrEqual(1)
+        expect(resultado, e.visual).toBeLessThanOrEqual(99)
+        // la comprobación con la suma
+        expect(e.answer, e.visual).toBe(resultado + b === a ? 'Sí' : 'No')
+      }
+    })
+
+    it('hay restas bien y mal hechas, y las malas fallan de varias formas', () => {
+      const lecturas = muchos({ kind: 'check-subtraction' }).map(choice)
+      const respuestas = lecturas.map((e) => e.answer)
+      expect(respuestas.filter((r) => r === 'Sí').length).toBeGreaterThan(SEMILLAS / 4)
+      expect(respuestas.filter((r) => r === 'No').length).toBeGreaterThan(SEMILLAS / 4)
+      const errores = new Set(
+        lecturas
+          .filter((e) => e.answer === 'No')
+          .map((e) => {
+            const { a, b, resultado } = leer(e.visual)
+            return resultado - (a - b)
+          }),
+      )
+      expect(errores.size).toBeGreaterThan(2)
+    })
   })
 
   it('la operación que comprueba la suma es la única resta válida entre las opciones', () => {
@@ -1193,6 +1339,87 @@ describe('generate: reglas de cada plantilla', () => {
     })
     expect(resultados.some((r) => r < 100)).toBe(true)
     expect(resultados.some((r) => r >= 100)).toBe(true)
+  })
+
+  describe('tres sumandos en columna (15 + 14 + 7)', () => {
+    const tres = () =>
+      muchos({ kind: 'column', operator: '+', carry: true, addends: 3 }).map((e) => {
+        if (e.type !== 'column' || e.third === undefined) throw new Error('se esperaba una columna de tres sumandos')
+        return { ...e, third: e.third }
+      })
+    // Tabla de verdad independiente: lo que se lleva a las decenas es la suma de las unidades entre 10
+    const llevada = (e: { top: number; bottom: number; third: number }) => Math.floor(((e.top % 10) + (e.bottom % 10) + (e.third % 10)) / 10)
+
+    it('la respuesta es la suma de los tres, va marcada con llevada y las unidades suman 10 o más', () => {
+      for (const e of tres()) {
+        const nombre = `${e.top} + ${e.bottom} + ${e.third}`
+        expect(e.carry, nombre).toBe(true)
+        expect(e.answer, nombre).toBe(e.top + e.bottom + e.third)
+        expect(llevada(e), nombre).toBeGreaterThanOrEqual(1)
+      }
+    })
+
+    it('mezcla sumandos de una y de dos cifras, y se lleva una decena o dos', () => {
+      const todos = tres()
+      expect(todos.some((e) => [e.top, e.bottom, e.third].some((n) => n < 10))).toBe(true)
+      expect(todos.some((e) => [e.top, e.bottom, e.third].some((n) => n >= 10))).toBe(true)
+      expect(new Set(todos.map(llevada))).toEqual(new Set([1, 2]))
+    })
+
+    it('el resultado nunca llega a 100, así que no hace falta la centena', () => {
+      for (const e of tres()) expect(e.answer, `${e.top} + ${e.bottom} + ${e.third}`).toBeLessThanOrEqual(99)
+    })
+
+    it('las columnas de dos números no llevan tercer sumando', () => {
+      for (const e of muchos({ kind: 'column', operator: '+', carry: true })) expect(e.type === 'column' && e.third).toBeUndefined()
+    })
+  })
+
+  it('un sumando de una cifra llevando (87 + 9): las unidades suman 10 o más y a veces pasa de 99', () => {
+    const resultados = muchos({ kind: 'column', operator: '+', carry: true, oneDigit: true }).map((e) => {
+      if (e.type !== 'column') throw new Error('se esperaba una columna')
+      const nombre = `${e.top} + ${e.bottom}`
+      expect(e.carry, nombre).toBe(true)
+      expect(e.bottom, nombre).toBeGreaterThanOrEqual(1)
+      expect(e.bottom, nombre).toBeLessThan(10)
+      expect(e.top, nombre).toBeGreaterThanOrEqual(10)
+      expect((e.top % 10) + e.bottom, nombre).toBeGreaterThanOrEqual(10)
+      expect(e.answer, nombre).toBe(e.top + e.bottom)
+      return e.answer
+    })
+    expect(resultados.some((r) => r < 100)).toBe(true)
+    expect(resultados.some((r) => r >= 100)).toBe(true)
+  })
+
+  describe('carry-spot: elegir la suma que lleva', () => {
+    // Tabla de verdad independiente del generador: una suma lleva si las unidades suman 10 o más
+    const lleva = (suma: string) => {
+      const [a, b] = suma.split(' + ').map(Number)
+      return (a % 10) + (b % 10) >= 10
+    }
+
+    it('de tres sumas lleva exactamente una y esa es la respuesta', () => {
+      for (const e of muchos({ kind: 'carry-spot' }).map(choice)) {
+        expect(e.question).toBe('¿Qué suma es llevando?')
+        expect(e.options, e.question).toHaveLength(3)
+        for (const opcion of e.options) expect(opcion, e.question).toMatch(/^\d\d \+ \d\d$/)
+        expect(e.options.filter(lleva), e.options.join(' | ')).toEqual([e.answer])
+      }
+    })
+
+    it('ninguna suma pasa de 99, así que el tamaño del resultado no delata cuál lleva', () => {
+      for (const e of muchos({ kind: 'carry-spot' }).map(choice)) {
+        for (const opcion of e.options) {
+          const [a, b] = opcion.split(' + ').map(Number)
+          expect(a + b, opcion).toBeLessThanOrEqual(99)
+        }
+      }
+    })
+
+    it('la suma que lleva sale en las tres posiciones', () => {
+      const posiciones = new Set(muchos({ kind: 'carry-spot' }).map(choice).map((e) => e.options.indexOf(e.answer)))
+      expect(posiciones).toEqual(new Set([0, 1, 2]))
+    })
   })
 
   it('las columnas sin llevar no llevan la marca', () => {

@@ -15,19 +15,35 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(unidadesMatematicas.find((unit) => unit.id === 'u2')!.topics).toBe(temasUnidad2)
   })
 
-  it('"Sumas llevando" mezcla 6 columnas con llevada y 4 problemas', () => {
+  it('"Sumas llevando" mezcla 6 columnas con llevada (2 con un sumando de una cifra y 2 de tres sumandos), 2 de elegir la que lleva y 2 problemas', () => {
     const session = sesion('sumas-llevando')
     const columnas = session.filter((e) => e.type === 'column')
     expect(columnas).toHaveLength(6)
     for (const e of columnas) expect(e.carry).toBe(true)
-    expect(session.filter((e) => e.type === 'number')).toHaveLength(4)
+    expect(columnas.filter((e) => e.third !== undefined)).toHaveLength(2)
+    // los de tres sumandos pueden tener un segundo sumando de una cifra: solo cuentan los de dos números
+    expect(columnas.filter((e) => e.third === undefined && e.bottom < 10)).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && e.question === '¿Qué suma es llevando?')).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number')).toHaveLength(2)
   })
 
-  it('"La suma y la resta" tiene 5 restas de comprobación, 3 huecos y 2 de elegir', () => {
+  it('"La suma y la resta" tiene 2 restas de una suma, 2 sumandos que faltan, 1 minuendo que falta, 1 resta que comprueba, 2 de términos y 2 de resta bien hecha', () => {
     const session = sesion('suma-resta')
-    expect(session.filter((e) => e.type === 'number' && e.question.includes('Entonces'))).toHaveLength(5)
-    expect(session.filter((e) => e.type === 'number' && e.question.startsWith('Completa'))).toHaveLength(3)
-    expect(session.filter((e) => e.type === 'choice')).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number' && e.question.includes('Entonces'))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number' && /^Completa: \d+ \+ ▢/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number' && e.question.startsWith('Completa: ▢ −'))).toHaveLength(1)
+    expect(session.filter((e) => e.type === 'choice' && e.question.startsWith('¿Qué resta comprueba'))).toHaveLength(1)
+    expect(session.filter((e) => e.type === 'choice' && /^En \d+ − \d+ = \d+, ¿/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && e.question === '¿Está bien hecha la resta?')).toHaveLength(2)
+    expect(session).toHaveLength(10)
+  })
+
+  it('"La suma y la resta" empieza con sumas pequeñas, hasta 20', () => {
+    const [primero, segundo] = sesion('suma-resta')
+    for (const e of [primero, segundo]) {
+      if (e.type !== 'number') throw new Error('se esperaba escribir un número')
+      expect(Math.max(...e.question.match(/\d+/g)!.map(Number)), e.question).toBeLessThanOrEqual(20)
+    }
   })
 
   it('"Ordinales" combina la fila de dibujos y los nombres', () => {
