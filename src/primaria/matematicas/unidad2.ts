@@ -17,8 +17,11 @@ export const temasUnidad2: Topic[] = [
     icon: '➕',
     tint: '#b5ecc1',
     plan: [
-      { spec: { kind: 'column', operator: '+', carry: true }, count: 6 },
-      { spec: { kind: 'word-problem', operator: '+', carry: true }, count: 4 },
+      { spec: { kind: 'column', operator: '+', carry: true }, count: 2 },
+      { spec: { kind: 'column', operator: '+', carry: true, oneDigit: true }, count: 2 },
+      { spec: { kind: 'column', operator: '+', carry: true, addends: 3 }, count: 2 },
+      { spec: { kind: 'carry-spot' }, count: 2 },
+      { spec: { kind: 'word-problem', operator: '+', carry: true }, count: 2 },
     ],
   },
   {
@@ -27,8 +30,10 @@ export const temasUnidad2: Topic[] = [
     icon: '🔄',
     tint: '#cdb9ff',
     plan: [
-      { spec: { kind: 'inverse', mode: 'subtract' }, count: 3 },
-      { spec: { kind: 'inverse', mode: 'missing' }, count: 2 },
+      { spec: { kind: 'inverse', mode: 'both', small: true }, count: 2 },
+      { spec: { kind: 'inverse', mode: 'missing' }, count: 1 },
+      { spec: { kind: 'inverse', mode: 'missing', round: true }, count: 1 },
+      { spec: { kind: 'inverse', mode: 'missing-minuend' }, count: 1 },
       { spec: { kind: 'inverse', mode: 'operation' }, count: 1 },
       { spec: { kind: 'subtraction-terms' }, count: 2 },
       { spec: { kind: 'check-subtraction' }, count: 2 },

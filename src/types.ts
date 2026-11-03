@@ -64,12 +64,14 @@ export type NumberExercise = {
 
 // Suma o resta en columna: el resultado se escribe cifra a cifra (unidades, decenas y, en las sumas,
 // centenas: siempre visible, obligatoria solo si el resultado llega a 100). Con `carry` las unidades llevan y se muestra un cuadro de llevada opcional (no se comprueba).
+// Con `third` (solo sumas) hay un tercer sumando debajo de los otros dos: 15 + 14 + 7
 export type ColumnExercise = {
   type: 'column'
   question: string
   operator: '+' | '−'
   top: number
   bottom: number
+  third?: number
   answer: number
   carry?: boolean
 }
@@ -143,8 +145,12 @@ export type BlockSpec =
   // Centenas (de 100 a 199): leer un número con centena, decenas y unidades (elegir) o componerlo (escribir)
   | { kind: 'hundreds'; ask: 'read' | 'compose' }
   // Suma o resta en columna: sin llevar, o con `carry` (sumas: las unidades pasan de 9; restas: se pide una decena).
-  // Con `oneDigit` el segundo número tiene una cifra (83 + 5, 87 − 5), sin llevar
-  | { kind: 'column'; operator: '+' | '−'; carry?: boolean; oneDigit?: boolean }
+  // Con `oneDigit` el segundo número tiene una cifra (83 + 5, 87 − 5), sin llevar; con `oneDigit` y `carry` (solo sumas) sí se
+  // lleva: 87 + 9
+  // Con `addends: 3` (solo sumas) hay tres sumandos de una o dos cifras que siempre llevan, con resultado de hasta 99: 15 + 14 + 7
+  | { kind: 'column'; operator: '+' | '−'; carry?: boolean; oneDigit?: boolean; addends?: 2 | 3 }
+  // ¿Qué suma es llevando? (elegir): tres sumas de dos números de dos cifras, una lleva y las otras dos no
+  | { kind: 'carry-spot' }
   // Pasos de un problema (elegir): a partir de un texto corto, ¿hay que sumar o restar? (`operation`) o ¿hay que calcular
   // el total o la diferencia? (`calculate`). Sin llevar
   | { kind: 'problem-step'; ask: 'operation' | 'calculate' }
@@ -183,9 +189,11 @@ export type BlockSpec =
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
   // sumas que no pasan de 10 y restas de números hasta el 10
   | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' | 'add-small' | 'sub-small' }
-  // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
-  // o qué resta comprueba una suma (elegir)
-  | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }
+  // La suma y la resta se relacionan (escribir): restar para comprobar (`subtract`: c − b), las dos restas de una suma
+  // (`both`: c − a o c − b), sumando que falta (`missing`: a + ▢ = c), minuendo que falta (`missing-minuend`: ▢ − b = a)
+  // o qué resta comprueba una suma (`operation`, elegir). Con `small`, números pequeños (hasta 20); con `round`,
+  // decenas redondas (hasta 90); `operation` ignora los dos
+  | { kind: 'inverse'; mode: 'subtract' | 'both' | 'missing' | 'missing-minuend' | 'operation'; small?: boolean; round?: boolean }
   // Los términos de la resta (elegir): en «38 − 13 = 25», ¿cuál es el sustraendo? (se elige un número) o ¿cómo se llama el
   // 13? (se elige minuendo, sustraendo o diferencia)
   | { kind: 'subtraction-terms' }
