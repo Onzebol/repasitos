@@ -144,6 +144,8 @@ const SPECS: BlockSpec[] = [
   { kind: 'inverse', mode: 'subtract' },
   { kind: 'inverse', mode: 'missing' },
   { kind: 'inverse', mode: 'operation' },
+  { kind: 'subtraction-terms' },
+  { kind: 'check-subtraction' },
   { kind: 'ordinal', mode: 'position' },
   { kind: 'ordinal', mode: 'name' },
   { kind: 'neighbor', mode: 'after', min: 100, max: 199 },
@@ -939,6 +941,81 @@ describe('generate: reglas de cada plantilla', () => {
       expect(a + e.answer, e.question).toBe(c)
       expect(e.answer, e.question).toBeGreaterThanOrEqual(10)
     }
+  })
+
+  describe('subtraction-terms: minuendo, sustraendo y diferencia', () => {
+    // Tabla independiente del generador: en a − b = c, a es el minuendo, b el sustraendo y c la diferencia
+    const TERMINOS = ['minuendo', 'sustraendo', 'diferencia']
+    const leer = (pregunta: string) => {
+      const m = pregunta.match(/^En (\d+) − (\d+) = (\d+), (?:¿cuál es el (\w+)\?|¿cómo se llama el (\d+)\?)$/)
+      if (!m) throw new Error(`pregunta inesperada: ${pregunta}`)
+      return { numeros: [Number(m[1]), Number(m[2]), Number(m[3])], termino: m[4], numero: m[5] === undefined ? undefined : Number(m[5]) }
+    }
+
+    it('la resta está bien hecha, sus tres números son distintos y la respuesta es el término correcto', () => {
+      for (const e of muchos({ kind: 'subtraction-terms' }).map(choice)) {
+        const { numeros, termino, numero } = leer(e.question)
+        const [a, b, c] = numeros
+        expect(a - b, e.question).toBe(c)
+        expect(new Set(numeros).size, e.question).toBe(3)
+        for (const n of numeros) expect(n, e.question).toBeGreaterThanOrEqual(10)
+        if (termino !== undefined) {
+          // por el nombre: se elige uno de los tres números
+          expect([...e.options].sort(), e.question).toEqual(numeros.map(String).sort())
+          expect(e.answer, e.question).toBe(String(numeros[TERMINOS.indexOf(termino)]))
+        } else {
+          // por el número: se elige uno de los tres nombres
+          expect([...e.options].sort(), e.question).toEqual([...TERMINOS].sort())
+          expect(e.answer, e.question).toBe(TERMINOS[numeros.indexOf(numero!)])
+        }
+      }
+    })
+
+    it('se pregunta en las dos direcciones y por los tres términos', () => {
+      const lecturas = muchos({ kind: 'subtraction-terms' }).map(choice).map((e) => leer(e.question))
+      expect(lecturas.some((l) => l.termino !== undefined)).toBe(true)
+      expect(lecturas.some((l) => l.numero !== undefined)).toBe(true)
+      // el término por el que se pregunta: el que nombra la pregunta o el que es la respuesta
+      const terminos = new Set(muchos({ kind: 'subtraction-terms' }).map(choice).map((e) => leer(e.question).termino ?? e.answer))
+      expect(terminos).toEqual(new Set(TERMINOS))
+    })
+  })
+
+  describe('check-subtraction: ¿está bien hecha la resta?', () => {
+    const leer = (visual: string | undefined) => {
+      const m = visual?.match(/^(\d+) − (\d+) = (\d+)$/)
+      if (!m) throw new Error(`resta inesperada: ${visual}`)
+      return { a: Number(m[1]), b: Number(m[2]), resultado: Number(m[3]) }
+    }
+
+    it('responde Sí solo si la resta está bien: el resultado más el sustraendo da el minuendo', () => {
+      for (const e of muchos({ kind: 'check-subtraction' }).map(choice)) {
+        const { a, b, resultado } = leer(e.visual)
+        expect(e.question).toBe('¿Está bien hecha la resta?')
+        expect([...e.options].sort()).toEqual(['No', 'Sí'])
+        expect(a, e.visual).toBeGreaterThan(b)
+        expect(resultado, e.visual).toBeGreaterThanOrEqual(1)
+        expect(resultado, e.visual).toBeLessThanOrEqual(99)
+        // la comprobación con la suma
+        expect(e.answer, e.visual).toBe(resultado + b === a ? 'Sí' : 'No')
+      }
+    })
+
+    it('hay restas bien y mal hechas, y las malas fallan de varias formas', () => {
+      const lecturas = muchos({ kind: 'check-subtraction' }).map(choice)
+      const respuestas = lecturas.map((e) => e.answer)
+      expect(respuestas.filter((r) => r === 'Sí').length).toBeGreaterThan(SEMILLAS / 4)
+      expect(respuestas.filter((r) => r === 'No').length).toBeGreaterThan(SEMILLAS / 4)
+      const errores = new Set(
+        lecturas
+          .filter((e) => e.answer === 'No')
+          .map((e) => {
+            const { a, b, resultado } = leer(e.visual)
+            return resultado - (a - b)
+          }),
+      )
+      expect(errores.size).toBeGreaterThan(2)
+    })
   })
 
   it('la operación que comprueba la suma es la única resta válida entre las opciones', () => {

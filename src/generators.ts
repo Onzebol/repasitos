@@ -166,6 +166,35 @@ const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = fal
   }
 }
 
+const TERMINOS_RESTA = ['minuendo', 'sustraendo', 'diferencia']
+
+// Una resta de dos cifras con los tres números distintos (a − b = c, con b y c de dos cifras como mínimo)
+function restaDeTresNumeros(rng: Rng): [number, number, number] {
+  for (;;) {
+    const a = int(rng, 30, 99)
+    const b = int(rng, 10, a - 10)
+    if (b !== a - b) return [a, b, a - b]
+  }
+}
+
+// En «38 − 13 = 25», ¿cuál es el sustraendo? (se elige un número) o ¿cómo se llama el 13? (se elige el término)
+function terminosDeLaResta(rng: Rng): ChoiceExercise {
+  const numeros = restaDeTresNumeros(rng)
+  const lugar = int(rng, 0, 2)
+  const resta = `En ${numeros[0]} − ${numeros[1]} = ${numeros[2]}`
+  if (pick(rng, [true, false])) return elegir(`${resta}, ¿cuál es el ${TERMINOS_RESTA[lugar]}?`, numeros, numeros[lugar])
+  return elegir(`${resta}, ¿cómo se llama el ${numeros[lugar]}?`, TERMINOS_RESTA, TERMINOS_RESTA[lugar])
+}
+
+// ¿Está bien hecha la resta? A veces el resultado está cambiado (una decena o una unidad de más o de menos, o se ha sumado en
+// vez de restar); nunca coincide con el bueno
+function restaBienHecha(rng: Rng): ChoiceExercise {
+  const [a, b, c] = restaDeTresNumeros(rng)
+  const bien = pick(rng, [true, false])
+  const mal = pick(rng, [c + 10, c - 10, c + 1, c - 1, a + b].filter((n) => n >= 1 && n <= 99 && n !== c))
+  return elegir('¿Está bien hecha la resta?', ['Sí', 'No'], bien ? 'Sí' : 'No', `${a} − ${b} = ${bien ? c : mal}`)
+}
+
 const HISTORIAS_SUMA: ((a: number, b: number) => string)[] = [
   (a, b) => `Tengo ${a} pegatinas y me regalan ${b}. ¿Cuántas tengo ahora?`,
   (a, b) => `En el parque hay ${a} niños y llegan ${b} más. ¿Cuántos hay ahora?`,
@@ -809,6 +838,12 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       const cerca = shuffle(rng, [lugar - 1, lugar + 1, lugar - 2, lugar + 2].filter((n) => n >= 0 && n <= 9)).slice(0, 2)
       return elegir(`¿Cómo se escribe "${ORDINALES[lugar]}"?`, [lugar, ...cerca].map((n) => `${n + 1}.º`), `${lugar + 1}.º`)
     }
+
+    case 'subtraction-terms':
+      return terminosDeLaResta(rng)
+
+    case 'check-subtraction':
+      return restaBienHecha(rng)
 
     case 'inverse': {
       // a + b = c, con a mayor que b y c menor que 100

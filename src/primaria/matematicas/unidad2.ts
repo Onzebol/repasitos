@@ -27,9 +27,11 @@ export const temasUnidad2: Topic[] = [
     icon: '🔄',
     tint: '#cdb9ff',
     plan: [
-      { spec: { kind: 'inverse', mode: 'subtract' }, count: 5 },
-      { spec: { kind: 'inverse', mode: 'missing' }, count: 3 },
-      { spec: { kind: 'inverse', mode: 'operation' }, count: 2 },
+      { spec: { kind: 'inverse', mode: 'subtract' }, count: 3 },
+      { spec: { kind: 'inverse', mode: 'missing' }, count: 2 },
+      { spec: { kind: 'inverse', mode: 'operation' }, count: 1 },
+      { spec: { kind: 'subtraction-terms' }, count: 2 },
+      { spec: { kind: 'check-subtraction' }, count: 2 },
     ],
   },
   {

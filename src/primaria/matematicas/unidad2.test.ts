@@ -23,11 +23,14 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(session.filter((e) => e.type === 'number')).toHaveLength(4)
   })
 
-  it('"La suma y la resta" tiene 5 restas de comprobación, 3 huecos y 2 de elegir', () => {
+  it('"La suma y la resta" tiene 3 restas de comprobación, 2 huecos, 1 resta que comprueba, 2 de términos y 2 de resta bien hecha', () => {
     const session = sesion('suma-resta')
-    expect(session.filter((e) => e.type === 'number' && e.question.includes('Entonces'))).toHaveLength(5)
-    expect(session.filter((e) => e.type === 'number' && e.question.startsWith('Completa'))).toHaveLength(3)
-    expect(session.filter((e) => e.type === 'choice')).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number' && e.question.includes('Entonces'))).toHaveLength(3)
+    expect(session.filter((e) => e.type === 'number' && e.question.startsWith('Completa'))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && e.question.startsWith('¿Qué resta comprueba'))).toHaveLength(1)
+    expect(session.filter((e) => e.type === 'choice' && /^En \d+ − \d+ = \d+, ¿/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && e.question === '¿Está bien hecha la resta?')).toHaveLength(2)
+    expect(session).toHaveLength(10)
   })
 
   it('"Ordinales" combina la fila de dibujos y los nombres', () => {

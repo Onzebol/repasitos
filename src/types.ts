@@ -186,6 +186,11 @@ export type BlockSpec =
   // La suma y la resta se relacionan: restar para comprobar (escribir), sumando que falta (escribir)
   // o qué resta comprueba una suma (elegir)
   | { kind: 'inverse'; mode: 'subtract' | 'missing' | 'operation' }
+  // Los términos de la resta (elegir): en «38 − 13 = 25», ¿cuál es el sustraendo? (se elige un número) o ¿cómo se llama el
+  // 13? (se elige minuendo, sustraendo o diferencia)
+  | { kind: 'subtraction-terms' }
+  // ¿Está bien hecha la resta? (elegir Sí o No): una resta ya hecha, a veces con el resultado cambiado; se comprueba sumando
+  | { kind: 'check-subtraction' }
   // ¿Cuántos hay? (Infantil): contar un grupo de animales dibujados y elegir la cifra (por defecto, del 1 al 7)
   | { kind: 'how-many'; min?: number; max?: number; tap?: boolean }
   // Conocimiento del medio: preguntas generadas a partir de tablas cerradas. Las opciones equivocadas salen de la propia
