@@ -27,12 +27,15 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(session.filter((e) => e.type === 'number')).toHaveLength(2)
   })
 
-  it('"La suma y la resta" tiene 4 restas de una suma, 2 sumandos que faltan, 2 minuendos que faltan y 2 de elegir', () => {
+  it('"La suma y la resta" tiene 2 restas de una suma, 2 sumandos que faltan, 1 minuendo que falta, 1 resta que comprueba, 2 de términos y 2 de resta bien hecha', () => {
     const session = sesion('suma-resta')
-    expect(session.filter((e) => e.type === 'number' && e.question.includes('Entonces'))).toHaveLength(4)
+    expect(session.filter((e) => e.type === 'number' && e.question.includes('Entonces'))).toHaveLength(2)
     expect(session.filter((e) => e.type === 'number' && /^Completa: \d+ \+ ▢/.test(e.question))).toHaveLength(2)
-    expect(session.filter((e) => e.type === 'number' && e.question.startsWith('Completa: ▢ −'))).toHaveLength(2)
-    expect(session.filter((e) => e.type === 'choice')).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number' && e.question.startsWith('Completa: ▢ −'))).toHaveLength(1)
+    expect(session.filter((e) => e.type === 'choice' && e.question.startsWith('¿Qué resta comprueba'))).toHaveLength(1)
+    expect(session.filter((e) => e.type === 'choice' && /^En \d+ − \d+ = \d+, ¿/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && e.question === '¿Está bien hecha la resta?')).toHaveLength(2)
+    expect(session).toHaveLength(10)
   })
 
   it('"La suma y la resta" empieza con sumas pequeñas, hasta 20', () => {

@@ -31,12 +31,12 @@ export const temasUnidad2: Topic[] = [
     tint: '#cdb9ff',
     plan: [
       { spec: { kind: 'inverse', mode: 'both', small: true }, count: 2 },
-      { spec: { kind: 'inverse', mode: 'both' }, count: 2 },
       { spec: { kind: 'inverse', mode: 'missing' }, count: 1 },
       { spec: { kind: 'inverse', mode: 'missing', round: true }, count: 1 },
       { spec: { kind: 'inverse', mode: 'missing-minuend' }, count: 1 },
-      { spec: { kind: 'inverse', mode: 'missing-minuend', round: true }, count: 1 },
-      { spec: { kind: 'inverse', mode: 'operation' }, count: 2 },
+      { spec: { kind: 'inverse', mode: 'operation' }, count: 1 },
+      { spec: { kind: 'subtraction-terms' }, count: 2 },
+      { spec: { kind: 'check-subtraction' }, count: 2 },
     ],
   },
   {

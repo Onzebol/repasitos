@@ -194,6 +194,11 @@ export type BlockSpec =
   // o qué resta comprueba una suma (`operation`, elegir). Con `small`, números pequeños (hasta 20); con `round`,
   // decenas redondas (hasta 90); `operation` ignora los dos
   | { kind: 'inverse'; mode: 'subtract' | 'both' | 'missing' | 'missing-minuend' | 'operation'; small?: boolean; round?: boolean }
+  // Los términos de la resta (elegir): en «38 − 13 = 25», ¿cuál es el sustraendo? (se elige un número) o ¿cómo se llama el
+  // 13? (se elige minuendo, sustraendo o diferencia)
+  | { kind: 'subtraction-terms' }
+  // ¿Está bien hecha la resta? (elegir Sí o No): una resta ya hecha, a veces con el resultado cambiado; se comprueba sumando
+  | { kind: 'check-subtraction' }
   // ¿Cuántos hay? (Infantil): contar un grupo de animales dibujados y elegir la cifra (por defecto, del 1 al 7)
   | { kind: 'how-many'; min?: number; max?: number; tap?: boolean }
   // Conocimiento del medio: preguntas generadas a partir de tablas cerradas. Las opciones equivocadas salen de la propia
