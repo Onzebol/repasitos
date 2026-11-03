@@ -73,12 +73,17 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
 
   it('"Ordinales" combina la fila de dibujos (sola y con «el tercer dibujo»), leer símbolos y escribir nombres, en masculino y femenino', () => {
     const session = sesion('ordinales')
-    expect(session.filter((e) => e.type === 'choice' && e.visual)).toHaveLength(6)
-    expect(session.filter((e) => e.type === 'choice' && !e.visual)).toHaveLength(4)
+    expect(session).toHaveLength(10)
+    expect(session.filter((e) => e.type === 'choice' && e.visual)).toHaveLength(3)
+    expect(session.filter((e) => e.type === 'choice' && !e.visual)).toHaveLength(7)
     const preguntas = session.map((e) => e.question)
-    // la fila de dibujos: 4 con «el quinto» y 2 con sustantivo
-    expect(preguntas.filter((q) => /^Desde la izquierda, ¿cuál es el \S+\?$/.test(q))).toHaveLength(4)
-    expect(preguntas.filter((q) => /^Desde la izquierda, ¿cuál es (el|la) \S+ (dibujo|figura)\?$/.test(q))).toHaveLength(2)
+    // la fila de dibujos: 2 con «el quinto» y 1 con sustantivo
+    expect(preguntas.filter((q) => /^Desde la izquierda, ¿cuál es el \S+\?$/.test(q))).toHaveLength(2)
+    expect(preguntas.filter((q) => /^Desde la izquierda, ¿cuál es (el|la) \S+ (dibujo|figura)\?$/.test(q))).toHaveLength(1)
+    // razonar con ordinales: la lista de llegada (con su texto de lectura) y los pisos de un edificio
+    const llegada = session.filter((e) => e.type === 'choice' && e.text?.startsWith('Llegada: '))
+    expect(llegada).toHaveLength(2)
+    expect(preguntas.filter((q) => /^¿Qué piso está (un piso|dos pisos) por (encima|debajo) del \d+º\?$/.test(q))).toHaveLength(1)
     // símbolo → palabra: uno en masculino y otro en femenino
     expect(preguntas.filter((q) => /^¿Cómo se lee \d+º\?$/.test(q))).toHaveLength(1)
     expect(preguntas.filter((q) => /^¿Cómo se lee \d+ª\?$/.test(q))).toHaveLength(1)

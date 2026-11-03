@@ -183,6 +183,8 @@ const SPECS: BlockSpec[] = [
   { kind: 'ordinal', mode: 'read', feminine: true },
   { kind: 'ordinal', mode: 'name', feminine: true },
   { kind: 'ordinal', mode: 'position', noun: true },
+  { kind: 'ordinal', mode: 'ranking' },
+  { kind: 'ordinal', mode: 'floors' },
   { kind: 'neighbor', mode: 'after', min: 100, max: 199 },
   { kind: 'neighbor', mode: 'before', min: 100, max: 199 },
   { kind: 'neighbor', mode: 'between', min: 100, max: 199 },
@@ -1646,6 +1648,117 @@ describe('generate: reglas de cada plantilla', () => {
       expect(vistos.has('la primera')).toBe(true)
       expect(vistos.has('la tercera')).toBe(true)
       expect(vistos.has('el segundo')).toBe(true)
+    })
+  })
+
+  describe('ordinales para razonar: una clasificación y los pisos de un edificio', () => {
+    describe('ranking: la lista de llegada de nueve animales', () => {
+      const fuente = new Set(emojisDeLaFuente(emojiFont))
+      // La lista de llegada en la tarjeta de lectura: «Llegada: 1º 🐘 · 2º 🐰 · … · 9º 🐷»
+      const lista = (texto: string) => {
+        const m = texto.match(/^Llegada: (.+)$/)
+        expect(m, texto).not.toBeNull()
+        const puestos = m![1].split(' · ').map((p) => p.match(/^(\d)º (\S+)$/))
+        expect(puestos, texto).toHaveLength(9)
+        return puestos.map((p, i) => {
+          expect(p, texto).not.toBeNull()
+          expect(Number(p![1]), texto).toBe(i + 1)
+          return p![2]
+        })
+      }
+
+      it('la lista tiene nueve animales distintos, numerados del 1º al 9º, y todos están en la fuente de emojis', () => {
+        for (const e of muchos({ kind: 'ordinal', mode: 'ranking' }).map(choice)) {
+          const animales = lista(e.text!)
+          expect(new Set(animales).size, e.text).toBe(9)
+          for (const animal of animales) expect(fuente.has(animal), `${animal} no está en la fuente`).toBe(true)
+        }
+      })
+
+      it('las tres preguntas (quién llegó, en qué puesto, cuántos llegaron después) se resuelven con la lista', () => {
+        const tipos = new Set<number>()
+        const puestos = new Set<number>()
+        for (const e of muchos({ kind: 'ordinal', mode: 'ranking' }).map(choice)) {
+          const animales = lista(e.text!)
+          expect(e.options, e.question).toHaveLength(3)
+          const quien = e.question.match(/^¿Quién llegó el (\d)º\?$/)
+          const puesto = e.question.match(/^¿En qué puesto llegó el (\S+)\?$/)
+          const despues = e.question.match(/^Si el (\S+) llegó el (\d)º, ¿cuántos llegaron después\?$/)
+          expect([quien, puesto, despues].filter(Boolean), e.question).toHaveLength(1)
+          if (quien) {
+            tipos.add(0)
+            // la respuesta es el animal de ese puesto y las otras opciones también están en la lista
+            expect(e.answer, e.question).toBe(animales[Number(quien[1]) - 1])
+            for (const opcion of e.options) expect(animales, e.question).toContain(opcion)
+            puestos.add(Number(quien[1]))
+          } else if (puesto) {
+            tipos.add(1)
+            expect(animales, e.question).toContain(puesto[1])
+            expect(e.answer, e.question).toBe(`${animales.indexOf(puesto[1]) + 1}º`)
+            for (const opcion of e.options) expect(opcion, e.question).toMatch(/^[1-9]º$/)
+          } else {
+            tipos.add(2)
+            const [, animal, p] = despues!
+            expect(animales.indexOf(animal) + 1, e.question).toBe(Number(p))
+            // después = total − puesto, con el puesto del 1º al 8º (el 9º no tiene a nadie detrás)
+            expect(Number(p), e.question).toBeLessThanOrEqual(8)
+            expect(e.answer, e.question).toBe(String(9 - Number(p)))
+            for (const opcion of e.options) expect(Number(opcion), e.question).toBeGreaterThanOrEqual(1)
+          }
+        }
+        expect(tipos).toEqual(new Set([0, 1, 2]))
+        expect(puestos.size).toBeGreaterThanOrEqual(7)
+      })
+    })
+
+    describe('floors: un piso por encima o por debajo', () => {
+      it('un o dos pisos, por encima o por debajo, entre el 1º y el 10º, con tres opciones y una sola correcta', () => {
+        const casos = new Set<string>()
+        for (const e of muchos({ kind: 'ordinal', mode: 'floors' }).map(choice)) {
+          const m = e.question.match(/^¿Qué piso está (un piso|dos pisos) por (encima|debajo) del (\d+)º\?$/)
+          expect(m, e.question).not.toBeNull()
+          const distancia = m![1] === 'un piso' ? 1 : 2
+          const base = Number(m![3])
+          expect(base, e.question).toBeGreaterThanOrEqual(1)
+          expect(base, e.question).toBeLessThanOrEqual(10)
+          const esperado = m![2] === 'encima' ? base + distancia : base - distancia
+          expect(esperado, e.question).toBeGreaterThanOrEqual(1)
+          expect(esperado, e.question).toBeLessThanOrEqual(10)
+          expect(e.answer, e.question).toBe(`${esperado}º`)
+          expect(e.options, e.question).toHaveLength(3)
+          for (const opcion of e.options) {
+            const n = Number(opcion.replace('º', ''))
+            expect(opcion, e.question).toMatch(/^(10|[1-9])º$/)
+            expect(n >= 1 && n <= 10, e.question).toBe(true)
+          }
+          casos.add(`${distancia} ${m![2]}`)
+        }
+        // salen los cuatro casos: un piso y dos pisos, por encima y por debajo
+        expect(casos).toEqual(new Set(['1 encima', '1 debajo', '2 encima', '2 debajo']))
+      })
+
+      it('salen el 1º y el 10º como piso de partida y como respuesta', () => {
+        const ejercicios = muchos({ kind: 'ordinal', mode: 'floors' }).map(choice)
+        expect(ejercicios.some((e) => / del 10º\?$/.test(e.question))).toBe(true)
+        expect(ejercicios.some((e) => / del 1º\?$/.test(e.question))).toBe(true)
+        expect(ejercicios.some((e) => e.answer === '10º')).toBe(true)
+        expect(ejercicios.some((e) => e.answer === '1º')).toBe(true)
+      })
+
+      it('una de las opciones equivocadas es la del lado contrario (encima ↔ debajo) cuando cabe', () => {
+        let conTrampa = 0
+        for (const e of muchos({ kind: 'ordinal', mode: 'floors' }).map(choice)) {
+          const m = e.question.match(/^¿Qué piso está (un piso|dos pisos) por (encima|debajo) del (\d+)º\?$/)!
+          const distancia = m[1] === 'un piso' ? 1 : 2
+          const base = Number(m[3])
+          const contrario = m[2] === 'encima' ? base - distancia : base + distancia
+          if (contrario >= 1 && contrario <= 10) {
+            expect(e.options, e.question).toContain(`${contrario}º`)
+            conTrampa++
+          }
+        }
+        expect(conTrampa).toBeGreaterThan(SEMILLAS / 2)
+      })
     })
   })
 
