@@ -144,6 +144,12 @@ const SPECS: BlockSpec[] = [
   { kind: 'inverse', mode: 'subtract' },
   { kind: 'inverse', mode: 'missing' },
   { kind: 'inverse', mode: 'operation' },
+  { kind: 'inverse', mode: 'both' },
+  { kind: 'inverse', mode: 'both', small: true },
+  { kind: 'inverse', mode: 'missing', small: true },
+  { kind: 'inverse', mode: 'missing', round: true },
+  { kind: 'inverse', mode: 'missing-minuend' },
+  { kind: 'inverse', mode: 'missing-minuend', round: true },
   { kind: 'ordinal', mode: 'position' },
   { kind: 'ordinal', mode: 'name' },
   { kind: 'neighbor', mode: 'after', min: 100, max: 199 },
@@ -930,6 +936,59 @@ describe('generate: reglas de cada plantilla', () => {
       expect([c2, b2], e.question).toEqual([c, b])
       expect(e.answer, e.question).toBe(a)
       expect(c, e.question).toBeLessThanOrEqual(99)
+    }
+  })
+
+  it('both: de a + b = c salen las dos restas, c − a o c − b', () => {
+    const quitados = new Set<'primero' | 'segundo'>()
+    for (const e of muchos({ kind: 'inverse', mode: 'both' }).map(number)) {
+      const [a, b, c, c2, x] = e.question.match(/\d+/g)!.map(Number)
+      expect(a + b, e.question).toBe(c)
+      expect(c2, e.question).toBe(c)
+      expect([a, b], e.question).toContain(x)
+      expect(e.answer, e.question).toBe(c - x)
+      // la respuesta es el otro sumando
+      expect(e.answer, e.question).toBe(x === a ? b : a)
+      quitados.add(x === a ? 'primero' : 'segundo')
+    }
+    expect(quitados).toEqual(new Set(['primero', 'segundo']))
+  })
+
+  it('small: los números de la suma no pasan de 20, como 7 + 4 = 11', () => {
+    for (const e of muchos({ kind: 'inverse', mode: 'both', small: true }).map(number)) {
+      const [a, b, c] = e.question.match(/\d+/g)!.map(Number)
+      expect(a + b, e.question).toBe(c)
+      expect(Math.min(a, b), e.question).toBeGreaterThanOrEqual(2)
+      expect(c, e.question).toBeLessThanOrEqual(20)
+    }
+    for (const modo of ['missing', 'missing-minuend'] as const) {
+      for (const e of muchos({ kind: 'inverse', mode: modo, small: true }).map(number)) {
+        for (const n of [...e.question.match(/\d+/g)!.map(Number), e.answer]) expect(n, e.question).toBeLessThanOrEqual(20)
+      }
+    }
+  })
+
+  it('round: con decenas redondas todos los números son múltiplos de 10', () => {
+    for (const modo of ['both', 'missing', 'missing-minuend'] as const) {
+      for (const e of muchos({ kind: 'inverse', mode: modo, round: true }).map(number)) {
+        for (const n of [...e.question.match(/\d+/g)!.map(Number), e.answer]) {
+          expect(n % 10, e.question).toBe(0)
+          expect(n, e.question).toBeGreaterThanOrEqual(10)
+          expect(n, e.question).toBeLessThanOrEqual(90)
+        }
+      }
+    }
+  })
+
+  it('missing-minuend: el minuendo que falta es el resultado más el sustraendo (▢ − 10 = 20)', () => {
+    for (const e of muchos({ kind: 'inverse', mode: 'missing-minuend' }).map(number)) {
+      const m = e.question.match(/^Completa: ▢ − (\d+) = (\d+)$/)
+      expect(m, e.question).not.toBeNull()
+      const [b, resultado] = [Number(m![1]), Number(m![2])]
+      expect(e.answer - b, e.question).toBe(resultado)
+      expect(e.answer, e.question).toBeLessThanOrEqual(99)
+      expect(b, e.question).toBeGreaterThanOrEqual(10)
+      expect(resultado, e.question).toBeGreaterThanOrEqual(10)
     }
   })
 

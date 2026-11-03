@@ -186,6 +186,35 @@ const problema = (operator: '+' | '−', carry: boolean, rng: Rng): NumberExerci
   return numero(historia(a, b), operator === '+' ? a + b : a - b)
 }
 
+// Los dos sumandos de a + b = c. Por defecto a mayor que b y c menor que 100; con `small`, números pequeños (c hasta 20,
+// como 7 + 4 = 11); con `round`, decenas redondas (c hasta 90, como 40 + 30 = 70). `round` manda sobre `small`
+function terminosInversos(rng: Rng, small = false, round = false): [number, number] {
+  if (round) {
+    const a = int(rng, 1, 8)
+    return [a * 10, int(rng, 1, 9 - a) * 10]
+  }
+  if (small) {
+    const a = int(rng, 3, 15)
+    return [a, int(rng, 2, 20 - a)]
+  }
+  const a = int(rng, 20, 89)
+  return [a, int(rng, 10, Math.min(a - 1, 99 - a))]
+}
+
+// La suma y la resta se relacionan: de a + b = c salen c − b (`subtract`), c − a o c − b (`both`), el sumando que falta
+// (`missing`), el minuendo que falta en ▢ − b = a (`missing-minuend`) y qué resta comprueba la suma (`operation`)
+function inversa(mode: 'subtract' | 'both' | 'missing' | 'missing-minuend' | 'operation', a: number, b: number, rng: Rng): Exercise {
+  const c = a + b
+  if (mode === 'subtract') return numero(`${a} + ${b} = ${c}. Entonces, ${c} − ${b} =`, a)
+  if (mode === 'both') {
+    const [quitado, queda] = pick(rng, [[b, a], [a, b]])
+    return numero(`${a} + ${b} = ${c}. Entonces, ${c} − ${quitado} =`, queda)
+  }
+  if (mode === 'missing') return numero(`Completa: ${a} + ▢ = ${c}`, b)
+  if (mode === 'missing-minuend') return numero(`Completa: ▢ − ${b} = ${a}`, c)
+  return elegir(`¿Qué resta comprueba que ${a} + ${b} = ${c}?`, [`${c} − ${b}`, `${a} − ${b}`, `${c} + ${b}`], `${c} − ${b}`)
+}
+
 // Los pasos de un problema: con el texto en la tarjeta de lectura, se elige qué operación hay que hacer o qué se calcula
 function pasoDeProblema(ask: 'operation' | 'calculate', rng: Rng): ChoiceExercise {
   const operator = pick(rng, ['+', '−'] as const)
@@ -811,13 +840,9 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'inverse': {
-      // a + b = c, con a mayor que b y c menor que 100
-      const a = int(rng, 20, 89)
-      const b = int(rng, 10, Math.min(a - 1, 99 - a))
-      const c = a + b
-      if (spec.mode === 'subtract') return numero(`${a} + ${b} = ${c}. Entonces, ${c} − ${b} =`, a)
-      if (spec.mode === 'missing') return numero(`Completa: ${a} + ▢ = ${c}`, b)
-      return elegir(`¿Qué resta comprueba que ${a} + ${b} = ${c}?`, [`${c} − ${b}`, `${a} − ${b}`, `${c} + ${b}`], `${c} − ${b}`)
+      // `operation` usa siempre el rango por defecto: sus opciones equivocadas (a − b) lo necesitan
+      const [a, b] = spec.mode === 'operation' ? terminosInversos(rng) : terminosInversos(rng, spec.small, spec.round)
+      return inversa(spec.mode, a, b, rng)
     }
 
     case 'hundreds': {
