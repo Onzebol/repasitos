@@ -142,10 +142,15 @@ function sumandosLlevando(rng: Rng): [number, number] {
 
 const operandosLlevando = (operator: '+' | '−', rng: Rng) => (operator === '+' ? sumandosLlevando(rng) : restandosLlevando(rng))
 
-// Un número de dos cifras y otro de una, sin llevar: 83 + 5 (las unidades suman menos de 10) o 87 − 5 (las unidades alcanzan)
-function operandosUnaCifra(operator: '+' | '−', rng: Rng): [number, number] {
+// Un número de dos cifras y otro de una: 83 + 5 (las unidades suman menos de 10) o 87 − 5 (las unidades alcanzan).
+// Con `carry` (solo sumas) las unidades suman 10 o más: 87 + 9
+function operandosUnaCifra(operator: '+' | '−', rng: Rng, carry = false): [number, number] {
   const topTens = int(rng, 1, 9)
   if (operator === '+') {
+    if (carry) {
+      const topUnits = int(rng, 1, 9)
+      return [topTens * 10 + topUnits, int(rng, 10 - topUnits, 9)]
+    }
     const topUnits = int(rng, 0, 8)
     return [topTens * 10 + topUnits, int(rng, 1, 9 - topUnits)]
   }
@@ -154,7 +159,7 @@ function operandosUnaCifra(operator: '+' | '−', rng: Rng): [number, number] {
 }
 
 const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = false): ColumnExercise => {
-  const [top, bottom] = oneDigit ? operandosUnaCifra(operator, rng) : carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
+  const [top, bottom] = oneDigit ? operandosUnaCifra(operator, rng, carry) : carry ? operandosLlevando(operator, rng) : operandos(operator, rng)
   return {
     type: 'column',
     question: operator === '+' ? 'Suma en columna' : 'Resta en columna',
@@ -164,6 +169,18 @@ const columna = (operator: '+' | '−', carry: boolean, rng: Rng, oneDigit = fal
     answer: operator === '+' ? top + bottom : top - bottom,
     ...(carry && { carry }),
   }
+}
+
+// ¿Qué suma es llevando? Tres sumas de dos números de dos cifras: una lleva (las unidades suman 10 o más) y las otras dos no.
+// Ninguna pasa de 99, para que el tamaño del resultado no delate cuál es
+function sumaQueLleva(rng: Rng): ChoiceExercise {
+  const escrita = ([a, b]: [number, number]) => `${a} + ${b}`
+  let llevando = sumandosLlevando(rng)
+  while (llevando[0] + llevando[1] > 99) llevando = sumandosLlevando(rng)
+  const respuesta = escrita(llevando)
+  const otras = new Set<string>()
+  while (otras.size < 2) otras.add(escrita(sumandos(rng)))
+  return elegir('¿Qué suma es llevando?', shuffle(rng, [respuesta, ...otras]), respuesta)
 }
 
 const HISTORIAS_SUMA: ((a: number, b: number) => string)[] = [
@@ -560,6 +577,9 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
 
     case 'column':
       return columna(spec.operator, spec.carry ?? false, rng, spec.oneDigit ?? false)
+
+    case 'carry-spot':
+      return sumaQueLleva(rng)
 
     case 'problem-step':
       return pasoDeProblema(spec.ask, rng)
