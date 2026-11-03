@@ -198,8 +198,10 @@ export type BlockSpec =
   // ejercicio); `sum`: sumar dos figuras (escribir) y `find`: «🟩 + ❓ = 7», qué figura falta (elegir entre tres)
   | { kind: 'shape-sum'; ask: 'sum' | 'find' }
   // Cálculo mental: sumar o restar pasando la decena, o con decenas exactas (escribir); `add-small` y `sub-small`:
-  // sumas que no pasan de 10 y restas de números hasta el 10
-  | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'add-digit' | 'add-small' | 'sub-small' }
+  // sumas que no pasan de 10 y restas de números hasta el 10. Con tres sumandos (unidad 2): `add-three` suma tres números,
+  // `missing-three` busca el que falta («4 + ▢ + 3 = 11», total de 10 a 13; escribir) y `compare-ten` elige si la suma de tres
+  // números del 1 al 6 es menor o mayor que 10 (elegir `<` o `>`; nunca da 10)
+  | { kind: 'mental'; mode: 'add-bridge' | 'sub-bridge' | 'tens-add' | 'tens-sub' | 'add-three' | 'missing-three' | 'compare-ten' | 'add-digit' | 'add-small' | 'sub-small' }
   // La suma y la resta se relacionan (escribir): restar para comprobar (`subtract`: c − b), las dos restas de una suma
   // (`both`: c − a o c − b), sumando que falta (`missing`: a + ▢ = c), minuendo que falta (`missing-minuend`: ▢ − b = a)
   // o qué resta comprueba una suma (`operation`, elegir). Con `small`, números pequeños (hasta 20); con `round`,

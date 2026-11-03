@@ -1027,6 +1027,29 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     }
 
     case 'mental': {
+      if (spec.mode === 'missing-three') {
+        // El sumando que falta de tres: «5 + 1 + ▢ = 10», «4 + ▢ + 3 = 11» o al revés, «12 = 6 + 5 + ▢». Sumandos de 1 a 9 y
+        // total de 10 a 13; el hueco sale en cualquiera de las tres posiciones
+        let terminos: number[]
+        let total: number
+        do {
+          terminos = [0, 1, 2].map(() => int(rng, 1, 9))
+          total = terminos[0] + terminos[1] + terminos[2]
+        } while (total < 10 || total > 13)
+        const hueco = int(rng, 0, 2)
+        const suma = terminos.map((n, i) => (i === hueco ? '▢' : String(n))).join(' + ')
+        return numero(pick(rng, [true, false]) ? `Completa: ${total} = ${suma}` : `Completa: ${suma} = ${total}`, terminos[hueco])
+      }
+      if (spec.mode === 'compare-ten') {
+        // ¿Menor o mayor que 10? Tres números del 1 al 6, y la suma nunca es exactamente 10 (no hay signo «=»)
+        let numeros: number[]
+        let suma: number
+        do {
+          numeros = [0, 1, 2].map(() => int(rng, 1, 6))
+          suma = numeros[0] + numeros[1] + numeros[2]
+        } while (suma === 10)
+        return elegir('¿Qué signo va en el recuadro?', ['>', '<'], suma > 10 ? '>' : '<', `${numeros.join(' + ')}  ❓  10`)
+      }
       if (spec.mode === 'add-small') {
         // Sin pasar de 10: 3 + 4, 6 + 2
         const a = int(rng, 1, 8)
