@@ -365,6 +365,8 @@ function familia(spec: { ask: 'sum' | 'subtract'; drawing?: boolean }, rng: Rng)
     correcta,
     `${uno.repeat(a)}  ${otro.repeat(b)}`,
   )
+}
+
 // Las actividades de la tabla de «información con números» (dibujo y cómo se nombra, sin « y » para no liar las etiquetas)
 const ACTIVIDADES = [
   { emoji: '🏃', nombre: 'correr' },

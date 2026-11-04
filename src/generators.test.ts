@@ -815,6 +815,8 @@ describe('generate: reglas de cada plantilla', () => {
         }
       })
     }
+  })
+
   describe('tabla de actividades con números (información con números)', () => {
     const ACTIVIDADES = ['🏃', '🎮', '📚', '🎨', '⚽', '🚲', '🏊', '🎵']
 

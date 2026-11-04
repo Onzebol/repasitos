@@ -696,6 +696,8 @@ body {
 
 .t99-ciento .c {
   font-size: clamp(0.6rem, 2.5vw, 0.95rem);
+}
+
 /* Información con números (CodeTable): tabla de 2 × 2 con un dibujo por casilla y la leyenda de números debajo */
 .code-box {
   width: 100%;
