@@ -580,6 +580,23 @@ function problemaComparar(ask: 'operation' | 'calculate', carry: boolean, rng: R
   return { ...elegir('¿Hay que sumar o restar?', ['sumar', 'restar'], mas ? 'sumar' : 'restar'), text: historia }
 }
 
+// Cantidades encadenadas (el rincón de la lógica): hay a peces amarillos, b peces rojos más que amarillos y c peces azules menos que
+// rojos. Se elige cuántos rojos (`second`: a + b) o cuántos azules (`third`: a + b − c). Datos de 2 a 5 y resultados positivos;
+// las opciones equivocadas son los errores típicos: repetir un dato, restar en vez de sumar o dejarse un paso
+function cantidadesEncadenadas(ask: 'second' | 'third', rng: Rng): ChoiceExercise {
+  const a = int(rng, 2, 5)
+  const b = int(rng, 2, 5)
+  const c = int(rng, 2, Math.min(5, a + b - 1))
+  const rojos = a + b
+  const respuesta = ask === 'second' ? rojos : rojos - c
+  const trampas = ask === 'second' ? [a, b, Math.abs(a - b), rojos + 1] : [rojos, c, rojos + c, a]
+  const equivocadas = shuffle(rng, [...new Set(trampas)].filter((n) => n >= 1 && n !== respuesta)).slice(0, 2)
+  return {
+    ...elegir(ask === 'second' ? '¿Cuántos peces rojos hay?' : '¿Cuántos peces azules hay?', shuffle(rng, [respuesta, ...equivocadas]), respuesta),
+    text: `Hay ${a} peces amarillos. Hay ${b} peces rojos más que amarillos. Hay ${c} peces azules menos que rojos.`,
+  }
+}
+
 // Los pasos de un problema: con el texto en la tarjeta de lectura, se elige qué operación hay que hacer o qué se calcula
 function pasoDeProblema(ask: 'operation' | 'calculate', rng: Rng, faltan = false): ChoiceExercise {
   const operator = faltan ? '−' : pick(rng, ['+', '−'] as const)
@@ -1070,6 +1087,8 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
 
     case 'compare-problem':
       return problemaComparar(spec.ask, spec.carry ?? false, rng)
+    case 'chain':
+      return cantidadesEncadenadas(spec.ask, rng)
 
     case 'problem-step':
       return pasoDeProblema(spec.ask, rng, spec.faltan ?? false)

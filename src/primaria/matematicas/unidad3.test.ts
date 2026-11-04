@@ -13,7 +13,7 @@ const sesion = (id: string, seed = 3) => buildSession(temasUnidad3.find((topic) 
 
 describe('Unidad 3 de Matemáticas: contenido', () => {
   it('tiene los cuatro temas de la issue y está registrada en la unidad 3', () => {
-    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'centenas-decenas-unidades', 'el-litro', 'mas-menos-que', 'calculo-mental'])
+    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'centenas-decenas-unidades', 'el-litro', 'mas-menos-que', 'desafios-y-logica', 'calculo-mental'])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u3')!.topics).toBe(temasUnidad3)
   })
 
@@ -67,6 +67,14 @@ describe('Unidad 3 de Matemáticas: contenido', () => {
     expect(elegir).toHaveLength(3)
     for (const e of elegir) expect(e.type === 'choice' && e.text, e.question).toMatch(/(más|menos)\. ¿/)
     expect(session.filter((e) => e.type === 'number')).toHaveLength(7)
+  })
+
+  it('"Desafíos y lógica" encadena «más que» y «menos que»: 5 de cuántos rojos y 5 de cuántos azules, con el texto a la vista', () => {
+    const session = sesion('desafios-y-logica')
+    expect(session).toHaveLength(10)
+    expect(session.filter((e) => e.question === '¿Cuántos peces rojos hay?')).toHaveLength(5)
+    expect(session.filter((e) => e.question === '¿Cuántos peces azules hay?')).toHaveLength(5)
+    for (const e of session) expect(e.type === 'choice' && e.text, e.question).toBeTruthy()
   })
 
   it('"El litro" pregunta por capacidades y por litros', () => {
