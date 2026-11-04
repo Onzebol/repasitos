@@ -215,8 +215,13 @@ function sumandosLlevando(rng: Rng): [number, number] {
 const operandosLlevando = (operator: '+' | '−', rng: Rng) => (operator === '+' ? sumandosLlevando(rng) : restandosLlevando(rng))
 
 // Un número de dos cifras y otro de una: 83 + 5 (las unidades suman menos de 10) o 87 − 5 (las unidades alcanzan).
-// Con `carry` (solo sumas) las unidades suman 10 o más: 87 + 9
+// Con `carry` las unidades suman 10 o más en las sumas (87 + 9) y en las restas las del minuendo son menores que el sustraendo
+// de una cifra (65 − 8, se pide una decena; el minuendo es de 20 o más para que el resultado tenga dos cifras)
 function operandosUnaCifra(operator: '+' | '−', rng: Rng, carry = false): [number, number] {
+  if (operator === '−' && carry) {
+    const bottom = int(rng, 2, 9)
+    return [int(rng, 2, 9) * 10 + int(rng, 0, bottom - 1), bottom]
+  }
   const topTens = int(rng, 1, 9)
   if (operator === '+') {
     if (carry) {

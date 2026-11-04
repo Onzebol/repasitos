@@ -48,10 +48,12 @@ export const temasUnidad3: Topic[] = [
     icon: '➖',
     tint: '#cdb9ff',
     plan: [
-      { spec: { kind: 'column', operator: '−', carry: true }, count: 4 },
+      { spec: { kind: 'column', operator: '−', carry: true }, count: 3 },
+      { spec: { kind: 'column', operator: '−', carry: true, oneDigit: true }, count: 1 },
       { spec: { kind: 'carry-spot', operator: '−' }, count: 1 },
       { spec: { kind: 'carry-spot', operator: '−', ask: 'type' }, count: 1 },
-      { spec: { kind: 'word-problem', operator: '−', carry: true }, count: 4 },
+      { spec: { kind: 'word-problem', operator: '−', carry: true }, count: 2 },
+      { spec: { kind: 'word-problem', operator: '−', carry: true, faltan: true }, count: 2 },
     ],
   },
   {
