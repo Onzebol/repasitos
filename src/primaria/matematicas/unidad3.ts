@@ -53,8 +53,10 @@ export const temasUnidad3: Topic[] = [
       { spec: { kind: 'column', operator: '−', carry: true, oneDigit: true }, count: 1 },
       { spec: { kind: 'carry-spot', operator: '−' }, count: 1 },
       { spec: { kind: 'carry-spot', operator: '−', ask: 'type' }, count: 1 },
-      { spec: { kind: 'word-problem', operator: '−', carry: true }, count: 2 },
-      { spec: { kind: 'word-problem', operator: '−', carry: true, faltan: true }, count: 2 },
+      { spec: { kind: 'borrow-condition', ask: 'minuend-digit', carry: false }, count: 1 },
+      { spec: { kind: 'borrow-condition', ask: 'subtrahend', carry: true }, count: 1 },
+      { spec: { kind: 'word-problem', operator: '−', carry: true }, count: 1 },
+      { spec: { kind: 'word-problem', operator: '−', carry: true, faltan: true }, count: 1 },
     ],
   },
   {

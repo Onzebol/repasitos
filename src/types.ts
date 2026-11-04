@@ -188,6 +188,9 @@ export type BlockSpec =
   // Con `operator: '−'` (unidad 3): ¿qué resta es llevando? (tres restas, una sola lleva: las unidades del minuendo son menores
   // que las del sustraendo) o, con `ask: 'type'`, una resta ya hecha (85 − 67 = 18) y se elige «Sin llevar» o «Llevando»
   | { kind: 'carry-spot'; operator?: '+' | '−'; ask?: 'pick' | 'type' }
+  // Completar una resta para que lleve o no (unidad 3, pp. 55 y 70; elegir): `minuend-digit` completa la cifra de las unidades del
+  // minuendo («4❓ − 14») y `subtrahend` elige el número que se resta («57 − ❓»); de tres números solo uno cumple `carry`
+  | { kind: 'borrow-condition'; ask: 'minuend-digit' | 'subtrahend'; carry: boolean }
   // Pasos de un problema (elegir): a partir de un texto corto, ¿hay que sumar o restar? (`operation`) o ¿hay que calcular
   // el total o la diferencia? (`calculate`). Sin llevar. Con `faltan` (unidad 2) solo salen restas de «¿cuántos faltan?»:
   // hace falta un total, ya hay una parte y se pregunta cuántos faltan
