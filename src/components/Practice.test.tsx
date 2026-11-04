@@ -376,6 +376,19 @@ describe('Practice: ejercicios con un texto para leer', () => {
     expect(speak).toHaveBeenLastCalledWith('La tortuga va al río. Camina muy despacio. ¿Adónde va la tortuga?')
   })
 
+  it('una suma en columna también puede llevar texto: se ve sobre la pregunta y el botón de escuchar lo lee', async () => {
+    const columnaConTexto = topicFrom([
+      { type: 'column', question: 'Suma el número mayor y el menor.', text: 'Números de la bandera: 65 · 23 · 88 · 11', operator: '+', top: 88, bottom: 11, answer: 99 },
+    ])
+    render(<Practice topic={columnaConTexto} onHome={vi.fn()} onBack={vi.fn()} />)
+    const texto = screen.getByText('Números de la bandera: 65 · 23 · 88 · 11')
+    expect(texto).toHaveClass('reading-text')
+    const pregunta = screen.getByRole('heading', { name: 'Suma el número mayor y el menor.' })
+    expect(texto.compareDocumentPosition(pregunta) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Escuchar' }))
+    expect(speak).toHaveBeenLastCalledWith('Números de la bandera: 65 · 23 · 88 · 11 Suma el número mayor y el menor.')
+  })
+
   it('sin texto, escucha solo la pregunta y no aparece la tarjeta de lectura', async () => {
     render(<Practice topic={tema} onHome={vi.fn()} onBack={vi.fn()} />)
     await userEvent.setup().click(screen.getByRole('button', { name: 'Escuchar' }))

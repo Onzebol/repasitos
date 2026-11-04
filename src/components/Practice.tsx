@@ -139,7 +139,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
     </p>
   )
 
-  const texto = exercise.type === 'choice' ? exercise.text : undefined
+  const texto = exercise.type === 'choice' || exercise.type === 'column' ? exercise.text : undefined
   const lectura = texto && <p className="reading-text">{texto}</p>
   const marcas = exercise.type === 'choice' ? exercise.table : undefined
   const tablaDeCodigos = exercise.type === 'choice' ? exercise.codeTable : undefined

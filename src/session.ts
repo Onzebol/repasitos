@@ -28,7 +28,7 @@ export function exerciseKey(exercise: Exercise): string {
     case 'table-paint':
       return JSON.stringify([exercise.type, exercise.question, exercise.targets])
     case 'column':
-      return JSON.stringify([exercise.type, exercise.operator, exercise.top, exercise.bottom, exercise.third ?? 0, exercise.carry ?? false])
+      return JSON.stringify([exercise.type, exercise.operator, exercise.top, exercise.bottom, exercise.third ?? 0, exercise.carry ?? false, ...(exercise.text === undefined ? [] : [exercise.text])])
   }
 }
 

@@ -95,6 +95,8 @@ export type ColumnExercise = {
   top: number
   bottom: number
   third?: number
+  // Texto para leer antes de calcular (los números de la bandera, unidad 2): se ve sobre la pregunta, como en los ejercicios de elegir
+  text?: string
   answer: number
   carry?: boolean
 }
@@ -224,6 +226,10 @@ export type BlockSpec =
   // `hole`: falta una casilla (una partida o el total) y se escribe el número, restando o sumando; con la tabla completa se
   // elige `round` (en qué partida hizo más puntos un jugador), `single` (quién hizo más en una sola partida) o `winner` (quién ganó)
   | { kind: 'score-table'; ask: 'hole' | 'round' | 'single' | 'winner' }
+  // Los números de la bandera (repaso acumulativo, unidad 2): cuatro números distintos de dos cifras en el texto de lectura y
+  // una consigna que se calcula en columna: `max-min` suma el mayor y el menor, `two-largest` resta los dos mayores (sin pedir
+  // una decena) y `three-smallest` suma los tres menores (tres sumandos). Los tres resultados llegan a 99 como mucho
+  | { kind: 'flag-numbers'; ask: 'max-min' | 'two-largest' | 'three-smallest' }
   // La información oculta (elegir): cuatro deportes con un número cada uno y una resta sin llevar cuyo resultado es el
   // número de uno de ellos: se pregunta qué deporte practica quien la hace
   | { kind: 'hidden-info' }

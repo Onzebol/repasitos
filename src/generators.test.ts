@@ -160,6 +160,9 @@ const SPECS: BlockSpec[] = [
   { kind: 'mental', mode: 'sub-small' },
   { kind: 'column', operator: '+', carry: true },
   { kind: 'column', operator: '+', carry: true, addends: 3 },
+  { kind: 'flag-numbers', ask: 'max-min' },
+  { kind: 'flag-numbers', ask: 'two-largest' },
+  { kind: 'flag-numbers', ask: 'three-smallest' },
   { kind: 'column', operator: '+', carry: true, oneDigit: true },
   { kind: 'carry-spot' },
   { kind: 'word-problem', operator: '+' },
@@ -2163,6 +2166,74 @@ describe('generate: reglas de cada plantilla', () => {
     })
     expect(resultados.some((r) => r < 100)).toBe(true)
     expect(resultados.some((r) => r >= 100)).toBe(true)
+  })
+
+  describe('los números de la bandera: operar según una pista', () => {
+    const CONSIGNAS = {
+      'max-min': 'Suma el número mayor y el menor.',
+      'two-largest': 'Resta los dos números mayores.',
+      'three-smallest': 'Suma los tres números menores.',
+    } as const
+
+    // Lo que dice el enunciado, leído sin el código del generador: los cuatro números ordenados de menor a mayor
+    const numerosDe = (texto: string) => {
+      const [, lista] = texto.match(/^🚩 Números de la bandera: (.+)$/u)!
+      return lista.split(' · ').map(Number).sort((a, b) => a - b)
+    }
+    const columna = (e: Exercise) => {
+      if (e.type !== 'column') throw new Error(`se esperaba una columna: ${e.question}`)
+      return e
+    }
+
+    it('la bandera sale de la fuente de emojis', () => {
+      expect(new Set(emojisDeLaFuente(emojiFont)).has('🚩')).toBe(true)
+    })
+
+    for (const [ask, consigna] of Object.entries(CONSIGNAS) as [keyof typeof CONSIGNAS, string][]) {
+      it(`${consigna} se calcula en columna con los números que dice la pista y da un resultado de dos cifras`, () => {
+        for (const e of muchos({ kind: 'flag-numbers', ask }).map(columna)) {
+          expect(e.question).toBe(consigna)
+          const [n1, n2, n3, n4] = numerosDe(e.text!)
+          expect(new Set([n1, n2, n3, n4]).size, e.text).toBe(4)
+          for (const n of [n1, n2, n3, n4]) expect(n >= 10 && n <= 99, e.text).toBe(true)
+          if (ask === 'max-min') {
+            expect([e.operator, e.top, e.bottom, e.third], e.text).toEqual(['+', n4, n1, undefined])
+            expect(e.answer).toBe(n4 + n1)
+          } else if (ask === 'two-largest') {
+            expect([e.operator, e.top, e.bottom, e.third], e.text).toEqual(['−', n4, n3, undefined])
+            expect(e.answer).toBe(n4 - n3)
+            // sin pedir una decena y de dos cifras
+            expect(n4 % 10, e.text).toBeGreaterThanOrEqual(n3 % 10)
+            expect(e.answer, e.text).toBeGreaterThanOrEqual(10)
+          } else {
+            expect([e.operator, e.top, e.bottom, e.third], e.text).toEqual(['+', n3, n2, n1])
+            expect(e.answer).toBe(n1 + n2 + n3)
+          }
+          expect(e.answer, e.text).toBeLessThanOrEqual(99)
+          // la llevada va marcada solo si las unidades suman 10 o más
+          if (e.operator === '+') {
+            const unidades = e.top % 10 + e.bottom % 10 + (e.third ?? 0) % 10
+            expect(e.carry === true, e.text).toBe(unidades >= 10)
+          } else expect(e.carry, e.text).toBeUndefined()
+        }
+      })
+    }
+
+    it('las tres consignas dan resultados de hasta 99 con los mismos cuatro números, que salen mezclados', () => {
+      const posiciones = new Set<number>()
+      const llevan = new Set<boolean>()
+      for (const e of muchos({ kind: 'flag-numbers', ask: 'max-min' }).map(columna)) {
+        const [n1, n2, n3, n4] = numerosDe(e.text!)
+        expect(n4 + n1).toBeLessThanOrEqual(99)
+        expect(n1 + n2 + n3).toBeLessThanOrEqual(99)
+        expect(n4 - n3).toBeGreaterThanOrEqual(10)
+        expect(n4 % 10).toBeGreaterThanOrEqual(n3 % 10)
+        posiciones.add(e.text!.split(': ')[1].split(' · ').map(Number).indexOf(n4))
+        llevan.add(e.carry === true)
+      }
+      expect(posiciones.size, 'el mayor no está siempre en el mismo sitio').toBe(4)
+      expect(llevan.size, 'a veces se lleva y a veces no').toBe(2)
+    })
   })
 
   describe('tres sumandos en columna (15 + 14 + 7)', () => {

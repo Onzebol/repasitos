@@ -99,6 +99,39 @@ function tablaDePuntos(ask: 'hole' | 'round' | 'single' | 'winner', rng: Rng): C
   return { ...elegir(`¿En qué partida hizo más puntos ${a.fem ? 'la' : 'el'} ${a.singular}?`, ['1ª partida', '2ª partida', 'Las dos iguales'], respuesta), scoreTable: tabla() }
 }
 
+// Los números de la bandera: cuatro números distintos de dos cifras (n1 < n2 < n3 < n4) con los que las tres consignas dan un
+// resultado de dos cifras que no pasa de 99: el mayor y el menor suman 99 como mucho, los tres menores también y los dos
+// mayores se restan sin pedir una decena (y dan 10 o más). En el texto salen mezclados; la consigna se calcula en columna y la
+// llevada va marcada solo si las unidades suman 10 o más
+function numerosDeLaBandera(ask: 'max-min' | 'two-largest' | 'three-smallest', rng: Rng): ColumnExercise {
+  let n: number[]
+  do {
+    n = [0, 1, 2, 3].map(() => int(rng, 10, 99)).sort((a, b) => a - b)
+  } while (
+    new Set(n).size < 4 ||
+    n[3] + n[0] > 99 ||
+    n[0] + n[1] + n[2] > 99 ||
+    n[3] - n[2] < 10 ||
+    n[3] % 10 < n[2] % 10
+  )
+  const text = `🚩 Números de la bandera: ${shuffle(rng, n).join(' · ')}`
+  const [n1, n2, n3, n4] = n
+  const operandos = ask === 'max-min' ? [n4, n1] : ask === 'two-largest' ? [n4, n3] : [n3, n2, n1]
+  const operator = ask === 'two-largest' ? '−' : '+'
+  const unidades = operandos.reduce((suma, x) => suma + (x % 10), 0)
+  return {
+    type: 'column',
+    question: ask === 'max-min' ? 'Suma el número mayor y el menor.' : ask === 'two-largest' ? 'Resta los dos números mayores.' : 'Suma los tres números menores.',
+    text,
+    operator,
+    top: operandos[0],
+    bottom: operandos[1],
+    ...(operandos.length === 3 && { third: operandos[2] }),
+    answer: operator === '+' ? operandos.reduce((suma, x) => suma + x, 0) : n4 - n3,
+    ...(operator === '+' && unidades >= 10 && { carry: true }),
+  }
+}
+
 // Los deportes de «la información oculta» (dibujo y nombre) y los nombres de quienes los practican (sin datos de nadie real)
 const DEPORTES = [
   { emoji: '🏀', nombre: 'baloncesto' },
@@ -687,6 +720,8 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
 
     case 'score-table':
       return tablaDePuntos(spec.ask, rng)
+    case 'flag-numbers':
+      return numerosDeLaBandera(spec.ask, rng)
 
     case 'hidden-info': {
       // Resta sin llevar con un resultado de dos cifras, que es el número de un deporte de la tabla
