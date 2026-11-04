@@ -112,9 +112,14 @@ export const temasUnidad3: Topic[] = [
     icon: '🧠',
     tint: '#ffd2b0',
     plan: [
-      { spec: { kind: 'mental', mode: 'add-digit' }, count: 6 },
-      { spec: { kind: 'mental', mode: 'tens-add' }, count: 2 },
-      { spec: { kind: 'mental', mode: 'tens-sub' }, count: 2 },
+      { spec: { kind: 'mental', mode: 'add-digit' }, count: 2 },
+      { spec: { kind: 'mental', mode: 'tens-digit' }, count: 2 },
+      { spec: { kind: 'mental', mode: 'digit-first' }, count: 1 },
+      { spec: { kind: 'mental', mode: 'digit-missing' }, count: 1 },
+      { spec: { kind: 'shape-sum', ask: 'sum', values: 'ones-tens' }, count: 1 },
+      { spec: { kind: 'shape-sum', ask: 'find', values: 'ones-tens' }, count: 1 },
+      { spec: { kind: 'mental', mode: 'tens-add' }, count: 1 },
+      { spec: { kind: 'mental', mode: 'tens-sub' }, count: 1 },
     ],
   },
 ]

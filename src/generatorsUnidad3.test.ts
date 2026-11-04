@@ -210,6 +210,51 @@ describe('Cálculo mental: sumar un dígito a un número de dos cifras', () => {
       expect(e.answer, e.question).toBe(a + b)
     }
   })
+
+  it('decena redonda + unidad o unidad + decena redonda (30 + 3, 5 + 60), sin llevar y hasta 99', () => {
+    const ordenes = new Set<string>()
+    for (const e of muchos({ kind: 'mental', mode: 'tens-digit' }).map(number)) {
+      const m = e.question.match(/^(\d+) \+ (\d+) =$/)
+      expect(m, e.question).not.toBeNull()
+      const [a, b] = [Number(m![1]), Number(m![2])]
+      const [decena, unidad] = a >= 10 ? [a, b] : [b, a]
+      expect(decena % 10, e.question).toBe(0)
+      expect(decena, e.question).toBeGreaterThanOrEqual(10)
+      expect(decena, e.question).toBeLessThanOrEqual(90)
+      expect(unidad, e.question).toBeGreaterThanOrEqual(1)
+      expect(unidad, e.question).toBeLessThanOrEqual(9)
+      expect(e.answer, e.question).toBe(a + b)
+      ordenes.add(a >= 10 ? 'decena primero' : 'unidad primero')
+    }
+    expect(ordenes).toEqual(new Set(['decena primero', 'unidad primero']))
+  })
+
+  it('con el dígito delante (4 + 63): sin llevar y el resultado tiene dos cifras', () => {
+    for (const e of muchos({ kind: 'mental', mode: 'digit-first' }).map(number)) {
+      const m = e.question.match(/^(\d) \+ (\d\d) =$/)
+      expect(m, e.question).not.toBeNull()
+      const [a, b] = [Number(m![1]), Number(m![2])]
+      expect(a, e.question).toBeGreaterThanOrEqual(1)
+      expect(a + (b % 10), e.question).toBeLessThanOrEqual(9)
+      expect(e.answer, e.question).toBe(a + b)
+    }
+  })
+
+  it('con el hueco en cualquiera de los dos sumandos (▢ + 24 = 27, 12 + ▢ = 15): el hueco es un dígito y no se lleva', () => {
+    const huecos = new Set<string>()
+    for (const e of muchos({ kind: 'mental', mode: 'digit-missing' }).map(number)) {
+      const m = e.question.match(/^Completa: (?:▢ \+ (\d\d)|(\d\d) \+ ▢) = (\d\d)$/)
+      expect(m, e.question).not.toBeNull()
+      const grande = Number(m![1] ?? m![2])
+      const total = Number(m![3])
+      expect(e.answer, e.question).toBe(total - grande)
+      expect(e.answer, e.question).toBeGreaterThanOrEqual(1)
+      expect(e.answer, e.question).toBeLessThanOrEqual(9)
+      expect((grande % 10) + e.answer, e.question).toBeLessThanOrEqual(9)
+      huecos.add(m![1] === undefined ? 'segundo' : 'primero')
+    }
+    expect(huecos).toEqual(new Set(['primero', 'segundo']))
+  })
 })
 
 describe('Problemas de «más que» y «menos que»', () => {

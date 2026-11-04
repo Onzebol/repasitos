@@ -84,9 +84,21 @@ describe('Unidad 3 de Matemáticas: contenido', () => {
     expect(session.filter((e) => e.type === 'number' && /litros/.test(e.question))).toHaveLength(2)
   })
 
-  it('"Cálculo mental" suma un dígito a números de dos cifras', () => {
+  it('"Cálculo mental" suma un dígito (detrás, delante, con el hueco), decenas redondas con unidades y figuras de 1, 2, 10 y 20', () => {
     const session = sesion('calculo-mental')
-    expect(session.filter((e) => e.type === 'number' && /^\d\d \+ \d =$/.test(e.question))).toHaveLength(6)
+    expect(session).toHaveLength(10)
+    const preguntas = session.map((e) => e.question)
+    // el dígito que falta
+    expect(preguntas.filter((q) => q.startsWith('Completa: ') && q.includes('▢'))).toHaveLength(1)
+    // las figuras: una suma que se escribe y una figura que falta, con los valores 1, 2, 10 y 20 en la leyenda
+    const figuras = session.filter((e) => (e.type === 'number' || e.type === 'choice') && e.visual?.includes(' = 20'))
+    expect(figuras).toHaveLength(2)
+    // el resto son siete operaciones escritas de dos números (sumar un dígito, decenas con unidades y decenas con decenas)
+    const operaciones = preguntas.filter((q) => /^\d+ [+−] \d+ =$/.test(q))
+    expect(operaciones).toHaveLength(7)
+    // decenas con decenas (30 + 40, 70 − 20) y decenas con unidades (30 + 3, 5 + 60)
+    expect(operaciones.filter((q) => /^\d0 [+−] \d0 =$/.test(q)).length).toBeGreaterThanOrEqual(2)
+    expect(operaciones.filter((q) => /^(\d0 \+ \d|\d \+ \d0) =$/.test(q)).length).toBeGreaterThanOrEqual(2)
   })
 
   it('los iconos de los temas y las piezas 🟥🟦🟨 están en la fuente de emojis', () => {
