@@ -260,3 +260,55 @@ describe('Problemas de «más que» y «menos que»', () => {
     expect(palabras).toEqual(new Set([true, false]))
   })
 })
+
+describe('Cantidades encadenadas con «más que» y «menos que»', () => {
+  // Lo que dice el enunciado, leído sin el código del generador: amarillos, «b rojos más que amarillos», «c azules menos que rojos»
+  const leer = (texto: string) => {
+    const m = texto.match(/^Hay (\d+) peces amarillos\. Hay (\d+) peces rojos más que amarillos\. Hay (\d+) peces azules menos que rojos\.$/)
+    if (!m) throw new Error(`texto inesperado: ${texto}`)
+    const [a, b, c] = [Number(m[1]), Number(m[2]), Number(m[3])]
+    return { amarillos: a, rojos: a + b, azules: a + b - c, a, b, c }
+  }
+
+  it('los rojos son los amarillos más los de «más que» y los azules son los rojos menos los de «menos que»', () => {
+    const preguntas = new Set<string>()
+    for (const ask of ['second', 'third'] as const) {
+      for (const e of muchos({ kind: 'chain', ask }).map(choice)) {
+        const { rojos, azules, a, b, c } = leer(e.text!)
+        const esperado = ask === 'second' ? rojos : azules
+        expect(e.question).toBe(ask === 'second' ? '¿Cuántos peces rojos hay?' : '¿Cuántos peces azules hay?')
+        expect(e.answer, e.text).toBe(String(esperado))
+        // datos pequeños, sin 1 (así el singular no hace falta) y con resultados positivos
+        for (const n of [a, b, c]) expect(n >= 2 && n <= 5, e.text).toBe(true)
+        expect(azules, e.text).toBeGreaterThanOrEqual(1)
+        expect(e.options, e.text).toHaveLength(3)
+        expect(new Set(e.options).size, e.text).toBe(3)
+        for (const opcion of e.options) expect(Number(opcion), e.text).toBeGreaterThanOrEqual(1)
+        preguntas.add(ask)
+      }
+    }
+    expect(preguntas).toEqual(new Set(['second', 'third']))
+  })
+
+  it('las opciones equivocadas son los errores típicos: repetir un dato, restar en vez de sumar o dejarse un paso', () => {
+    for (const e of muchos({ kind: 'chain', ask: 'second' }).map(choice)) {
+      const { a, b } = leer(e.text!)
+      for (const opcion of e.options.filter((o) => o !== e.answer)) {
+        expect([a, b, Math.abs(a - b), a + b + 1].map(String), e.text).toContain(opcion)
+      }
+    }
+    for (const e of muchos({ kind: 'chain', ask: 'third' }).map(choice)) {
+      const { rojos, a, c } = leer(e.text!)
+      for (const opcion of e.options.filter((o) => o !== e.answer)) {
+        expect([rojos, c, rojos + c, a].map(String), e.text).toContain(opcion)
+      }
+    }
+  })
+
+  it('el resultado correcto sale en las tres posiciones', () => {
+    for (const ask of ['second', 'third'] as const) {
+      const ejercicios = muchos({ kind: 'chain', ask }).map(choice)
+      expect(new Set(ejercicios.map((e) => e.options.indexOf(e.answer)))).toEqual(new Set([0, 1, 2]))
+    }
+  })
+})

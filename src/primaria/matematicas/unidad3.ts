@@ -96,6 +96,17 @@ export const temasUnidad3: Topic[] = [
     ],
   },
   {
+    // El rincón de la lógica del libro (p. 69): cantidades encadenadas con «más que» y «menos que»
+    id: 'desafios-y-logica',
+    name: 'Desafíos y lógica',
+    icon: '🧩',
+    tint: '#d7f0c8',
+    plan: [
+      { spec: { kind: 'chain', ask: 'second' }, count: 5 },
+      { spec: { kind: 'chain', ask: 'third' }, count: 5 },
+    ],
+  },
+  {
     id: 'calculo-mental',
     name: 'Cálculo mental',
     icon: '🧠',

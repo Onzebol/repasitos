@@ -196,6 +196,9 @@ export type BlockSpec =
   // piezas más. ¿Cuántas piezas tiene el rojo?». `operation`: elegir sumar o restar (con el texto en la tarjeta de lectura);
   // `calculate`: escribir el resultado. «Más» se suma y «menos» se resta; con `carry` la cuenta lleva
   | { kind: 'compare-problem'; ask: 'operation' | 'calculate'; carry?: boolean }
+  // Cantidades encadenadas (unidad 3, rincón de la lógica): «Hay 2 peces amarillos. Hay 3 peces rojos más que amarillos. Hay 4
+  // peces azules menos que rojos» (texto de lectura) y se elige cuántos rojos (`second`) o cuántos azules (`third`) entre tres
+  | { kind: 'chain'; ask: 'second' | 'third' }
   // Problema de dos pasos (escribir): sumar y restar (`add-sub`) o restar y sumar (`sub-add`), sin llevar y entre 1 y 99
   | { kind: 'two-steps'; mode: 'add-sub' | 'sub-add' }
   // Problema de suma o resta con un enunciado corto (escribir): sin llevar, o con `carry` (como en `column`). Con `faltan`

@@ -153,6 +153,8 @@ const SPECS: BlockSpec[] = [
   { kind: 'compare-problem', ask: 'operation' },
   { kind: 'compare-problem', ask: 'calculate' },
   { kind: 'compare-problem', ask: 'calculate', carry: true },
+  { kind: 'chain', ask: 'second' },
+  { kind: 'chain', ask: 'third' },
   { kind: 'problem-step', ask: 'calculate' },
   { kind: 'problem-step', ask: 'operation', faltan: true },
   { kind: 'problem-step', ask: 'calculate', faltan: true },
