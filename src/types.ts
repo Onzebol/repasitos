@@ -197,7 +197,7 @@ export type BlockSpec =
   // (solo restas) el enunciado es de «¿cuántos faltan?» y no de quitar
   | { kind: 'word-problem'; operator: '+' | '−'; carry?: boolean; faltan?: boolean }
   // Centenas, decenas y unidades de números de 3 cifras: leer (elegir), componer, contar con piezas 🟥🟦🟨 o contar un lugar (escribir)
-  | { kind: 'cdu'; ask: 'read' | 'compose' | 'blocks' | 'count' }
+  | { kind: 'cdu'; ask: 'read' | 'compose' | 'blocks' | 'count' | 'clue' }
   // El litro: qué recipiente tiene más o menos capacidad de tres (elegir)
   | { kind: 'capacity'; mode: 'more' | 'less' }
   // Decena más cercana a un número (elegir); con `ask`: entre qué dos decenas está, si la cifra de las unidades
