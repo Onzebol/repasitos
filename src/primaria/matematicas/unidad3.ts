@@ -84,6 +84,18 @@ export const temasUnidad3: Topic[] = [
     ],
   },
   {
+    // Laboratorio de problemas del libro (pp. 64–65): comparar con «más que…» y «menos que…»
+    id: 'mas-menos-que',
+    name: 'Más que, menos que',
+    icon: '🧮',
+    tint: '#d4ecc4',
+    plan: [
+      { spec: { kind: 'compare-problem', ask: 'operation' }, count: 3 },
+      { spec: { kind: 'compare-problem', ask: 'calculate' }, count: 4 },
+      { spec: { kind: 'compare-problem', ask: 'calculate', carry: true }, count: 3 },
+    ],
+  },
+  {
     id: 'calculo-mental',
     name: 'Cálculo mental',
     icon: '🧠',
