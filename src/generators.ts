@@ -339,6 +339,23 @@ function sumaQueLleva(rng: Rng): ChoiceExercise {
   return elegir('¿Qué suma es llevando?', shuffle(rng, [respuesta, ...otras]), respuesta)
 }
 
+// ¿Qué resta es llevando? (elegir): tres restas de dos cifras, una sola lleva (las unidades del minuendo son menores que las
+// del sustraendo) y las otras dos no; las que no llevan pueden tener decenas grandes (95 − 21), que no lleva aunque lo parezca
+function restaQueLleva(rng: Rng): ChoiceExercise {
+  const escrita = ([a, b]: [number, number]) => `${a} − ${b}`
+  const respuesta = escrita(restandosLlevando(rng))
+  const otras = new Set<string>()
+  while (otras.size < 2) otras.add(escrita(restandos(rng)))
+  return elegir('¿Qué resta es llevando?', shuffle(rng, [respuesta, ...otras]), respuesta)
+}
+
+// Una resta ya hecha (visual «85 − 67 = 18»): ¿es sin llevar o llevando? (elegir entre las dos)
+function tipoDeResta(rng: Rng): ChoiceExercise {
+  const llevando = rng() < 0.5
+  const [a, b] = llevando ? restandosLlevando(rng) : restandos(rng)
+  return elegir('Esta resta, ¿es sin llevar o llevando?', ['Sin llevar', 'Llevando'], llevando ? 'Llevando' : 'Sin llevar', `${a} − ${b} = ${a - b}`)
+}
+
 const HISTORIAS_SUMA: ((a: number, b: number) => string)[] = [
   (a, b) => `Tengo ${a} pegatinas y me regalan ${b}. ¿Cuántas tengo ahora?`,
   (a, b) => `En el parque hay ${a} niños y llegan ${b} más. ¿Cuántos hay ahora?`,
@@ -977,6 +994,7 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       return columna(spec.operator, spec.carry ?? false, rng, spec.oneDigit ?? false, spec.addends ?? 2)
 
     case 'carry-spot':
+      if (spec.operator === '−') return spec.ask === 'type' ? tipoDeResta(rng) : restaQueLleva(rng)
       return sumaQueLleva(rng)
 
     case 'problem-step':
