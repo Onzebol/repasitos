@@ -738,14 +738,16 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       const max = spec.max ?? 99
       // Hacia atrás: se empieza arriba y siempre queda sitio para bajar tres veces sin salirse del rango
       const salto = spec.down ? -spec.step : spec.step
+      // De 100 en 100 la serie empieza en una centena redonda (100, 200… 900)
+      const entre = (a: number, b: number) => (spec.step === 100 ? 100 * int(rng, Math.ceil(a / 100), Math.floor(b / 100)) : int(rng, a, b))
       // Con `cross` (ignora min y max) la serie pasa de menos de 100 a 100 o más (97, 98, 99, 100…; hacia atrás 101, 100, 99…)
       const inicio = spec.cross
         ? spec.down
           ? int(rng, 100, 99 + 3 * spec.step)
           : int(rng, 100 - 3 * spec.step, 99)
         : spec.down
-          ? int(rng, min + 3 * spec.step, max)
-          : int(rng, min, max - 3 * spec.step)
+          ? entre(min + 3 * spec.step, max)
+          : entre(min, max - 3 * spec.step)
       const mostrados = [0, 1, 2].map((i) => inicio + i * salto)
       return numero(`Completa la serie: ${mostrados.join(', ')}, …`, inicio + 3 * salto)
     }

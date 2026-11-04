@@ -151,9 +151,10 @@ export type BlockSpec =
   | { kind: 'neighbor'; mode: 'after' | 'before' | 'between'; min: number; max: number; cross?: boolean }
   // ¿Cuál es el número mayor o el menor de tres? (elegir). Rango por defecto: 10 a 99
   | { kind: 'extreme'; mode: 'greatest' | 'smallest'; min?: number; max?: number }
-  // Completar una serie que sube (o baja, con `down`) de 1 a 5 en 1 o de 10 en 10 (escribir). Rango por defecto: 10 a 99.
+  // Completar una serie que sube (o baja, con `down`) de 1 a 5 en 1, de 10 en 10 o de 100 en 100 (escribir; de 100 en 100 empieza
+  // en una centena redonda: con min: 100 y max: 900 va de 100 a 900). Rango por defecto: 10 a 99.
   // Con `cross` (unidad 2) la serie pasa del 99 al 100 (97, 98, 99, 100…) y se ignoran min y max
-  | { kind: 'series'; step: 1 | 2 | 3 | 4 | 5 | 10; down?: boolean; min?: number; max?: number; cross?: boolean }
+  | { kind: 'series'; step: 1 | 2 | 3 | 4 | 5 | 10 | 100; down?: boolean; min?: number; max?: number; cross?: boolean }
   // Decenas y unidades: leer un número, contar decenas o unidades, componerlo con cifras o con piezas
   | { kind: 'place-value'; ask: 'read' | 'tens' | 'units' | 'compose' | 'blocks' }
   // Cómo se lee un número (elegir) o escribirlo con cifras a partir de su nombre (escribir). Rango por defecto: 10 a 99;

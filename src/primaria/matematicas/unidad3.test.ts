@@ -33,6 +33,19 @@ describe('Unidad 3 de Matemáticas: contenido', () => {
     expect(session.filter((e) => e.type === 'choice' && e.question === 'Esta resta, ¿es sin llevar o llevando?')).toHaveLength(1)
   })
 
+  it('"Centenas, decenas y unidades" incluye una serie de 100 en 100 hacia arriba y otra hacia abajo, y sigue en 10', () => {
+    const plan = temasUnidad3.find((topic) => topic.id === 'centenas-decenas-unidades')!.plan
+    expect(plan.filter((bloque) => bloque.spec.kind === 'series').map((bloque) => bloque.spec)).toEqual([
+      { kind: 'series', step: 100, min: 100, max: 900 },
+      { kind: 'series', step: 100, min: 100, max: 900, down: true },
+    ])
+    const session = sesion('centenas-decenas-unidades')
+    expect(session).toHaveLength(10)
+    const series = session.filter((e) => e.question.startsWith('Completa la serie: '))
+    expect(series).toHaveLength(2)
+    for (const e of series) expect(e.type === 'number' && e.answer % 100, e.question).toBe(0)
+  })
+
   it('"Centenas, decenas y unidades" trabaja siempre con números de tres cifras', () => {
     for (let seed = 0; seed < 100; seed++) {
       for (const e of sesion('centenas-decenas-unidades', seed)) {
