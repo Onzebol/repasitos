@@ -173,6 +173,10 @@ const SPECS: BlockSpec[] = [
   { kind: 'check-subtraction' },
   { kind: 'inverse', mode: 'both' },
   { kind: 'inverse', mode: 'both', small: true },
+  { kind: 'family', ask: 'sum' },
+  { kind: 'family', ask: 'subtract' },
+  { kind: 'family', ask: 'sum', drawing: true },
+  { kind: 'family', ask: 'subtract', drawing: true },
   { kind: 'inverse', mode: 'missing', small: true },
   { kind: 'inverse', mode: 'missing', round: true },
   { kind: 'inverse', mode: 'missing-minuend' },
@@ -745,6 +749,69 @@ describe('generate: reglas de cada plantilla', () => {
     }
     expect(columnas.size).toBe(10)
     expect(huecos.size, 'salen todas las posiciones del 1 al 9').toBe(9)
+  })
+
+  describe('la familia de la suma y la resta (elegir la operación)', () => {
+    // verdad independiente del código: «6 + 2 = 8» o «8 − 6 = 2» es cierta si el cálculo sale
+    const cierta = (operacion: string) => {
+      const [, x, signo, y, z] = operacion.match(/^(\d+) ([+−]) (\d+) = (\d+)$/)!
+      return (signo === '+' ? Number(x) + Number(y) : Number(x) - Number(y)) === Number(z)
+    }
+    const CIRCULOS = ['🟣', '🟢', '🔵', '🟡', '🟠', '🔴']
+
+    it('los círculos de colores salen de la fuente de emojis', () => {
+      const fuente = new Set(emojisDeLaFuente(emojiFont))
+      for (const c of CIRCULOS) expect(fuente.has(c), c).toBe(true)
+    })
+
+    for (const [ask, signo, pregunta] of [['sum', '+', 'suma'], ['subtract', '−', 'resta']] as const) {
+      it(`con tres números, ¿qué ${pregunta} sale?: solo una de las tres opciones es cierta y usa los tres números`, () => {
+        const ordenes = new Set<string>()
+        const posicionDelMayor = new Set<number>()
+        for (const e of muchos({ kind: 'family', ask }).map(choice)) {
+          expect(e.question).toMatch(new RegExp(`^Con \\d+, \\d+ y \\d+, ¿qué ${pregunta} sale\\?$`))
+          const numeros = e.question.match(/\d+/g)!.map(Number)
+          const [menor, medio, mayor] = [...numeros].sort((a, b) => a - b)
+          expect(menor + medio, e.question).toBe(mayor)
+          expect(new Set(numeros).size, e.question).toBe(3)
+          expect(mayor, e.question).toBeLessThanOrEqual(20)
+          expect(e.options).toHaveLength(3)
+          expect(e.options.filter(cierta), e.question).toEqual([e.answer])
+          for (const opcion of e.options) {
+            expect(opcion).toContain(` ${signo} `)
+            expect([...opcion.matchAll(/\d+/g)].map((m) => Number(m[0])).sort((a, b) => a - b), opcion).toEqual([menor, medio, mayor])
+          }
+          ordenes.add(e.answer)
+          posicionDelMayor.add(numeros.indexOf(mayor))
+        }
+        expect(ordenes.size, 'salen operaciones distintas').toBeGreaterThan(20)
+        // el orden en que salen los números no delata cuál es el total
+        expect(posicionDelMayor.size).toBe(3)
+      })
+
+      it(`con un dibujo de dos colores, ¿qué ${pregunta} sale?: los números son los de cada color y el total`, () => {
+        for (const e of muchos({ kind: 'family', ask, drawing: true }).map(choice)) {
+          const [uno, otro] = e.visual!.split('  ')
+          const [a, b] = [[...uno].length, [...otro].length]
+          expect(CIRCULOS, e.visual).toContain([...uno][0])
+          expect(CIRCULOS, e.visual).toContain([...otro][0])
+          expect(new Set([...uno]).size, e.visual).toBe(1)
+          expect(new Set([...otro]).size, e.visual).toBe(1)
+          expect([...uno][0], e.visual).not.toBe([...otro][0])
+          expect(a, e.visual).not.toBe(b)
+          expect(a + b, e.visual).toBeLessThanOrEqual(12)
+          expect(e.question).toBe(ask === 'sum' ? '¿Qué suma cuenta todos los dibujos?' : `Si quitamos los ${[...otro][0]}, ¿qué resta sale?`)
+          expect(e.options).toHaveLength(3)
+          expect(e.options.filter(cierta), e.visual).toEqual([e.answer])
+          for (const opcion of e.options) {
+            expect(opcion).toContain(` ${signo} `)
+            expect([...opcion.matchAll(/\d+/g)].map((m) => Number(m[0])).sort((x, y) => x - y), opcion).toEqual([Math.min(a, b), Math.max(a, b), a + b].sort((x, y) => x - y))
+          }
+          // la resta quita el otro color: lo que queda es el primero
+          if (ask === 'subtract') expect(e.answer).toBe(`${a + b} − ${b} = ${a}`)
+        }
+      })
+    }
   })
 
   describe('figuras con valores', () => {

@@ -214,6 +214,10 @@ export type BlockSpec =
   // o qué resta comprueba una suma (`operation`, elegir). Con `small`, números pequeños (hasta 20); con `round`,
   // decenas redondas (hasta 90); `operation` ignora los dos
   | { kind: 'inverse'; mode: 'subtract' | 'both' | 'missing' | 'missing-minuend' | 'operation'; small?: boolean; round?: boolean }
+  // La familia de la suma y la resta (elegir la operación completa, unidad 2): con tres números (8, 6 y 2) se elige la suma
+  // que sale (`sum`: 6 + 2 = 8) o la resta (`subtract`: 8 − 6 = 2) entre tres opciones, una sola cierta. Con `drawing`, los
+  // tres números salen de un dibujo de dos colores: se cuentan los dibujos (suma) o se quitan los de un color (resta)
+  | { kind: 'family'; ask: 'sum' | 'subtract'; drawing?: boolean }
   // Los términos de la resta (elegir): en «38 − 13 = 25», ¿cuál es el sustraendo? (se elige un número) o ¿cómo se llama el
   // 13? (se elige minuendo, sustraendo o diferencia)
   | { kind: 'subtraction-terms' }

@@ -335,6 +335,38 @@ function inversa(mode: 'subtract' | 'both' | 'missing' | 'missing-minuend' | 'op
   return elegir(`¿Qué resta comprueba que ${a} + ${b} = ${c}?`, [`${c} − ${b}`, `${a} − ${b}`, `${c} + ${b}`], `${c} − ${b}`)
 }
 
+// Los círculos de colores del dibujo de «la familia de la suma y la resta»
+const CIRCULOS = ['🟣', '🟢', '🔵', '🟡', '🟠', '🔴']
+
+// La familia de a + b = c (a y b distintos, c hasta 20; con dibujo, hasta 12 para poder contar): se elige la suma o la resta
+// cierta entre tres. Las equivocadas ponen el total donde no toca (6 + 8 = 2) o la resta al revés (6 − 8 = 2) y son falsas siempre
+function familia(spec: { ask: 'sum' | 'subtract'; drawing?: boolean }, rng: Rng): ChoiceExercise {
+  let a: number
+  let b: number
+  do {
+    ;[a, b] = spec.drawing ? [int(rng, 3, 8), int(rng, 2, 6)] : terminosInversos(rng, true)
+  } while (a === b || (spec.drawing && a + b > 12))
+  const c = a + b
+  // sumandos en un orden cualquiera (6 + 2 y 2 + 6 valen); en la resta, el total menos uno de ellos (con dibujo, quitando los b)
+  const [x, y] = spec.drawing || rng() < 0.5 ? [a, b] : [b, a]
+  const [correcta, equivocadas] =
+    spec.ask === 'sum'
+      ? [`${x} + ${y} = ${c}`, [`${c} + ${y} = ${x}`, `${x} + ${c} = ${y}`]]
+      : [`${c} − ${y} = ${x}`, [`${y} − ${c} = ${x}`, `${x} − ${y} = ${c}`]]
+  const opciones = [correcta, ...equivocadas]
+  if (!spec.drawing) {
+    const numeros = shuffle(rng, [a, b, c])
+    return elegir(`Con ${numeros[0]}, ${numeros[1]} y ${numeros[2]}, ¿qué ${spec.ask === 'sum' ? 'suma' : 'resta'} sale?`, opciones, correcta)
+  }
+  const [uno, otro] = shuffle(rng, CIRCULOS)
+  return elegir(
+    spec.ask === 'sum' ? '¿Qué suma cuenta todos los dibujos?' : `Si quitamos los ${otro}, ¿qué resta sale?`,
+    opciones,
+    correcta,
+    `${uno.repeat(a)}  ${otro.repeat(b)}`,
+  )
+}
+
 // Los pasos de un problema: con el texto en la tarjeta de lectura, se elige qué operación hay que hacer o qué se calcula
 function pasoDeProblema(ask: 'operation' | 'calculate', rng: Rng, faltan = false): ChoiceExercise {
   const operator = faltan ? '−' : pick(rng, ['+', '−'] as const)
@@ -1078,6 +1110,9 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       }
       return elegir(`¿Cómo se escribe "${palabras[lugar]}"?`, [lugar, ...cerca].map((n) => `${n + 1}${marca}`), `${lugar + 1}${marca}`)
     }
+
+    case 'family':
+      return familia(spec, rng)
 
     case 'subtraction-terms':
       return terminosDeLaResta(rng)
