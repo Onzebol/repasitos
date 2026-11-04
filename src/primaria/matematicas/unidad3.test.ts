@@ -13,7 +13,7 @@ const sesion = (id: string, seed = 3) => buildSession(temasUnidad3.find((topic) 
 
 describe('Unidad 3 de Matemáticas: contenido', () => {
   it('tiene los temas de la unidad y está registrada en la unidad 3', () => {
-    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'centenas-decenas-unidades', 'el-litro', 'instrumentos-y-unidades', 'mas-menos-que', 'desafios-y-logica', 'calculo-mental'])
+    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'centenas-decenas-unidades', 'el-litro', 'medio-y-cuarto-de-litro', 'instrumentos-y-unidades', 'mas-menos-que', 'desafios-y-logica', 'calculo-mental'])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u3')!.topics).toBe(temasUnidad3)
   })
 
@@ -82,6 +82,16 @@ describe('Unidad 3 de Matemáticas: contenido', () => {
     expect(session.filter((e) => e.type === 'choice' && /capacidad/.test(e.question))).toHaveLength(4)
     expect(session.filter((e) => e.type === 'choice' && !/capacidad/.test(e.question))).toHaveLength(4)
     expect(session.filter((e) => e.type === 'number' && /litros/.test(e.question))).toHaveLength(2)
+  })
+
+  it('"Medio litro y cuarto de litro" mezcla recipientes, equivalencias, sumas de litros y comparaciones', () => {
+    const session = sesion('medio-y-cuarto-de-litro')
+    expect(session).toHaveLength(10)
+    expect(session.filter((e) => e.type === 'choice' && /^¿Cuánta agua cabe/.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && /^¿Qué recipiente tiene/.test(e.question))).toHaveLength(1)
+    expect(session.filter((e) => e.type === 'number' && /^Para llenar/.test(e.question))).toHaveLength(3)
+    expect(session.filter((e) => e.type === 'number' && /^Botella = /.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && e.question === '¿Qué signo va en el recuadro?')).toHaveLength(2)
   })
 
   it('"Cálculo mental" suma un dígito (detrás, delante, con el hueco), decenas redondas con unidades y figuras de 1, 2, 10 y 20', () => {

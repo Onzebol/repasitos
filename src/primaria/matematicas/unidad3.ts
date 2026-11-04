@@ -84,6 +84,22 @@ export const temasUnidad3: Topic[] = [
       { spec: { kind: 'bag', items: PROBLEMAS_LITROS }, count: 2 },
     ],
   },
+  {
+    // Medio litro y cuarto de litro (pp. 60, 61 y 68): botella 1 l, bol ½ l, vaso ¼ l
+    id: 'medio-y-cuarto-de-litro',
+    name: 'Medio litro y cuarto de litro',
+    icon: '🥣',
+    tint: '#c9e8ff',
+    plan: [
+      { spec: { kind: 'liter-label', ask: 'amount' }, count: 2 },
+      { spec: { kind: 'liter-label', ask: 'container' }, count: 1 },
+      { spec: { kind: 'liter-parts', part: 'half' }, count: 2 },
+      { spec: { kind: 'liter-parts', part: 'quarter' }, count: 1 },
+      { spec: { kind: 'liter-sum' }, count: 2 },
+      { spec: { kind: 'liter-compare' }, count: 1 },
+      { spec: { kind: 'liter-compare', fractions: true }, count: 1 },
+    ],
+  },
   temaMedidas,
   {
     // Laboratorio de problemas del libro (pp. 64–65): comparar con «más que…» y «menos que…»
