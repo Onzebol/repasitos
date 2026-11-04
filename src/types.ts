@@ -23,6 +23,13 @@ export type CodeTableData = {
   legend: { emoji: string; name: string; number: number }[]
 }
 
+// Tabla de puntos (ScoreTable, unidad 2): tres jugadores —animales— con los puntos de dos partidas y el total. `null` es
+// una casilla que falta (se dibuja como ❓)
+export type ScoreTableData = {
+  columns: string[]
+  players: { emoji: string; name: string; values: (number | null)[] }[]
+}
+
 // Mapa de un itinerario (4 filas × 5 columnas, ver src/itinerarios.ts): el dibujo de cada casilla ('' = hierba), la casilla
 // donde está Repi, el camino (casillas contiguas, se tiñen de arena) y si cada casilla del camino lleva una flecha
 export type RouteMapData = {
@@ -43,6 +50,8 @@ export type ChoiceExercise = {
   table?: TableMarks
   // Tabla de actividades con números (unidad 2): se dibuja entre la pregunta y las opciones, con su leyenda
   codeTable?: CodeTableData
+  // Tabla de puntos de tres jugadores (unidad 2): se dibuja entre la pregunta y las opciones
+  scoreTable?: ScoreTableData
   // Itinerarios con flechas: mapa dibujado entre la pregunta y las opciones. `steps` son las instrucciones («3> 1^ 1>», ver
   // src/route.ts) que se ven como fichas con flechas sobre el mapa; con `stepOptions`, las opciones son itinerarios y se
   // dibujan también con flechas (su nombre accesible sale de `labels`)
@@ -71,6 +80,8 @@ export type NumberExercise = {
   type: 'number'
   question: string
   visual?: string
+  // Tabla de puntos con una casilla vacía (unidad 2): el número que falta es la respuesta
+  scoreTable?: ScoreTableData
   answer: number
 }
 
@@ -209,6 +220,10 @@ export type BlockSpec =
   // Estimar sin mirar la tabla cuántos números del 0 al 99 incluyen una cifra del 1 al 9 (elegir entre 10, 19 y 25; son 19);
   // se comprueba después con `table-paint` y `digit`
   | { kind: 'digit-count' }
+  // Tabla de puntuaciones, «¿quién ganó?» (unidad 2): tres animales con los puntos de dos partidas y el total, sin empates.
+  // `hole`: falta una casilla (una partida o el total) y se escribe el número, restando o sumando; con la tabla completa se
+  // elige `round` (en qué partida hizo más puntos un jugador), `single` (quién hizo más en una sola partida) o `winner` (quién ganó)
+  | { kind: 'score-table'; ask: 'hole' | 'round' | 'single' | 'winner' }
   // La información oculta (elegir): cuatro deportes con un número cada uno y una resta sin llevar cuyo resultado es el
   // número de uno de ellos: se pregunta qué deporte practica quien la hace
   | { kind: 'hidden-info' }

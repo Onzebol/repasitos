@@ -110,6 +110,10 @@ const SPECS: BlockSpec[] = [
   { kind: 'table-paint', ask: 'digit' },
   { kind: 'digit-count' },
   { kind: 'hidden-info' },
+  { kind: 'score-table', ask: 'hole' },
+  { kind: 'score-table', ask: 'round' },
+  { kind: 'score-table', ask: 'single' },
+  { kind: 'score-table', ask: 'winner' },
   { kind: 'shape-sum', ask: 'sum' },
   { kind: 'shape-sum', ask: 'find' },
   { kind: 'number-name', ask: 'read' },
@@ -902,6 +906,112 @@ describe('generate: reglas de cada plantilla', () => {
         }
         expect(e.labels![e.answer]).toBe(`${uno.name} y ${otro.name}`)
       }
+    })
+  })
+
+  describe('tabla de puntuaciones: ¿quién ganó?', () => {
+    const NOMBRES = Object.fromEntries(ANIMALES.map((a) => [a.emoji, a.singular]))
+
+    // Lo que dice la tabla, leído sin el código del generador
+    const filas = (e: Exercise) => {
+      const tabla = e.type === 'choice' || e.type === 'number' ? e.scoreTable : undefined
+      if (!tabla) throw new Error(`falta la tabla: ${e.question}`)
+      return tabla.players
+    }
+
+    it('tres jugadores distintos (animales con su nombre), dos partidas y el total', () => {
+      for (const ask of ['hole', 'round', 'single', 'winner'] as const) {
+        for (const e of muchos({ kind: 'score-table', ask })) {
+          const t = (e as { scoreTable: { columns: string[]; players: { emoji: string; name: string; values: (number | null)[] }[] } }).scoreTable
+          expect(t.columns).toEqual(['1ª partida', '2ª partida', 'Total'])
+          expect(t.players).toHaveLength(3)
+          expect(new Set(t.players.map((p) => p.emoji)).size).toBe(3)
+          for (const p of t.players) {
+            expect(p.name).toBe(NOMBRES[p.emoji])
+            expect(p.values).toHaveLength(3)
+          }
+        }
+      }
+    })
+
+    it('hueco: una sola casilla vacía; la respuesta es lo que hace falta para que el total sea la suma de las dos partidas (sumar o restar)', () => {
+      const huecos = new Set<number>()
+      for (const e of muchos({ kind: 'score-table', ask: 'hole' }).map(number)) {
+        expect(e.question).toBe('Completa la tabla: ¿qué número falta?')
+        const jugadores = filas(e)
+        const casillas = jugadores.flatMap((p, i) => p.values.map((v, j) => ({ v, i, j })))
+        const vacias = casillas.filter((c) => c.v === null)
+        expect(vacias, 'una sola casilla vacía').toHaveLength(1)
+        const { i, j } = vacias[0]
+        const [x, y, total] = jugadores[i].values
+        const esperado = j === 2 ? x! + y! : j === 0 ? total! - y! : total! - x!
+        expect(e.answer, e.question).toBe(esperado)
+        // las otras dos filas son cuentas bien hechas
+        for (const [k, p] of jugadores.entries()) if (k !== i) expect(p.values[0]! + p.values[1]!).toBe(p.values[2])
+        expect(e.answer).toBeGreaterThanOrEqual(15)
+        expect(jugadores.flatMap((p) => p.values).filter((v) => v !== null).every((v) => v! <= 99)).toBe(true)
+        huecos.add(j)
+      }
+      expect(huecos, 'el hueco está en las dos partidas y en el total').toEqual(new Set([0, 1, 2]))
+    })
+
+    it('las tablas completas son cuentas bien hechas, sin empates de total ni de puntos en una partida, y de dos cifras', () => {
+      for (const ask of ['round', 'single', 'winner'] as const) {
+        for (const e of muchos({ kind: 'score-table', ask }).map(choice)) {
+          const jugadores = filas(e)
+          for (const p of jugadores) {
+            expect(p.values.every((v) => v !== null)).toBe(true)
+            expect(p.values[0]! + p.values[1]!).toBe(p.values[2])
+            expect(p.values[2]!).toBeLessThanOrEqual(99)
+          }
+          const partidas = jugadores.flatMap((p) => [p.values[0]!, p.values[1]!])
+          expect(new Set(partidas).size, 'ninguna puntuación se repite').toBe(6)
+          expect(new Set(jugadores.map((p) => p.values[2])).size, 'no hay empates de total').toBe(3)
+        }
+      }
+    })
+
+    it('¿quién ganó?: gana el jugador con más puntos en total; las opciones son los tres animales', () => {
+      const ganadores = new Set<string>()
+      for (const e of muchos({ kind: 'score-table', ask: 'winner' }).map(choice)) {
+        expect(e.question).toBe('¿Quién ganó? Gana quien suma más puntos.')
+        const jugadores = filas(e)
+        const mejor = [...jugadores].sort((a, b) => b.values[2]! - a.values[2]!)[0]
+        expect(e.answer).toBe(mejor.emoji)
+        expect(new Set(e.options)).toEqual(new Set(jugadores.map((p) => p.emoji)))
+        for (const p of jugadores) expect(e.labels![p.emoji]).toBe(p.name)
+        ganadores.add(jugadores.indexOf(mejor).toString())
+      }
+      expect(ganadores.size, 'el ganador no está siempre en la misma fila').toBe(3)
+    })
+
+    it('una sola partida: gana quien hizo más puntos en una partida, no siempre quien ganó en total', () => {
+      let distintos = 0
+      for (const e of muchos({ kind: 'score-table', ask: 'single' }).map(choice)) {
+        expect(e.question).toBe('¿Quién hizo más puntos en una sola partida?')
+        const jugadores = filas(e)
+        const mejor = [...jugadores].sort((a, b) => Math.max(b.values[0]!, b.values[1]!) - Math.max(a.values[0]!, a.values[1]!))[0]
+        expect(e.answer).toBe(mejor.emoji)
+        expect(new Set(e.options)).toEqual(new Set(jugadores.map((p) => p.emoji)))
+        const ganador = [...jugadores].sort((a, b) => b.values[2]! - a.values[2]!)[0]
+        if (ganador.emoji !== mejor.emoji) distintos++
+      }
+      expect(distintos, 'a veces el mejor de una partida no es el ganador').toBeGreaterThan(30)
+    })
+
+    it('partida: la pregunta nombra al animal y la respuesta es la partida con más puntos (nunca iguales)', () => {
+      const respuestas = new Set<string>()
+      for (const e of muchos({ kind: 'score-table', ask: 'round' }).map(choice)) {
+        const [, articulo, nombre] = e.question.match(/^¿En qué partida hizo más puntos (el|la) (.+)\?$/)!
+        const jugador = filas(e).find((p) => p.name === nombre)!
+        expect(jugador, e.question).toBeDefined()
+        expect(articulo).toBe(ANIMALES.find((a) => a.singular === nombre)!.fem ? 'la' : 'el')
+        const esperado = jugador.values[0]! > jugador.values[1]! ? '1ª partida' : '2ª partida'
+        expect(e.answer).toBe(esperado)
+        expect(new Set(e.options)).toEqual(new Set(['1ª partida', '2ª partida', 'Las dos iguales']))
+        respuestas.add(esperado)
+      }
+      expect(respuestas.size).toBe(2)
     })
   })
 
