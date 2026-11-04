@@ -1086,6 +1086,36 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       if (spec.operator === '−') return spec.ask === 'type' ? tipoDeResta(rng) : restaQueLleva(rng)
       return sumaQueLleva(rng)
 
+    case 'borrow-condition': {
+      const condicion = spec.carry ? 'llevando' : 'sin llevar'
+      if (spec.ask === 'minuend-digit') {
+        // Las decenas del minuendo superan a las del sustraendo: siempre se puede restar, también pidiendo una decena
+        const d = int(rng, 1, 8)
+        const t = int(rng, d + 1, 9)
+        // Llevando: unidades del minuendo menores que las del sustraendo (el sustraendo acaba en 1 a 7 para que haya dos que no lleven)
+        const s = spec.carry ? int(rng, 1, 7) : int(rng, 3, 9)
+        const cumplen = spec.carry ? Array.from({ length: s }, (_, i) => i) : Array.from({ length: 10 - s }, (_, i) => i + s)
+        const incumplen = Array.from({ length: 10 }, (_, i) => i).filter((i) => !cumplen.includes(i))
+        const bien = pick(rng, cumplen)
+        const mal = shuffle(rng, incumplen).slice(0, 2)
+        const numeros = [bien, ...mal].map((u) => t * 10 + u)
+        return elegir(`¿Qué número completa la resta para que sea ${condicion}?`, numeros, t * 10 + bien, `${t}❓ − ${d * 10 + s}`)
+      }
+      // Sustraendo: el minuendo tiene unidades de 2 a 7, así que hay dos sustraendos de cada tipo con cifras de las unidades de 1 a 9
+      const t = int(rng, 2, 9)
+      const m = int(rng, 2, 7)
+      const cumplen = spec.carry ? Array.from({ length: 9 - m }, (_, i) => i + m + 1) : Array.from({ length: m }, (_, i) => i + 1)
+      const incumplen = spec.carry ? Array.from({ length: m }, (_, i) => i + 1) : Array.from({ length: 9 - m }, (_, i) => i + m + 1)
+      const unSustraendo = (u: number) => int(rng, 1, t - 1) * 10 + u
+      const bien = unSustraendo(pick(rng, cumplen))
+      const otros = new Set<number>()
+      while (otros.size < 2) {
+        const n = unSustraendo(pick(rng, incumplen))
+        if (n !== bien) otros.add(n)
+      }
+      return elegir(`¿Qué número se puede restar para que la resta sea ${condicion}?`, [bien, ...otros], bien, `${t * 10 + m} − ❓`)
+    }
+
     case 'compare-problem':
       return problemaComparar(spec.ask, spec.carry ?? false, rng)
     case 'chain':
