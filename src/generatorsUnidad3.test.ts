@@ -123,6 +123,50 @@ describe('Centenas, decenas y unidades', () => {
     }
     expect([...lugares].sort()).toEqual(['centenas', 'decenas', 'unidades'])
   })
+
+  describe('pistas: elegir el número que cumple la pista', () => {
+    // Tabla de verdad independiente del generador: cada pista es una condición sobre las cifras del número.
+    // Un lugar que no se nombra (en «1 centena y 5 decenas») vale 0, salvo con «más de» y «menos de», que solo hablan de un lugar
+    const cifras = (n: number) => ({ c: Math.floor(n / 100), d: Math.floor((n % 100) / 10), u: n % 10 })
+    const cumple = (pregunta: string, n: number): boolean => {
+      const { c, d, u } = cifras(n)
+      let m = pregunta.match(/^¿Qué número tiene (\d) centenas?, (\d) decenas? y (\d) unidad(?:es)?\?$/)
+      if (m) return c === +m[1] && d === +m[2] && u === +m[3]
+      m = pregunta.match(/^¿Qué número tiene (\d) centenas? y más de (\d) decenas\?$/)
+      if (m) return c === +m[1] && d > +m[2]
+      m = pregunta.match(/^¿Qué número tiene (\d) centenas? y menos de (\d) unidades\?$/)
+      if (m) return c === +m[1] && u < +m[2]
+      m = pregunta.match(/^¿Qué número tiene (\d) centenas? y (\d) decenas?\?$/)
+      if (m) return c === +m[1] && d === +m[2] && u === 0
+      m = pregunta.match(/^¿Qué número tiene (\d) centenas? y (\d) unidad(?:es)?\?$/)
+      if (m) return c === +m[1] && d === 0 && u === +m[2]
+      throw new Error(`pista inesperada: ${pregunta}`)
+    }
+
+    it('de tres números de tres cifras cumple la pista exactamente uno y es la respuesta', () => {
+      for (const e of muchos({ kind: 'cdu', ask: 'clue' }).map(choice)) {
+        expect(e.options, e.question).toHaveLength(3)
+        for (const opcion of e.options) expect(opcion, e.question).toMatch(/^[1-9]\d\d$/)
+        expect(e.options.filter((o) => cumple(e.question, Number(o))), e.question).toEqual([e.answer])
+      }
+    })
+
+    it('salen todos los tipos de pista: tres lugares, «más de», «menos de», y un lugar sin nombrar (el cero)', () => {
+      const tipos = new Set<string>()
+      for (const e of muchos({ kind: 'cdu', ask: 'clue' }).map(choice)) {
+        tipos.add(
+          /, .* y .*\?$/.test(e.question) ? 'tres' : /más de/.test(e.question) ? 'mas' : /menos de/.test(e.question) ? 'menos' : /decenas?\?$/.test(e.question) ? 'sin-unidades' : 'sin-decenas',
+        )
+      }
+      expect(tipos).toEqual(new Set(['tres', 'mas', 'menos', 'sin-unidades', 'sin-decenas']))
+    })
+
+    it('la respuesta correcta sale en las tres posiciones y se usa el singular («1 centena», «1 unidad»)', () => {
+      const ejercicios = muchos({ kind: 'cdu', ask: 'clue' }).map(choice)
+      expect(new Set(ejercicios.map((e) => e.options.indexOf(e.answer)))).toEqual(new Set([0, 1, 2]))
+      for (const e of ejercicios) expect(e.question).not.toMatch(/\b1 (centenas|decenas|unidades)\b/)
+    })
+  })
 })
 
 // Tabla de verdad independiente: de menor a mayor capacidad

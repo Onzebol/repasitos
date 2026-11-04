@@ -361,6 +361,48 @@ function tipoDeResta(rng: Rng): ChoiceExercise {
   return elegir('Esta resta, ¿es sin llevar o llevando?', ['Sin llevar', 'Llevando'], llevando ? 'Llevando' : 'Sin llevar', `${a} − ${b} = ${a - b}`)
 }
 
+// Pistas de centenas, decenas y unidades (elegir entre tres números de tres cifras, uno solo cumple la pista): las tres cifras,
+// «más de N decenas», «menos de N unidades» y un lugar sin nombrar, que vale 0 («1 centena y 5 decenas» es el 150, «1 centena y
+// 6 unidades» el 106). Las equivocadas incumplen la pista por construcción: cifras cambiadas, el límite exacto o un 0 mal puesto
+function pistaCdu(rng: Rng): ChoiceExercise {
+  const c = int(rng, 1, 9)
+  const n = (d: number, u: number) => c * 100 + d * 10 + u
+  const cualquiera = () => int(rng, 0, 9)
+  const tipo = int(rng, 0, 4)
+  let pregunta: string
+  let opciones: number[] // la primera es la respuesta
+  if (tipo === 0) {
+    // las tres cifras, distintas y sin cero: la respuesta, las cifras cambiadas y la centena en otro sitio
+    let [d, u] = [int(rng, 1, 9), int(rng, 1, 9)]
+    while (d === u || d === c || u === c) [d, u] = [int(rng, 1, 9), int(rng, 1, 9)]
+    pregunta = `¿Qué número tiene ${centenasDecenasUnidades(c, d, u)}?`
+    opciones = [n(d, u), n(u, d), d * 100 + c * 10 + u]
+  } else if (tipo === 1) {
+    // más de N decenas: la respuesta tiene más; las otras, N decenas o menos
+    const limite = int(rng, 3, 8)
+    const [x, y] = shuffle(rng, Array.from({ length: limite + 1 }, (_, i) => i)).slice(0, 2)
+    pregunta = `¿Qué número tiene ${centenas(c)} y más de ${limite} decenas?`
+    opciones = [n(int(rng, limite + 1, 9), cualquiera()), n(x, cualquiera()), n(y, cualquiera())]
+  } else if (tipo === 2) {
+    // menos de N unidades: la respuesta tiene menos; las otras, N unidades o más
+    const limite = int(rng, 2, 5)
+    const [x, y] = shuffle(rng, Array.from({ length: 10 - limite }, (_, i) => i + limite)).slice(0, 2)
+    pregunta = `¿Qué número tiene ${centenas(c)} y menos de ${limite} unidades?`
+    opciones = [n(cualquiera(), int(rng, 0, limite - 1)), n(cualquiera(), x), n(cualquiera(), y)]
+  } else if (tipo === 3) {
+    // sin unidades (el lugar sin nombrar vale 0): 1 centena y 5 decenas es el 150, no el 155 ni el 105
+    const d = int(rng, 1, 9)
+    pregunta = `¿Qué número tiene ${centenas(c)} y ${decenas(d)}?`
+    opciones = [n(d, 0), n(d, int(rng, 1, 9)), n(0, d)]
+  } else {
+    // sin decenas: 1 centena y 6 unidades es el 106, no el 160 ni el 116
+    const u = int(rng, 1, 9)
+    pregunta = `¿Qué número tiene ${centenas(c)} y ${unidades(u)}?`
+    opciones = [n(0, u), n(u, 0), n(int(rng, 1, 9), u)]
+  }
+  return elegir(pregunta, shuffle(rng, opciones), opciones[0])
+}
+
 const HISTORIAS_SUMA: ((a: number, b: number) => string)[] = [
   (a, b) => `Tengo ${a} pegatinas y me regalan ${b}. ¿Cuántas tengo ahora?`,
   (a, b) => `En el parque hay ${a} niños y llegan ${b} más. ¿Cuántos hay ahora?`,
@@ -1012,6 +1054,7 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       return problema(spec.operator, spec.carry ?? false, rng, spec.faltan ?? false)
 
     case 'cdu': {
+      if (spec.ask === 'clue') return pistaCdu(rng)
       if (spec.ask === 'compose') {
         const c = int(rng, 1, 9)
         const d = int(rng, 0, 9)

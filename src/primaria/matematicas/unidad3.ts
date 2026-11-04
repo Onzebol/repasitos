@@ -62,10 +62,11 @@ export const temasUnidad3: Topic[] = [
     icon: '💯',
     tint: '#ffd1dc',
     plan: [
-      { spec: { kind: 'cdu', ask: 'read' }, count: 2 },
+      { spec: { kind: 'cdu', ask: 'read' }, count: 1 },
       { spec: { kind: 'cdu', ask: 'compose' }, count: 3 },
       { spec: { kind: 'cdu', ask: 'blocks' }, count: 2 },
-      { spec: { kind: 'cdu', ask: 'count' }, count: 3 },
+      { spec: { kind: 'cdu', ask: 'count' }, count: 2 },
+      { spec: { kind: 'cdu', ask: 'clue' }, count: 2 },
     ],
   },
   {
