@@ -13,7 +13,7 @@ const sesion = (id: string, seed = 3) => buildSession(temasUnidad3.find((topic) 
 
 describe('Unidad 3 de Matemáticas: contenido', () => {
   it('tiene los cuatro temas de la issue y está registrada en la unidad 3', () => {
-    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'centenas-decenas-unidades', 'el-litro', 'calculo-mental'])
+    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'centenas-decenas-unidades', 'el-litro', 'mas-menos-que', 'calculo-mental'])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u3')!.topics).toBe(temasUnidad3)
   })
 
@@ -58,6 +58,15 @@ describe('Unidad 3 de Matemáticas: contenido', () => {
     const session = sesion('centenas-decenas-unidades')
     expect(session).toHaveLength(10)
     expect(session.filter((e) => e.type === 'choice' && /^¿Qué número tiene \d centenas?/.test(e.question))).toHaveLength(2)
+  })
+
+  it('"Más que, menos que" elige sumar o restar con el texto a la vista y calcula, con y sin llevada', () => {
+    const session = sesion('mas-menos-que')
+    expect(session).toHaveLength(10)
+    const elegir = session.filter((e) => e.type === 'choice')
+    expect(elegir).toHaveLength(3)
+    for (const e of elegir) expect(e.type === 'choice' && e.text, e.question).toMatch(/(más|menos)\. ¿/)
+    expect(session.filter((e) => e.type === 'number')).toHaveLength(7)
   })
 
   it('"El litro" pregunta por capacidades y por litros', () => {

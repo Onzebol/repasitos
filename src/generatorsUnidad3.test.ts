@@ -211,3 +211,52 @@ describe('Cálculo mental: sumar un dígito a un número de dos cifras', () => {
     }
   })
 })
+
+describe('Problemas de «más que» y «menos que»', () => {
+  // Lo que dice el enunciado, leído sin el código del generador: los dos números y si es «más» o «menos»
+  const leer = (texto: string) => {
+    const [a, b] = texto.match(/\d+/g)!.map(Number)
+    const palabra = texto.match(/ (más|menos)\. ¿/)![1]
+    return { a, b, mas: palabra === 'más' }
+  }
+
+  it('elegir si sumar o restar: «más» es sumar y «menos» es restar, con el texto en la tarjeta de lectura', () => {
+    const palabras = new Set<boolean>()
+    for (const e of muchos({ kind: 'compare-problem', ask: 'operation' }).map(choice)) {
+      expect(e.question).toBe('¿Hay que sumar o restar?')
+      expect(e.options.slice().sort()).toEqual(['restar', 'sumar'])
+      const { mas } = leer(e.text!)
+      expect(e.answer, e.text).toBe(mas ? 'sumar' : 'restar')
+      palabras.add(mas)
+    }
+    expect(palabras).toEqual(new Set([true, false]))
+  })
+
+  it('calcular: el resultado es el primer número más o menos el segundo, de dos cifras y sin pasar de 99', () => {
+    for (const carry of [false, true]) {
+      for (const e of muchos({ kind: 'compare-problem', ask: 'calculate', carry }).map(number)) {
+        const { a, b, mas } = leer(e.question)
+        expect(e.question).toMatch(/^[^?]*\. ¿(Cuánt[oa]s? )[^?]*\?$/)
+        expect(a, e.question).toBeGreaterThanOrEqual(10)
+        expect(b, e.question).toBeGreaterThanOrEqual(10)
+        expect(e.answer, e.question).toBe(mas ? a + b : a - b)
+        expect(e.answer, e.question).toBeGreaterThan(0)
+        expect(e.answer, e.question).toBeLessThanOrEqual(99)
+        // sin llevar, las unidades no pasan ni piden una decena; llevando, sí
+        const lleva = mas ? (a % 10) + (b % 10) >= 10 : a % 10 < b % 10
+        expect(lleva, e.question).toBe(carry)
+      }
+    }
+  })
+
+  it('salen todas las historias y tanto «más» como «menos»', () => {
+    const historias = new Set<string>()
+    const palabras = new Set<boolean>()
+    for (const e of muchos({ kind: 'compare-problem', ask: 'calculate' }).map(number)) {
+      historias.add(e.question.replace(/\d+/g, '#').replace(/ (más|menos)\./, ' X.'))
+      palabras.add(leer(e.question).mas)
+    }
+    expect(historias.size).toBe(6)
+    expect(palabras).toEqual(new Set([true, false]))
+  })
+})

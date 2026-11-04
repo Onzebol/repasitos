@@ -558,6 +558,28 @@ function tablaDeCodigos(ask: 'cell' | 'line' | 'decode', rng: Rng): ChoiceExerci
   }
 }
 
+// Problemas de comparación (unidad 3): el primer dato es la cantidad conocida y el segundo dice cuánto «más» o «menos» tiene el
+// otro: «más» se suma y «menos» se resta. Siempre se pregunta por el segundo sujeto, así que la palabra manda
+const HISTORIAS_COMPARAR: ((a: number, b: number, w: string) => string)[] = [
+  (a, b, w) => `El puzle azul tiene ${a} piezas. El puzle rojo tiene ${b} piezas ${w}. ¿Cuántas piezas tiene el puzle rojo?`,
+  (a, b, w) => `La ballena mide ${a} metros. El delfín mide ${b} metros ${w}. ¿Cuántos metros mide el delfín?`,
+  (a, b, w) => `El tiburón vive ${a} años. La tortuga vive ${b} años ${w}. ¿Cuántos años vive la tortuga?`,
+  (a, b, w) => `En la clase de los leones hay ${a} niños. En la clase de los osos hay ${b} niños ${w}. ¿Cuántos niños hay en la clase de los osos?`,
+  (a, b, w) => `La caja roja tiene ${a} lápices. La caja verde tiene ${b} lápices ${w}. ¿Cuántos lápices tiene la caja verde?`,
+  (a, b, w) => `Mi álbum tiene ${a} cromos. El álbum de mi hermano tiene ${b} cromos ${w}. ¿Cuántos cromos tiene el álbum de mi hermano?`,
+]
+
+// Con `ask: 'operation'` se elige sumar o restar (el texto va en la tarjeta de lectura); con `calculate` se escribe el resultado.
+// Los dos números son de dos cifras y el resultado de hasta 99; con `carry` la cuenta lleva
+function problemaComparar(ask: 'operation' | 'calculate', carry: boolean, rng: Rng): ChoiceExercise | NumberExercise {
+  const mas = rng() < 0.5
+  let [a, b] = carry ? operandosLlevando(mas ? '+' : '−', rng) : operandos(mas ? '+' : '−', rng)
+  while (a + b > 99 && mas) [a, b] = carry ? operandosLlevando('+', rng) : operandos('+', rng)
+  const historia = pick(rng, HISTORIAS_COMPARAR)(a, b, mas ? 'más' : 'menos')
+  if (ask === 'calculate') return numero(historia, mas ? a + b : a - b)
+  return { ...elegir('¿Hay que sumar o restar?', ['sumar', 'restar'], mas ? 'sumar' : 'restar'), text: historia }
+}
+
 // Los pasos de un problema: con el texto en la tarjeta de lectura, se elige qué operación hay que hacer o qué se calcula
 function pasoDeProblema(ask: 'operation' | 'calculate', rng: Rng, faltan = false): ChoiceExercise {
   const operator = faltan ? '−' : pick(rng, ['+', '−'] as const)
@@ -1045,6 +1067,9 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
     case 'carry-spot':
       if (spec.operator === '−') return spec.ask === 'type' ? tipoDeResta(rng) : restaQueLleva(rng)
       return sumaQueLleva(rng)
+
+    case 'compare-problem':
+      return problemaComparar(spec.ask, spec.carry ?? false, rng)
 
     case 'problem-step':
       return pasoDeProblema(spec.ask, rng, spec.faltan ?? false)
