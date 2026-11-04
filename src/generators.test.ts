@@ -1081,6 +1081,30 @@ describe('generate: reglas de cada plantilla', () => {
       expect(valoresDeLaPrimera.size, 'el valor de una figura cambia de un ejercicio a otro').toBeGreaterThan(4)
     })
 
+    it('con valores de unidades y decenas: las figuras valen 1, 2, 10 y 20 repartidos al azar y la suma es de 2 a 40', () => {
+      const repartos = new Set<string>()
+      for (const e of muchos({ kind: 'shape-sum', ask: 'sum', values: 'ones-tens' }).map(number)) {
+        const valores = leyenda(e.visual!)
+        expect(Object.keys(valores).sort(), e.visual).toEqual(Object.keys(FIGURAS).sort())
+        expect(Object.values(valores).sort((a, b) => a - b), e.visual).toEqual([1, 2, 10, 20])
+        const [, f1, f2] = e.question.match(/^(\S+) \+ (\S+) =$/u)!
+        expect(e.answer, `${e.question} ${e.visual}`).toBe(valores[f1] + valores[f2])
+        expect(e.answer).toBeGreaterThanOrEqual(2)
+        expect(e.answer).toBeLessThanOrEqual(40)
+        repartos.add(e.visual!)
+      }
+      expect(repartos.size, 'el reparto de valores cambia de un ejercicio a otro').toBeGreaterThan(10)
+    })
+
+    it('con valores de unidades y decenas, qué figura falta: una sola completa la suma', () => {
+      for (const e of muchos({ kind: 'shape-sum', ask: 'find', values: 'ones-tens' }).map(choice)) {
+        const valores = leyenda(e.visual!)
+        expect(Object.values(valores).sort((a, b) => a - b), e.visual).toEqual([1, 2, 10, 20])
+        const [, f1, suma] = e.question.match(/^¿Qué figura falta\? (\S+) \+ ❓ = (\d+)$/u)!
+        expect(e.options.filter((opcion) => valores[f1] + valores[opcion] === Number(suma)), `${e.question} ${e.visual}`).toEqual([e.answer])
+      }
+    })
+
     it('qué figura falta: una sola de las tres opciones completa la suma', () => {
       for (const e of muchos({ kind: 'shape-sum', ask: 'find' }).map(choice)) {
         const valores = leyenda(e.visual!)

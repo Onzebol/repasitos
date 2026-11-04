@@ -806,7 +806,8 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
 
     case 'shape-sum': {
       // Cada figura vale un número distinto de 2 a 9 que cambia en cada ejercicio: no hay que aprenderlo, se lee en la leyenda
-      const valores = shuffle(rng, [2, 3, 4, 5, 6, 7, 8, 9])
+      // (con `values: 'ones-tens'`, unidad 3: valen 1, 2, 10 y 20, repartidos al azar)
+      const valores = shuffle(rng, spec.values === 'ones-tens' ? [1, 2, 10, 20] : [2, 3, 4, 5, 6, 7, 8, 9])
       const figuras = FIGURAS.map((figura, i) => ({ ...figura, valor: valores[i] }))
       const leyenda = figuras.map((f) => `${f.emoji} = ${f.valor}`).join('  ')
       const primera = pick(rng, figuras)
@@ -1430,6 +1431,25 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
           c = int(rng, 1, 9)
         } while (a + b + c < 10 || a + b + c > 25)
         return numero(`${a} + ${b} + ${c} =`, a + b + c)
+      }
+      if (spec.mode === 'tens-digit') {
+        // Decena redonda y unidad, en cualquier orden: 30 + 3 y 5 + 60 (sin llevar, hasta 99)
+        const [decena, unidad] = [int(rng, 1, 9) * 10, int(rng, 1, 9)]
+        return numero(rng() < 0.5 ? `${decena} + ${unidad} =` : `${unidad} + ${decena} =`, decena + unidad)
+      }
+      if (spec.mode === 'digit-first') {
+        // El dígito delante del número de dos cifras: 4 + 63 (sin llevar)
+        const [decenasN, unidadesN] = [int(rng, 1, 8), int(rng, 0, 8)]
+        const digito = int(rng, 1, 9 - unidadesN)
+        return numero(`${digito} + ${decenasN * 10 + unidadesN} =`, digito + decenasN * 10 + unidadesN)
+      }
+      if (spec.mode === 'digit-missing') {
+        // El dígito que falta, en el primer sumando o en el segundo: ▢ + 24 = 27 y 12 + ▢ = 15 (sin llevar)
+        const [decenasN, unidadesN] = [int(rng, 1, 8), int(rng, 0, 8)]
+        const grande = decenasN * 10 + unidadesN
+        const digito = int(rng, 1, 9 - unidadesN)
+        const total = grande + digito
+        return numero(rng() < 0.5 ? `Completa: ▢ + ${grande} = ${total}` : `Completa: ${grande} + ▢ = ${total}`, digito)
       }
       if (spec.mode === 'add-digit') {
         // Sin llevar: las unidades del número más el dígito no pasan de 9
