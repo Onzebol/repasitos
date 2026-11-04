@@ -184,7 +184,9 @@ export type BlockSpec =
   // Con `addends: 3` (solo sumas) hay tres sumandos de una o dos cifras que siempre llevan, con resultado de hasta 99: 15 + 14 + 7
   | { kind: 'column'; operator: '+' | '−'; carry?: boolean; oneDigit?: boolean; addends?: 2 | 3 }
   // ¿Qué suma es llevando? (elegir): tres sumas de dos números de dos cifras, una lleva y las otras dos no
-  | { kind: 'carry-spot' }
+  // Con `operator: '−'` (unidad 3): ¿qué resta es llevando? (tres restas, una sola lleva: las unidades del minuendo son menores
+  // que las del sustraendo) o, con `ask: 'type'`, una resta ya hecha (85 − 67 = 18) y se elige «Sin llevar» o «Llevando»
+  | { kind: 'carry-spot'; operator?: '+' | '−'; ask?: 'pick' | 'type' }
   // Pasos de un problema (elegir): a partir de un texto corto, ¿hay que sumar o restar? (`operation`) o ¿hay que calcular
   // el total o la diferencia? (`calculate`). Sin llevar. Con `faltan` (unidad 2) solo salen restas de «¿cuántos faltan?»:
   // hace falta un total, ya hay una parte y se pregunta cuántos faltan

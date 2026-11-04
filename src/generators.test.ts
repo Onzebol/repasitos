@@ -165,6 +165,8 @@ const SPECS: BlockSpec[] = [
   { kind: 'flag-numbers', ask: 'three-smallest' },
   { kind: 'column', operator: '+', carry: true, oneDigit: true },
   { kind: 'carry-spot' },
+  { kind: 'carry-spot', operator: '−' },
+  { kind: 'carry-spot', operator: '−', ask: 'type' },
   { kind: 'word-problem', operator: '+' },
   { kind: 'word-problem', operator: '−' },
   { kind: 'word-problem', operator: '+', carry: true },
@@ -2314,6 +2316,47 @@ describe('generate: reglas de cada plantilla', () => {
     it('la suma que lleva sale en las tres posiciones', () => {
       const posiciones = new Set(muchos({ kind: 'carry-spot' }).map(choice).map((e) => e.options.indexOf(e.answer)))
       expect(posiciones).toEqual(new Set([0, 1, 2]))
+    })
+  })
+
+  describe('carry-spot con restas: elegir la resta que lleva y decir si una resta lleva', () => {
+    // Tabla de verdad independiente del generador: una resta lleva si las unidades del minuendo son menores que las del sustraendo
+    const lleva = (resta: string) => {
+      const [a, b] = resta.split(' − ').map(Number)
+      return a % 10 < b % 10
+    }
+
+    it('de tres restas lleva exactamente una y esa es la respuesta; todas de dos cifras y con resultado positivo', () => {
+      for (const e of muchos({ kind: 'carry-spot', operator: '−' }).map(choice)) {
+        expect(e.question).toBe('¿Qué resta es llevando?')
+        expect(e.options, e.question).toHaveLength(3)
+        for (const opcion of e.options) {
+          expect(opcion, e.question).toMatch(/^\d\d − \d\d$/)
+          const [a, b] = opcion.split(' − ').map(Number)
+          expect(a - b, opcion).toBeGreaterThan(0)
+        }
+        expect(e.options.filter(lleva), e.options.join(' | ')).toEqual([e.answer])
+      }
+    })
+
+    it('la resta que lleva sale en las tres posiciones y hay restas sin llevar con decenas grandes', () => {
+      const ejercicios = muchos({ kind: 'carry-spot', operator: '−' }).map(choice)
+      expect(new Set(ejercicios.map((e) => e.options.indexOf(e.answer)))).toEqual(new Set([0, 1, 2]))
+      // trampa: una resta sin llevar con las decenas del sustraendo de 5 o más (95 − 21 no lleva aunque lo parezca)
+      expect(ejercicios.some((e) => e.options.some((o) => !lleva(o) && Number(o.split(' − ')[1]) >= 50))).toBe(true)
+    })
+
+    it('«¿sin llevar o llevando?»: la resta ya hecha tiene bien el resultado y la respuesta es la que dice la regla', () => {
+      const respuestas = new Set<string>()
+      for (const e of muchos({ kind: 'carry-spot', operator: '−', ask: 'type' }).map(choice)) {
+        expect(e.question).toBe('Esta resta, ¿es sin llevar o llevando?')
+        const [, a, b, c] = e.visual!.match(/^(\d\d) − (\d\d) = (\d+)$/)!
+        expect(Number(a) - Number(b), e.visual).toBe(Number(c))
+        expect(e.options.slice().sort()).toEqual(['Llevando', 'Sin llevar'])
+        expect(e.answer, e.visual).toBe(lleva(`${a} − ${b}`) ? 'Llevando' : 'Sin llevar')
+        respuestas.add(e.answer)
+      }
+      expect(respuestas).toEqual(new Set(['Llevando', 'Sin llevar']))
     })
   })
 
