@@ -20,6 +20,7 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
       'problemas',
       'calculo-mental',
       'informacion-con-numeros',
+      'quien-gano',
       'desafios-y-logica',
     ])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u2')!.topics).toBe(temasUnidad2)
@@ -33,6 +34,20 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(preguntas.filter((q) => q.endsWith('Elige sus números.'))).toHaveLength(3)
     expect(preguntas.filter((q) => q.startsWith('Las actividades '))).toHaveLength(3)
     for (const e of session) expect(e.type === 'choice' && e.codeTable, e.question).toBeTruthy()
+  })
+
+  it('"¿Quién ganó?" completa la tabla de puntos (sumando o restando) y después pregunta por la partida, el mejor de una partida y el ganador', () => {
+    const session = sesion('quien-gano')
+    expect(session).toHaveLength(10)
+    expect(session.filter((e) => e.type === 'number' && e.question === 'Completa la tabla: ¿qué número falta?')).toHaveLength(4)
+    expect(session.filter((e) => e.type === 'choice' && /^¿En qué partida hizo más puntos /.test(e.question))).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && e.question === '¿Quién hizo más puntos en una sola partida?')).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'choice' && e.question.startsWith('¿Quién ganó?'))).toHaveLength(2)
+    // la tabla se ve siempre
+    for (const e of session) expect((e.type === 'choice' || e.type === 'number') && e.scoreTable, e.question).toBeTruthy()
+    // primero se calcula y después se contesta sobre la tabla ya completa
+    expect(session.slice(0, 4).every((e) => e.type === 'number')).toBe(true)
+    expect(session.slice(4).every((e) => e.type === 'choice')).toBe(true)
   })
 
   it('"Problemas" mezcla los pasos (sumar o restar, qué se calcula) y problemas de sumar y de restar, con «¿cuántos faltan?»', () => {

@@ -7,7 +7,7 @@ import type { Animal } from './infantil/animales'
 import { RIMAS, SONIDOS } from './infantil/letras/palabras'
 import type { Palabra } from './infantil/letras/palabras'
 import type { Digit } from './infantil/trazos'
-import type { BlockSpec, ChoiceExercise, ColumnExercise, Exercise, NumberExercise } from './types'
+import type { BlockSpec, ChoiceExercise, ColumnExercise, Exercise, NumberExercise, ScoreTableData } from './types'
 
 const elegir = (question: string, options: (string | number)[], answer: string | number, visual?: string): ChoiceExercise => ({
   type: 'choice',
@@ -62,6 +62,42 @@ function tresCifras(rng: Rng, answer: number, min: number, max: number): number[
 
 // «3 perros», «1 perro»: nombre accesible de un grupo de dibujos
 const etiqueta = (animal: Animal, k: number) => `${k} ${k === 1 ? animal.singular : animal.plural}`
+
+// Tabla de puntuaciones: tres animales, dos partidas de 15 a 49 y el total (hasta 98). Todas las puntuaciones son distintas y
+// los totales también: sin empates. `hole` vacía una casilla (el total el 40 % de las veces, si no una partida) y se escribe
+// el número; con la tabla completa se elige la partida, el mejor de una partida o el ganador
+function tablaDePuntos(ask: 'hole' | 'round' | 'single' | 'winner', rng: Rng): ChoiceExercise | NumberExercise {
+  const jugadores = shuffle(rng, ANIMALES_CON_NOMBRE).slice(0, 3)
+  let filas: number[][]
+  do {
+    filas = jugadores.map(() => {
+      const [x, y] = [int(rng, 15, 49), int(rng, 15, 49)]
+      return [x, y, x + y]
+    })
+  } while (new Set(filas.flatMap((f) => [f[0], f[1]])).size < 6 || new Set(filas.map((f) => f[2])).size < 3)
+  const tabla = (hueco?: [number, number]): ScoreTableData => ({
+    columns: ['1ª partida', '2ª partida', 'Total'],
+    players: jugadores.map((a, i) => ({ emoji: a.emoji, name: a.singular, values: filas[i].map((v, j) => (hueco && i === hueco[0] && j === hueco[1] ? null : v)) })),
+  })
+  if (ask === 'hole') {
+    const i = int(rng, 0, 2)
+    const j = rng() < 0.4 ? 2 : int(rng, 0, 1)
+    return { ...numero('Completa la tabla: ¿qué número falta?', filas[i][j]), scoreTable: tabla([i, j]) }
+  }
+  const nombres = Object.fromEntries(jugadores.map((a) => [a.emoji, a.singular]))
+  const emojis = jugadores.map((a) => a.emoji)
+  const mejor = (valor: (f: number[]) => number) => jugadores[filas.map(valor).indexOf(Math.max(...filas.map(valor)))].emoji
+  if (ask === 'winner') {
+    return { ...elegir('¿Quién ganó? Gana quien suma más puntos.', emojis, mejor((f) => f[2])), labels: nombres, scoreTable: tabla() }
+  }
+  if (ask === 'single') {
+    return { ...elegir('¿Quién hizo más puntos en una sola partida?', emojis, mejor((f) => Math.max(f[0], f[1]))), labels: nombres, scoreTable: tabla() }
+  }
+  const i = int(rng, 0, 2)
+  const a = jugadores[i]
+  const respuesta = filas[i][0] > filas[i][1] ? '1ª partida' : '2ª partida'
+  return { ...elegir(`¿En qué partida hizo más puntos ${a.fem ? 'la' : 'el'} ${a.singular}?`, ['1ª partida', '2ª partida', 'Las dos iguales'], respuesta), scoreTable: tabla() }
+}
 
 // Los deportes de «la información oculta» (dibujo y nombre) y los nombres de quienes los practican (sin datos de nadie real)
 const DEPORTES = [
@@ -648,6 +684,9 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
         labels: Object.fromEntries(opciones.map((o) => [o.emoji, o.nombre])),
       }
     }
+
+    case 'score-table':
+      return tablaDePuntos(spec.ask, rng)
 
     case 'hidden-info': {
       // Resta sin llevar con un resultado de dos cifras, que es el número de un deporte de la tabla

@@ -141,6 +141,19 @@ export const temasUnidad2: Topic[] = [
     ],
   },
   {
+    // Situación de aprendizaje del libro: una tabla de puntos con huecos y «¿quién ganó?»
+    id: 'quien-gano',
+    name: '¿Quién ganó?',
+    icon: '🏆',
+    tint: '#ffe3a3',
+    plan: [
+      { spec: { kind: 'score-table', ask: 'hole' }, count: 4 },
+      { spec: { kind: 'score-table', ask: 'round' }, count: 2 },
+      { spec: { kind: 'score-table', ask: 'single' }, count: 2 },
+      { spec: { kind: 'score-table', ask: 'winner' }, count: 2 },
+    ],
+  },
+  {
     // Los rincones matemáticos del libro: el número que falta (desafíos) y las cifras de la tabla del 0 al 99 (lógica)
     id: 'desafios-y-logica',
     name: 'Desafíos y lógica',
