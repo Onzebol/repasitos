@@ -129,6 +129,18 @@ export const temasUnidad2: Topic[] = [
     ],
   },
   {
+    // Taller de programación del libro: codificar y descodificar información con números (una tabla de actividades)
+    id: 'informacion-con-numeros',
+    name: 'Información con números',
+    icon: '📅',
+    tint: '#d9d2f2',
+    plan: [
+      { spec: { kind: 'code-table', ask: 'cell' }, count: 4 },
+      { spec: { kind: 'code-table', ask: 'line' }, count: 3 },
+      { spec: { kind: 'code-table', ask: 'decode' }, count: 3 },
+    ],
+  },
+  {
     // Los rincones matemáticos del libro: el número que falta (desafíos) y las cifras de la tabla del 0 al 99 (lógica)
     id: 'desafios-y-logica',
     name: 'Desafíos y lógica',

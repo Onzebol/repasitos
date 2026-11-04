@@ -14,6 +14,15 @@ export type Subject = {
 // `row` y `col` se siguen contando de 0 a 9 desde la tabla
 export type TableMarks = { row?: number; col?: number; hole?: number; from?: 0 | 100 }
 
+// Tabla de actividades con un número cada una (CodeTable, unidad 2): días en las columnas, momentos del día en las filas, un
+// dibujo en cada casilla y la leyenda con el número de cada dibujo (de 1 a 4, de menor a mayor)
+export type CodeTableData = {
+  columns: string[]
+  rows: string[]
+  cells: string[][]
+  legend: { emoji: string; name: string; number: number }[]
+}
+
 // Mapa de un itinerario (4 filas × 5 columnas, ver src/itinerarios.ts): el dibujo de cada casilla ('' = hierba), la casilla
 // donde está Repi, el camino (casillas contiguas, se tiñen de arena) y si cada casilla del camino lleva una flecha
 export type RouteMapData = {
@@ -32,6 +41,8 @@ export type ChoiceExercise = {
   text?: string
   // Tabla del 0 al 99 dibujada entre la pregunta y las opciones, con una fila o columna marcadas y/o un número que falta
   table?: TableMarks
+  // Tabla de actividades con números (unidad 2): se dibuja entre la pregunta y las opciones, con su leyenda
+  codeTable?: CodeTableData
   // Itinerarios con flechas: mapa dibujado entre la pregunta y las opciones. `steps` son las instrucciones («3> 1^ 1>», ver
   // src/route.ts) que se ven como fichas con flechas sobre el mapa; con `stepOptions`, las opciones son itinerarios y se
   // dibujan también con flechas (su nombre accesible sale de `labels`)
@@ -218,6 +229,11 @@ export type BlockSpec =
   // que sale (`sum`: 6 + 2 = 8) o la resta (`subtract`: 8 − 6 = 2) entre tres opciones, una sola cierta. Con `drawing`, los
   // tres números salen de un dibujo de dos colores: se cuentan los dibujos (suma) o se quitan los de un color (resta)
   | { kind: 'family'; ask: 'sum' | 'subtract'; drawing?: boolean }
+  // Información con números (elegir, unidad 2): una tabla de 2 × 2 (sábado y domingo, mañana y tarde) con una actividad
+  // dibujada en cada casilla y un número del 1 al 4 por actividad (distintos en cada ejercicio). `cell`: el número de una
+  // casilla; `line`: los dos números de un día (mañana y tarde) o de un momento (sábado y domingo), en ese orden;
+  // `decode`: qué dibujos son «las actividades 3 y 1», en ese orden
+  | { kind: 'code-table'; ask: 'cell' | 'line' | 'decode' }
   // Los términos de la resta (elegir): en «38 − 13 = 25», ¿cuál es el sustraendo? (se elige un número) o ¿cómo se llama el
   // 13? (se elige minuendo, sustraendo o diferencia)
   | { kind: 'subtraction-terms' }
