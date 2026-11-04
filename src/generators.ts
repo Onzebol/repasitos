@@ -1088,6 +1088,22 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
 
     case 'borrow-condition': {
       const condicion = spec.carry ? 'llevando' : 'sin llevar'
+      if (spec.typed) {
+        // Se escribe y vale cualquier número que cumpla la condición; la respuesta guardada es la menor
+        const lleva = (minuendo: number, sustraendo: number) => minuendo % 10 < sustraendo % 10
+        if (spec.ask === 'minuend-digit') {
+          const d = int(rng, 1, 8)
+          const t = int(rng, d + 1, 9)
+          const s = int(rng, 1, 9)
+          const validas = Array.from({ length: 10 }, (_, u) => u).filter((u) => lleva(t * 10 + u, d * 10 + s) === spec.carry)
+          return { ...numero(`¿Qué cifra falta para que la resta sea ${condicion}?`, Math.min(...validas), `${t}❓ − ${d * 10 + s}`), valid: validas }
+        }
+        const t = int(rng, 2, 9)
+        const m = int(rng, 1, 8)
+        const tope = (t - 1) * 10 + 9
+        const validas = Array.from({ length: tope }, (_, i) => i + 1).filter((n) => lleva(t * 10 + m, n) === spec.carry)
+        return { ...numero(`¿Qué número se puede restar para que la resta sea ${condicion}?`, Math.min(...validas), `${t * 10 + m} − ❓`), valid: validas }
+      }
       if (spec.ask === 'minuend-digit') {
         // Las decenas del minuendo superan a las del sustraendo: siempre se puede restar, también pidiendo una decena
         const d = int(rng, 1, 8)

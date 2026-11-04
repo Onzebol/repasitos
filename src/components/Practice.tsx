@@ -81,7 +81,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
 
   const checkNumber = () => {
     if (exercise.type !== 'number' || input === '') return
-    if (Number(input) === exercise.answer) {
+    if (Number(input) === exercise.answer || exercise.valid?.includes(Number(input))) {
       setSolved(true)
       setFailed(false)
     } else {
@@ -201,6 +201,9 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
                   <span role="img" aria-label={describeSteps(parseSteps(program))}>
                     <Steps value={program} />
                   </span>
+                ) : exercise.type === 'number' && exercise.valid ? (
+                  // varias respuestas valen: se enseña la que se ha escrito
+                  input
                 ) : (
                   exercise.answer
                 )}
