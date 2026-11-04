@@ -210,6 +210,8 @@ const SPECS: BlockSpec[] = [
   { kind: 'compare', mode: 'order', min: 100, max: 199 },
   { kind: 'series', step: 1, min: 100, max: 199 },
   { kind: 'series', step: 10, min: 100, max: 199 },
+  { kind: 'series', step: 100, min: 100, max: 900 },
+  { kind: 'series', step: 100, min: 100, max: 900, down: true },
   { kind: 'series', step: 1, cross: true },
   { kind: 'series', step: 10, cross: true },
   { kind: 'series', step: 1, cross: true, down: true },
@@ -397,6 +399,27 @@ describe('generate: reglas de cada plantilla', () => {
         }
       }
     }
+  })
+
+  it('las series de 100 en 100 suben y bajan por las centenas redondas, de 100 a 900', () => {
+    const empiezan = new Set<number>()
+    for (const down of [false, true]) {
+      for (const e of muchos({ kind: 'series', step: 100, min: 100, max: 900, down }).map(number)) {
+        const [a, b, c] = e.question.match(/\d+/g)!.map(Number)
+        const signo = down ? -1 : 1
+        expect(b - a, e.question).toBe(signo * 100)
+        expect(c - b, e.question).toBe(signo * 100)
+        expect(e.answer, e.question).toBe(c + signo * 100)
+        for (const n of [a, b, c, e.answer]) {
+          expect(n % 100, e.question).toBe(0)
+          expect(n, e.question).toBeGreaterThanOrEqual(100)
+          expect(n, e.question).toBeLessThanOrEqual(900)
+        }
+        empiezan.add(down ? -a : a)
+      }
+    }
+    // suben desde 100 hasta 600 y bajan desde 900 hasta 400: salen todas las salidas posibles
+    expect(empiezan).toEqual(new Set([100, 200, 300, 400, 500, 600, -400, -500, -600, -700, -800, -900]))
   })
 
   it('las series hacia atrás por defecto también salen de dos cifras y bajan de 1 en 1 o de 10 en 10', () => {
