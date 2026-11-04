@@ -12,8 +12,8 @@ describeUnit('Unidad 3 de Matemáticas', temasUnidad3)
 const sesion = (id: string, seed = 3) => buildSession(temasUnidad3.find((topic) => topic.id === id)!.plan, mulberry32(seed))
 
 describe('Unidad 3 de Matemáticas: contenido', () => {
-  it('tiene los cuatro temas de la issue y está registrada en la unidad 3', () => {
-    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'centenas-decenas-unidades', 'el-litro', 'mas-menos-que', 'desafios-y-logica', 'calculo-mental'])
+  it('tiene los temas de la unidad y está registrada en la unidad 3', () => {
+    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'centenas-decenas-unidades', 'el-litro', 'instrumentos-y-unidades', 'mas-menos-que', 'desafios-y-logica', 'calculo-mental'])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u3')!.topics).toBe(temasUnidad3)
   })
 

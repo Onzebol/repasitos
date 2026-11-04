@@ -1,4 +1,5 @@
 import type { Group, Member, Topic } from '../../types'
+import { temaMedidas } from './medidas'
 
 const litros = (question: string, answer: number) => ({ type: 'number' as const, question, answer })
 
@@ -83,6 +84,7 @@ export const temasUnidad3: Topic[] = [
       { spec: { kind: 'bag', items: PROBLEMAS_LITROS }, count: 2 },
     ],
   },
+  temaMedidas,
   {
     // Laboratorio de problemas del libro (pp. 64–65): comparar con «más que…» y «menos que…»
     id: 'mas-menos-que',
