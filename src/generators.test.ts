@@ -998,6 +998,60 @@ describe('generate: reglas de cada plantilla', () => {
     }
   })
 
+  it('tabla del 100 al 199, fila: los números de la fila empiezan por 10… 19 (la decena con el 1 delante)', () => {
+    const filas = new Set<number>()
+    for (const e of muchos({ kind: 'table-99', ask: 'row', from: 100 }).map(choice)) {
+      const fila = e.table!.row!
+      expect(e.table, e.question).toEqual({ from: 100, row: fila })
+      expect(fila).toBeGreaterThanOrEqual(0)
+      expect(fila).toBeLessThanOrEqual(9)
+      // la fila 3 es la de los 130 a 139: empiezan por 13
+      expect(e.answer).toBe(String(10 + fila))
+      expect(e.options).toHaveLength(3)
+      for (const opcion of e.options) {
+        expect(Number(opcion)).toBeGreaterThanOrEqual(10)
+        expect(Number(opcion)).toBeLessThanOrEqual(19)
+      }
+      filas.add(fila)
+    }
+    expect(filas.size).toBe(10)
+  })
+
+  it('tabla del 100 al 199, columna: acaban en la cifra de las unidades', () => {
+    const columnas = new Set<number>()
+    for (const e of muchos({ kind: 'table-99', ask: 'column', from: 100 }).map(choice)) {
+      const col = e.table!.col!
+      expect(e.table, e.question).toEqual({ from: 100, col })
+      expect(e.answer).toBe(String(col))
+      for (const opcion of e.options) expect(Number(opcion)).toBeLessThanOrEqual(9)
+      columnas.add(col)
+    }
+    expect(columnas.size).toBe(10)
+  })
+
+  it('tabla del 100 al 199, número que falta: está entre 100 y 199, en su fila y columna, con el de las cifras cambiadas', () => {
+    const huecos = new Set<number>()
+    for (const e of muchos({ kind: 'table-99', ask: 'missing', from: 100 }).map(choice)) {
+      const { row, col, hole } = e.table!
+      expect(e.table!.from).toBe(100)
+      expect(hole).toBeGreaterThanOrEqual(100)
+      expect(hole).toBeLessThanOrEqual(199)
+      expect(row, e.question).toBe(Math.floor((hole! - 100) / 10))
+      expect(col, e.question).toBe(hole! % 10)
+      expect(e.answer).toBe(String(hole))
+      expect(e.options).toHaveLength(3)
+      expect(new Set(e.options).size).toBe(3)
+      for (const opcion of e.options) {
+        expect(Number(opcion)).toBeGreaterThanOrEqual(100)
+        expect(Number(opcion)).toBeLessThanOrEqual(199)
+      }
+      // 147 y 174: las dos últimas cifras cambiadas
+      if (col !== 0 && col !== row) expect(e.options).toContain(String(100 + col! * 10 + row!))
+      huecos.add(hole!)
+    }
+    expect(huecos.size).toBeGreaterThan(30)
+  })
+
   it('leer un número: la respuesta es su nombre y las otras dos opciones son nombres de otros números', () => {
     const numeros = new Set<number>()
     for (const e of muchos({ kind: 'number-name', ask: 'read' }).map(choice)) {

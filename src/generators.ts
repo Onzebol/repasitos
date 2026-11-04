@@ -633,24 +633,30 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
         // Fila: las decenas, de 1 a 9 (la 0 empieza por «0»); columna: las unidades, de 0 a 9
         const fila = spec.ask === 'row'
         const minimo = fila ? 1 : 0
-        const cifra = int(rng, minimo, 9)
-        const otras = shuffle(rng, Array.from({ length: 10 - minimo }, (_, i) => i + minimo).filter((x) => x !== cifra)).slice(0, 2)
+        // Del 100 al 199 todas las filas valen (la 0 es la de los 100 a 109, que empiezan por 10) y la fila 3 empieza por 13
+        const ciento = spec.from === 100
+        const cifra = int(rng, ciento ? 0 : minimo, 9)
+        const desde = ciento ? 0 : minimo
+        const otras = shuffle(rng, Array.from({ length: 10 - desde }, (_, i) => i + desde).filter((x) => x !== cifra)).slice(0, 2)
+        const nombre = (c: number) => (ciento && fila ? 10 + c : c)
         return {
           ...elegir(
             fila ? 'Todos los números de la fila amarilla empiezan por…' : 'Todos los números de la columna naranja acaban en…',
-            [cifra, ...otras],
-            cifra,
+            [cifra, ...otras].map(nombre),
+            nombre(cifra),
           ),
-          table: fila ? { row: cifra } : { col: cifra },
+          table: { ...(ciento ? { from: 100 as const } : {}), ...(fila ? { row: cifra } : { col: cifra }) },
         }
       }
       // El que falta, con su fila y su columna marcadas. Opciones: el de las cifras cambiadas (47 y 74) y un vecino
-      const n = int(rng, 10, 99)
-      const [d, u] = [Math.floor(n / 10), n % 10]
-      const cambiado = u * 10 + d
-      const vecinos = shuffle(rng, [n - 10, n - 1, n + 1, n + 10].filter((m) => m >= 10 && m <= 99))
+      // (del 100 al 199, el cambiado es el de las dos últimas cifras: 147 y 174)
+      const desde = spec.from === 100 ? 100 : 0
+      const n = spec.from === 100 ? int(rng, 100, 199) : int(rng, 10, 99)
+      const [d, u] = [Math.floor((n - desde) / 10), n % 10]
+      const cambiado = desde + u * 10 + d
+      const vecinos = shuffle(rng, [n - 10, n - 1, n + 1, n + 10].filter((m) => m >= Math.max(10, desde) && m <= desde + 99))
       const otros = u !== 0 && u !== d ? [cambiado, vecinos[0]] : vecinos.slice(0, 2)
-      return { ...elegir('¿Qué número falta?', [n, ...otros], n), table: { row: d, col: u, hole: n } }
+      return { ...elegir('¿Qué número falta?', [n, ...otros], n), table: { ...(desde === 100 ? { from: 100 as const } : {}), row: d, col: u, hole: n } }
     }
 
     case 'place-value': {

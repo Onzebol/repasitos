@@ -57,4 +57,42 @@ describe('HundredTable: la tabla del 0 al 99', () => {
     expect(css).toMatch(/\.t99 \.c\.col\s*\{/)
     expect(css).toMatch(/\.t99 \.c\.hueco\s*\{/)
   })
+
+  describe('del 100 al 199 (from={100})', () => {
+    const tabla100 = () => screen.getByRole('img', { name: /Tabla del 100 al 199/ })
+
+    it('muestra los cien números con tres cifras y las cabeceras de decenas 10D… 19D', () => {
+      render(<HundredTable from={100} />)
+      const celdas = within(tabla100()).getAllByText(/^\d\d\d$/)
+      expect(celdas).toHaveLength(100)
+      expect(celdas[0]).toHaveTextContent('100')
+      expect(celdas[37]).toHaveTextContent('137')
+      expect(celdas[99]).toHaveTextContent('199')
+      for (let i = 0; i < 10; i++) {
+        expect(within(tabla100()).getByText(`${10 + i}D`)).toBeInTheDocument()
+        expect(within(tabla100()).getByText(`${i}U`)).toBeInTheDocument()
+      }
+      expect(within(tabla100()).queryByText('0D')).not.toBeInTheDocument()
+    })
+
+    it('la fila y la columna se cuentan desde la tabla (0 a 9) y se marcan con sus cabeceras', () => {
+      render(<HundredTable from={100} row={3} col={5} />)
+      for (const n of ['130', '135', '139']) expect(within(tabla100()).getByText(n)).toHaveClass('fila')
+      for (const n of ['105', '145', '195']) expect(within(tabla100()).getByText(n)).toHaveClass('col')
+      expect(within(tabla100()).getByText('13D')).toHaveClass('fila')
+      expect(within(tabla100()).getByText('5U')).toHaveClass('col')
+    })
+
+    it('el hueco es el número completo (147) y no se ve; el nombre accesible no dice cuál es', () => {
+      render(<HundredTable from={100} row={4} col={7} hole={147} />)
+      expect(within(tabla100()).queryByText('147')).not.toBeInTheDocument()
+      expect(within(tabla100()).getByText('❓')).toBeInTheDocument()
+      expect(within(tabla100()).getAllByText(/^\d\d\d$/)).toHaveLength(99)
+      expect(tabla100().getAttribute('aria-label')!.replace('100 al 199', '')).not.toMatch(/\d/)
+    })
+
+    it('usa casillas más estrechas para caber con tres cifras', () => {
+      expect(css).toMatch(/\.t99-ciento\b/)
+    })
+  })
 })

@@ -688,6 +688,16 @@ body {
   background: var(--card);
 }
 
+/* La tabla del 100 al 199: números de tres cifras y cabeceras de decenas «10D», más anchas */
+.t99-ciento {
+  grid-template-columns: 2.25rem repeat(10, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.t99-ciento .c {
+  font-size: clamp(0.6rem, 2.5vw, 0.95rem);
+}
+
 /* Completar una fila o columna (TableFill): los huecos son botones y el que tiene el foco se resalta */
 .t99 button.c {
   padding: 0;

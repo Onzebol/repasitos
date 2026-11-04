@@ -10,8 +10,9 @@ export type Subject = {
 }
 
 // Qué se marca en la tabla del 0 al 99: la fila de una decena (0 a 9), la columna de una unidad (0 a 9) y/o el número
-// que falta (se dibuja como ❓)
-export type TableMarks = { row?: number; col?: number; hole?: number }
+// que falta (se dibuja como ❓, con su valor completo). Con `from: 100` es la tabla del 100 al 199 (cabeceras 10D… 19D):
+// `row` y `col` se siguen contando de 0 a 9 desde la tabla
+export type TableMarks = { row?: number; col?: number; hole?: number; from?: 0 | 100 }
 
 // Mapa de un itinerario (4 filas × 5 columnas, ver src/itinerarios.ts): el dibujo de cada casilla ('' = hierba), la casilla
 // donde está Repi, el camino (casillas contiguas, se tiñen de arena) y si cada casilla del camino lleva una flecha
@@ -180,7 +181,9 @@ export type BlockSpec =
   | { kind: 'operation-sign' }
   // La tabla del 0 al 99 dibujada (elegir): la cifra con la que empiezan los números de una fila amarilla (`row`), con la
   // que acaban los de una columna naranja (`column`) o qué número falta en un hueco (`missing`)
-  | { kind: 'table-99'; ask: 'row' | 'column' | 'missing' }
+  // Con `from: 100` (unidad 2) es la tabla del 100 al 199: la fila empieza por 10… 19, la columna acaba igual y el número
+  // que falta está entre el 100 y el 199
+  | { kind: 'table-99'; ask: 'row' | 'column' | 'missing'; from?: 100 }
   // Itinerarios con flechas en un mapa de 4 × 5 (elegir): seguir unas flechas y decir dónde se llega (`where`), elegir el
   // itinerario que recorre el camino dibujado (`which`) o por qué lugar pasa Repi al seguir unas flechas, sin pintar el camino (`passes`)
   | { kind: 'route'; ask: 'where' | 'which' | 'passes' }

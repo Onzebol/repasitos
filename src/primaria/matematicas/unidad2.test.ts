@@ -156,6 +156,20 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     expect(terminos).toContain(100)
   })
 
+  it('"Del 100 al 199" dibuja la tabla del 100 al 199: el número que falta y la cifra por la que empieza una fila', () => {
+    const plan = temasUnidad2.find((topic) => topic.id === 'del-100-al-199')!.plan
+    expect(plan.filter((bloque) => bloque.spec.kind === 'table-99').map((bloque) => bloque.spec)).toEqual([
+      { kind: 'table-99', ask: 'missing', from: 100 },
+      { kind: 'table-99', ask: 'row', from: 100 },
+    ])
+    for (let seed = 0; seed < 50; seed++) {
+      const tablas = buildSession(plan, mulberry32(seed)).filter((e) => e.type === 'choice' && e.table)
+      expect(tablas).toHaveLength(2)
+      for (const e of tablas) expect(e.type === 'choice' && e.table?.from).toBe(100)
+    }
+    expect(sesion('del-100-al-199')).toHaveLength(10)
+  })
+
   it('"Del 100 al 199" ya no lleva las preguntas sobre la centena (están en "La centena")', () => {
     const plan = temasUnidad2.find((topic) => topic.id === 'del-100-al-199')!.plan
     expect(plan.some((bloque) => bloque.spec.kind === 'bag')).toBe(false)
