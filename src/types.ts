@@ -179,8 +179,8 @@ export type BlockSpec =
   // Centenas (de 100 a 199): leer un número con centena, decenas y unidades (elegir) o componerlo (escribir)
   | { kind: 'hundreds'; ask: 'read' | 'compose' }
   // Suma o resta en columna: sin llevar, o con `carry` (sumas: las unidades pasan de 9; restas: se pide una decena).
-  // Con `oneDigit` el segundo número tiene una cifra (83 + 5, 87 − 5), sin llevar; con `oneDigit` y `carry` (solo sumas) sí se
-  // lleva: 87 + 9
+  // Con `oneDigit` el segundo número tiene una cifra (83 + 5, 87 − 5), sin llevar; con `oneDigit` y `carry` sí se lleva, en
+  // sumas (87 + 9) y en restas (65 − 8, unidad 3)
   // Con `addends: 3` (solo sumas) hay tres sumandos de una o dos cifras que siempre llevan, con resultado de hasta 99: 15 + 14 + 7
   | { kind: 'column'; operator: '+' | '−'; carry?: boolean; oneDigit?: boolean; addends?: 2 | 3 }
   // ¿Qué suma es llevando? (elegir): tres sumas de dos números de dos cifras, una lleva y las otras dos no

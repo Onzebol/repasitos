@@ -46,6 +46,33 @@ describe('Restas llevando', () => {
     }
   })
 
+  it('con sustraendo de una cifra (65 − 8): las unidades del minuendo son menores, se pide una decena y el resultado es positivo', () => {
+    const minuendos = new Set<number>()
+    for (const e of muchos({ kind: 'column', operator: '−', carry: true, oneDigit: true }).map(column)) {
+      const nombre = `${e.top} − ${e.bottom}`
+      expect(e.carry, nombre).toBe(true)
+      expect(e.bottom, nombre).toBeGreaterThanOrEqual(2)
+      expect(e.bottom, nombre).toBeLessThanOrEqual(9)
+      expect(e.top % 10, nombre).toBeLessThan(e.bottom)
+      expect(e.top, nombre).toBeGreaterThanOrEqual(20)
+      expect(e.top, nombre).toBeLessThanOrEqual(99)
+      expect(e.answer, nombre).toBe(e.top - e.bottom)
+      expect(e.answer, nombre).toBeGreaterThanOrEqual(11)
+      minuendos.add(e.top)
+    }
+    expect(minuendos.size, 'salen muchos minuendos distintos').toBeGreaterThan(30)
+  })
+
+  it('el problema de «cuánto falta» con llevada: hace falta un total, ya hay una parte con más unidades y se pregunta cuántos faltan', () => {
+    for (const e of muchos({ kind: 'word-problem', operator: '−', carry: true, faltan: true }).map(number)) {
+      const [a, b] = e.question.match(/\d+/g)!.map(Number)
+      expect(e.question, e.question).toMatch(/falta/)
+      expect(a % 10, e.question).toBeLessThan(b % 10)
+      expect(e.answer, e.question).toBe(a - b)
+      expect(e.answer, e.question).toBeGreaterThan(0)
+    }
+  })
+
   it('las restas sin llevar no llevan', () => {
     for (const e of muchos({ kind: 'column', operator: '−' }).map(column)) {
       expect(e.carry).toBeUndefined()

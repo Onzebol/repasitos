@@ -17,7 +17,7 @@ describe('Unidad 3 de Matemáticas: contenido', () => {
     expect(unidadesMatematicas.find((unit) => unit.id === 'u3')!.topics).toBe(temasUnidad3)
   })
 
-  it('"Restas llevando" mezcla 4 columnas con llevada, 2 de reconocer si una resta lleva y 4 problemas de resta', () => {
+  it('"Restas llevando" mezcla 4 columnas con llevada (1 con sustraendo de una cifra), 2 de reconocer si una resta lleva y 4 problemas de resta (2 de «cuánto falta»)', () => {
     const session = sesion('restas-llevando')
     const columnas = session.filter((e) => e.type === 'column')
     expect(columnas).toHaveLength(4)
@@ -25,7 +25,10 @@ describe('Unidad 3 de Matemáticas: contenido', () => {
       expect(e.operator).toBe('−')
       expect(e.carry).toBe(true)
     }
-    expect(session.filter((e) => e.type === 'number')).toHaveLength(4)
+    const problemas = session.filter((e) => e.type === 'number')
+    expect(problemas).toHaveLength(4)
+    expect(problemas.filter((e) => /falta/.test(e.question))).toHaveLength(2)
+    expect(columnas.filter((e) => e.bottom < 10)).toHaveLength(1)
     expect(session.filter((e) => e.type === 'choice' && e.question === '¿Qué resta es llevando?')).toHaveLength(1)
     expect(session.filter((e) => e.type === 'choice' && e.question === 'Esta resta, ¿es sin llevar o llevando?')).toHaveLength(1)
   })
