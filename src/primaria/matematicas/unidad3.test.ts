@@ -41,6 +41,12 @@ describe('Unidad 3 de Matemáticas: contenido', () => {
     }
   })
 
+  it('"Centenas, decenas y unidades" incluye 2 pistas de elegir el número que las cumple (más de, menos de, el cero) y sigue en 10', () => {
+    const session = sesion('centenas-decenas-unidades')
+    expect(session).toHaveLength(10)
+    expect(session.filter((e) => e.type === 'choice' && /^¿Qué número tiene \d centenas?/.test(e.question))).toHaveLength(2)
+  })
+
   it('"El litro" pregunta por capacidades y por litros', () => {
     const session = sesion('el-litro')
     expect(session.filter((e) => e.type === 'choice' && /capacidad/.test(e.question))).toHaveLength(4)
