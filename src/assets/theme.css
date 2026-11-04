@@ -698,6 +698,56 @@ body {
   font-size: clamp(0.6rem, 2.5vw, 0.95rem);
 }
 
+/* Información con números (CodeTable): tabla de 2 × 2 con un dibujo por casilla y la leyenda de números debajo */
+.code-box {
+  width: 100%;
+  max-width: 28rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  background: var(--card);
+  box-shadow: 0 6px 0 var(--card-shadow);
+}
+
+.code-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 6px;
+  text-align: center;
+}
+
+.code-table th {
+  font-size: clamp(0.8rem, 3.2vw, 1.05rem);
+  font-weight: 700;
+  color: #3d6f8a;
+}
+
+.code-table td {
+  height: clamp(3rem, 14vw, 4.5rem);
+  border: 2px solid #cfe6f3;
+  border-radius: 0.6rem;
+  font-size: clamp(1.6rem, 8vw, 2.4rem);
+}
+
+.code-table td.esquina {
+  border: 0;
+}
+
+.code-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: clamp(1rem, 4.2vw, 1.4rem);
+  font-weight: 700;
+}
+
 /* Completar una fila o columna (TableFill): los huecos son botones y el que tiene el foco se resalta */
 .t99 button.c {
   padding: 0;

@@ -367,6 +367,64 @@ function familia(spec: { ask: 'sum' | 'subtract'; drawing?: boolean }, rng: Rng)
   )
 }
 
+// Las actividades de la tabla de «información con números» (dibujo y cómo se nombra, sin « y » para no liar las etiquetas)
+const ACTIVIDADES = [
+  { emoji: '🏃', nombre: 'correr' },
+  { emoji: '🎮', nombre: 'jugar' },
+  { emoji: '📚', nombre: 'leer' },
+  { emoji: '🎨', nombre: 'pintar' },
+  { emoji: '⚽', nombre: 'fútbol' },
+  { emoji: '🚲', nombre: 'bici' },
+  { emoji: '🏊', nombre: 'nadar' },
+  { emoji: '🎵', nombre: 'música' },
+]
+
+// Información con números: cuatro actividades al azar, un número del 1 al 4 cada una y colocadas al azar en una tabla de 2 × 2
+// (sábado y domingo × mañana y tarde). Se pregunta el número de una casilla, los dos de un día o de un momento, o qué dibujos
+// son dos números dados
+function tablaDeCodigos(ask: 'cell' | 'line' | 'decode', rng: Rng): ChoiceExercise {
+  const numeros = shuffle(rng, [1, 2, 3, 4])
+  const elegidas = shuffle(rng, ACTIVIDADES).slice(0, 4).map((a, i) => ({ ...a, numero: numeros[i] }))
+  const colocadas = shuffle(rng, elegidas)
+  const grid = [
+    [colocadas[0], colocadas[1]],
+    [colocadas[2], colocadas[3]],
+  ]
+  const codeTable = {
+    columns: ['Sábado', 'Domingo'],
+    rows: ['Mañana', 'Tarde'],
+    cells: grid.map((fila) => fila.map((a) => a.emoji)),
+    legend: [...elegidas].sort((a, b) => a.numero - b.numero).map((a) => ({ emoji: a.emoji, name: a.nombre, number: a.numero })),
+  }
+  const dias = ['sábado', 'domingo']
+  const momentos = ['mañana', 'tarde']
+  if (ask === 'cell') {
+    const [f, c] = [int(rng, 0, 1), int(rng, 0, 1)]
+    const respuesta = grid[f][c].numero
+    const otros = shuffle(rng, [1, 2, 3, 4].filter((n) => n !== respuesta)).slice(0, 2)
+    return { ...elegir(`¿Qué hizo el ${dias[c]} por la ${momentos[f]}? Elige su número.`, [respuesta, ...otros], respuesta), codeTable }
+  }
+  if (ask === 'line') {
+    // un día (la columna, de mañana a tarde) o un momento del día (la fila, de sábado a domingo)
+    const porDia = rng() < 0.5
+    const i = int(rng, 0, 1)
+    const [x, y] = porDia ? [grid[0][i].numero, grid[1][i].numero] : [grid[i][0].numero, grid[i][1].numero]
+    const pregunta = porDia
+      ? `¿Qué hizo el ${dias[i]}, primero por la mañana y después por la tarde? Elige sus números.`
+      : `¿Qué hizo cada día por la ${momentos[i]}, primero el sábado y después el domingo? Elige sus números.`
+    const otro = pick(rng, [1, 2, 3, 4].filter((n) => n !== x && n !== y))
+    return { ...elegir(pregunta, [`${x} y ${y}`, `${y} y ${x}`, `${x} y ${otro}`], `${x} y ${y}`), codeTable }
+  }
+  const [uno, otro, tercero] = shuffle(rng, elegidas)
+  const opciones = [`${uno.emoji} ${otro.emoji}`, `${otro.emoji} ${uno.emoji}`, `${uno.emoji} ${tercero.emoji}`]
+  const nombres = [[uno, otro], [otro, uno], [uno, tercero]]
+  return {
+    ...elegir(`Las actividades ${uno.numero} y ${otro.numero}, en ese orden. ¿Qué dibujos son?`, opciones, opciones[0]),
+    labels: Object.fromEntries(opciones.map((o, k) => [o, `${nombres[k][0].nombre} y ${nombres[k][1].nombre}`])),
+    codeTable,
+  }
+}
+
 // Los pasos de un problema: con el texto en la tarjeta de lectura, se elige qué operación hay que hacer o qué se calcula
 function pasoDeProblema(ask: 'operation' | 'calculate', rng: Rng, faltan = false): ChoiceExercise {
   const operator = faltan ? '−' : pick(rng, ['+', '−'] as const)
@@ -1113,6 +1171,8 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
 
     case 'family':
       return familia(spec, rng)
+    case 'code-table':
+      return tablaDeCodigos(spec.ask, rng)
 
     case 'subtraction-terms':
       return terminosDeLaResta(rng)

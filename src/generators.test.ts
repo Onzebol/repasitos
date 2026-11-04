@@ -98,6 +98,9 @@ const SPECS: BlockSpec[] = [
   { kind: 'route', ask: 'where' },
   { kind: 'route', ask: 'which' },
   { kind: 'route', ask: 'passes' },
+  { kind: 'code-table', ask: 'cell' },
+  { kind: 'code-table', ask: 'line' },
+  { kind: 'code-table', ask: 'decode' },
   { kind: 'table-fill', ask: 'row' },
   { kind: 'table-fill', ask: 'column' },
   { kind: 'route-program' },
@@ -812,6 +815,94 @@ describe('generate: reglas de cada plantilla', () => {
         }
       })
     }
+  })
+
+  describe('tabla de actividades con números (información con números)', () => {
+    const ACTIVIDADES = ['🏃', '🎮', '📚', '🎨', '⚽', '🚲', '🏊', '🎵']
+
+    // Lo que dice la tabla, leído sin el código del generador: número de la actividad de cada casilla
+    const numeroEn = (e: ReturnType<typeof choice>, fila: number, columna: number) => {
+      const tabla = e.codeTable!
+      return tabla.legend.find((l) => l.emoji === tabla.cells[fila][columna])!.number
+    }
+
+    it('las actividades salen de la fuente de emojis', () => {
+      const fuente = new Set(emojisDeLaFuente(emojiFont))
+      for (const a of ACTIVIDADES) expect(fuente.has(a), a).toBe(true)
+    })
+
+    it('la tabla es de 2 × 2 con cuatro actividades distintas y los números del 1 al 4 sin repetir, uno por actividad', () => {
+      const vistas = new Set<string>()
+      for (const ask of ['cell', 'line', 'decode'] as const) {
+        for (const e of muchos({ kind: 'code-table', ask }).map(choice)) {
+          const t = e.codeTable!
+          expect(t.columns).toEqual(['Sábado', 'Domingo'])
+          expect(t.rows).toEqual(['Mañana', 'Tarde'])
+          const emojis = t.cells.flat()
+          expect(t.cells.map((fila) => fila.length)).toEqual([2, 2])
+          expect(new Set(emojis).size).toBe(4)
+          for (const emoji of emojis) expect(ACTIVIDADES).toContain(emoji)
+          expect(t.legend.map((l) => l.number)).toEqual([1, 2, 3, 4])
+          expect(new Set(t.legend.map((l) => l.emoji))).toEqual(new Set(emojis))
+          for (const l of t.legend) expect(l.name.length).toBeGreaterThan(0)
+          vistas.add(JSON.stringify(t.legend))
+        }
+      }
+      expect(vistas.size, 'los números y las actividades cambian de un ejercicio a otro').toBeGreaterThan(50)
+    })
+
+    it('una casilla: la respuesta es el número de la actividad de ese día y ese momento, entre tres números distintos del 1 al 4', () => {
+      const casillas = new Set<string>()
+      for (const e of muchos({ kind: 'code-table', ask: 'cell' }).map(choice)) {
+        const [, dia, momento] = e.question.match(/^¿Qué hizo el (sábado|domingo) por la (mañana|tarde)\? Elige su número\.$/)!
+        const esperado = numeroEn(e, momento === 'mañana' ? 0 : 1, dia === 'sábado' ? 0 : 1)
+        expect(e.answer, e.question).toBe(String(esperado))
+        expect(e.options).toHaveLength(3)
+        for (const opcion of e.options) expect([1, 2, 3, 4]).toContain(Number(opcion))
+        casillas.add(`${dia} ${momento}`)
+      }
+      expect(casillas.size).toBe(4)
+    })
+
+    it('una fila o una columna: dos números, en el orden que dice la pregunta; la pareja al revés y otra pareja son opciones falsas', () => {
+      const preguntas = new Set<string>()
+      for (const e of muchos({ kind: 'code-table', ask: 'line' }).map(choice)) {
+        let esperado: number[]
+        const dia = e.question.match(/^¿Qué hizo el (sábado|domingo), primero por la mañana y después por la tarde\? Elige sus números\.$/)
+        const momento = e.question.match(/^¿Qué hizo cada día por la (mañana|tarde), primero el sábado y después el domingo\? Elige sus números\.$/)
+        if (dia) {
+          const c = dia[1] === 'sábado' ? 0 : 1
+          esperado = [numeroEn(e, 0, c), numeroEn(e, 1, c)]
+        } else if (momento) {
+          const f = momento[1] === 'mañana' ? 0 : 1
+          esperado = [numeroEn(e, f, 0), numeroEn(e, f, 1)]
+        } else throw new Error(`pregunta inesperada: ${e.question}`)
+        expect(e.answer, e.question).toBe(`${esperado[0]} y ${esperado[1]}`)
+        expect(e.options).toHaveLength(3)
+        expect(e.options).toContain(`${esperado[1]} y ${esperado[0]}`)
+        for (const opcion of e.options) expect(opcion).toMatch(/^[1-4] y [1-4]$/)
+        preguntas.add(e.question)
+      }
+      expect(preguntas.size, 'dos días y dos momentos').toBe(4)
+    })
+
+    it('descodificar: «las actividades 3 y 1, en ese orden» son los dibujos de esos números; los nombres accesibles van en las etiquetas', () => {
+      for (const e of muchos({ kind: 'code-table', ask: 'decode' }).map(choice)) {
+        const [, n1, n2] = e.question.match(/^Las actividades ([1-4]) y ([1-4]), en ese orden\. ¿Qué dibujos son\?$/)!
+        expect(n1).not.toBe(n2)
+        const t = e.codeTable!
+        const dibujo = (n: string) => t.legend.find((l) => l.number === Number(n))!
+        const [uno, otro] = [dibujo(n1), dibujo(n2)]
+        expect(e.answer).toBe(`${uno.emoji} ${otro.emoji}`)
+        expect(e.options).toHaveLength(3)
+        expect(e.options).toContain(`${otro.emoji} ${uno.emoji}`)
+        for (const opcion of e.options) {
+          for (const emoji of opcion.split(' ')) expect(ACTIVIDADES).toContain(emoji)
+          expect(e.labels![opcion], opcion).toMatch(/^\S.* y \S.*$/)
+        }
+        expect(e.labels![e.answer]).toBe(`${uno.name} y ${otro.name}`)
+      }
+    })
   })
 
   describe('figuras con valores', () => {

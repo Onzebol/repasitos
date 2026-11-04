@@ -10,7 +10,7 @@ describeUnit('Unidad 2 de Matemáticas', temasUnidad2)
 const sesion = (id: string) => buildSession(temasUnidad2.find((topic) => topic.id === id)!.plan, mulberry32(3))
 
 describe('Unidad 2 de Matemáticas: contenido', () => {
-  it('tiene los ocho temas del índice y está registrada en la unidad 2', () => {
+  it('tiene los temas del índice y está registrada en la unidad 2', () => {
     expect(temasUnidad2.map((topic) => topic.id)).toEqual([
       'sumas-llevando',
       'suma-resta',
@@ -19,9 +19,20 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
       'del-100-al-199',
       'problemas',
       'calculo-mental',
+      'informacion-con-numeros',
       'desafios-y-logica',
     ])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u2')!.topics).toBe(temasUnidad2)
+  })
+
+  it('"Información con números" lee una casilla de la tabla, dos números de un día o un momento y descodifica dibujos, con la tabla siempre a la vista', () => {
+    const session = sesion('informacion-con-numeros')
+    expect(session).toHaveLength(10)
+    const preguntas = session.map((e) => e.question)
+    expect(preguntas.filter((q) => q.startsWith('¿Qué hizo el ') && q.endsWith(' Elige su número.'))).toHaveLength(4)
+    expect(preguntas.filter((q) => q.endsWith('Elige sus números.'))).toHaveLength(3)
+    expect(preguntas.filter((q) => q.startsWith('Las actividades '))).toHaveLength(3)
+    for (const e of session) expect(e.type === 'choice' && e.codeTable, e.question).toBeTruthy()
   })
 
   it('"Problemas" mezcla los pasos (sumar o restar, qué se calcula) y problemas de sumar y de restar, con «¿cuántos faltan?»', () => {

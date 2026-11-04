@@ -7,6 +7,7 @@ import type { Profile, Topic } from '../types'
 import { ColumnExercise } from './ColumnExercise'
 import { CountTap } from './CountTap'
 import { Hills } from './Hills'
+import { CodeTable } from './CodeTable'
 import { HundredTable } from './HundredTable'
 import { Icon } from './Icon'
 import { Keypad } from './Keypad'
@@ -140,6 +141,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
   const texto = exercise.type === 'choice' ? exercise.text : undefined
   const lectura = texto && <p className="reading-text">{texto}</p>
   const marcas = exercise.type === 'choice' ? exercise.table : undefined
+  const tablaDeCodigos = exercise.type === 'choice' ? exercise.codeTable : undefined
 
   // Itinerarios con flechas: las instrucciones (fichas con flechas y, para lectores de pantalla y voz, con palabras) y el mapa.
   // Al acertar, el mapa muestra el camino que seguían las flechas.
@@ -175,6 +177,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
             {visual}
             {/* Al acertar, el hueco de la tabla se rellena con su número */}
             {marcas && <HundredTable {...marcas} hole={undefined} />}
+            {tablaDeCodigos && <CodeTable data={tablaDeCodigos} />}
             {itinerario(true)}
             {exercise.type === 'table-fill' && <TableFill exercise={exercise} solved />}
             {exercise.type === 'table-paint' && <TablePaint exercise={exercise} solved />}
@@ -218,6 +221,7 @@ export function Practice({ profile = 'primaria', topic, onHome, onBack, rng }: P
             </div>
             {!tapToCount && visual}
             {marcas && <HundredTable {...marcas} />}
+            {tablaDeCodigos && <CodeTable data={tablaDeCodigos} />}
             {itinerario(false)}
             {exercise.type === 'choice' ? (
               <>
