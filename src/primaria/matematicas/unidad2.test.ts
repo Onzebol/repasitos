@@ -22,6 +22,7 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
       'informacion-con-numeros',
       'quien-gano',
       'desafios-y-logica',
+      'repaso',
     ])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u2')!.topics).toBe(temasUnidad2)
   })
@@ -48,6 +49,17 @@ describe('Unidad 2 de Matemáticas: contenido', () => {
     // primero se calcula y después se contesta sobre la tabla ya completa
     expect(session.slice(0, 4).every((e) => e.type === 'number')).toBe(true)
     expect(session.slice(4).every((e) => e.type === 'choice')).toBe(true)
+  })
+
+  it('"Repaso" mezcla lo de la unidad y propone las tres consignas de los números de la bandera, con sus números a la vista', () => {
+    const session = sesion('repaso')
+    expect(session).toHaveLength(10)
+    const banderas = session.filter((e) => e.type === 'column' && e.text?.startsWith('🚩 Números de la bandera: '))
+    expect(banderas.map((e) => e.question).sort()).toEqual(['Resta los dos números mayores.', 'Suma el número mayor y el menor.', 'Suma los tres números menores.'])
+    // además: sumas y restas en columna, problemas, la suma que lleva, la resta que falta y alturas
+    expect(session.filter((e) => e.type === 'column' && !e.text)).toHaveLength(2)
+    expect(session.filter((e) => e.type === 'number' && /falta|▢/.test(e.question)).length).toBeGreaterThanOrEqual(2)
+    expect(session.filter((e) => e.type === 'choice' && e.question === '¿Qué suma es llevando?' || (e.type === 'choice' && /^¿Qué monumento es más (alto|bajo)\?$/.test(e.question)))).toHaveLength(2)
   })
 
   it('"Problemas" mezcla los pasos (sumar o restar, qué se calcula) y problemas de sumar y de restar, con «¿cuántos faltan?»', () => {

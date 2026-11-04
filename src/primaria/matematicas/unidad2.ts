@@ -168,4 +168,23 @@ export const temasUnidad2: Topic[] = [
       { spec: { kind: 'table-paint', ask: 'digit' }, count: 2 },
     ],
   },
+  {
+    // Repaso acumulativo del libro (p. 51): operar con cuatro números según una pista y repasar lo de la unidad
+    id: 'repaso',
+    name: 'Repaso',
+    icon: '🏁',
+    tint: '#cfe8ff',
+    plan: [
+      { spec: { kind: 'flag-numbers', ask: 'max-min' }, count: 1 },
+      { spec: { kind: 'flag-numbers', ask: 'two-largest' }, count: 1 },
+      { spec: { kind: 'flag-numbers', ask: 'three-smallest' }, count: 1 },
+      { spec: { kind: 'column', operator: '+', carry: true }, count: 1 },
+      { spec: { kind: 'column', operator: '−' }, count: 1 },
+      { spec: { kind: 'carry-spot' }, count: 1 },
+      { spec: { kind: 'word-problem', operator: '+', carry: true }, count: 1 },
+      { spec: { kind: 'word-problem', operator: '−', faltan: true }, count: 1 },
+      { spec: { kind: 'inverse', mode: 'missing' }, count: 1 },
+      { spec: { kind: 'compare', mode: 'height' }, count: 1 },
+    ],
+  },
 ]
