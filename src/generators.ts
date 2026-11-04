@@ -1151,6 +1151,52 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       return { ...ejercicio, fact: `capacity:${spec.mode}:${[...lugares].sort().join('')}` }
     }
 
+    case 'liter-parts': {
+      const litros = spec.part === 'half' ? int(rng, 1, 4) : int(rng, 1, 2)
+      const [veces, recipiente] = spec.part === 'half' ? [2, 'jarras de ½ l'] : [4, 'vasos de ¼ l']
+      return numero(`Para llenar un cubo de ${litros} l, ¿cuántas ${recipiente} hacen falta?`, litros * veces)
+    }
+
+    case 'liter-sum': {
+      // En cuartos de litro: botella 4, bol 2, vaso 1. Siempre litros enteros, de 2 a 6, con al menos dos clases de recipiente
+      for (;;) {
+        const botellas = int(rng, 0, 3)
+        const boles = int(rng, 0, 4)
+        const vasos = int(rng, 0, 8)
+        const cuartos = 4 * botellas + 2 * boles + vasos
+        if (cuartos % 4 !== 0 || cuartos < 8 || cuartos > 24) continue
+        if ([botellas, boles, vasos].filter((n) => n > 0).length < 2) continue
+        const visual = [['🍼', botellas], ['🥣', boles], ['🥛', vasos]].filter(([, n]) => (n as number) > 0).map(([e, n]) => (e as string).repeat(n as number)).join('  ')
+        return numero('Botella = 1 l, bol = ½ l, vaso = ¼ l. ¿Cuántos litros hay en total?', cuartos / 4, visual)
+      }
+    }
+
+    case 'liter-label': {
+      const recipientes = [
+        { emoji: '🍼', nombre: 'una botella', cabe: '1 l' },
+        { emoji: '🥣', nombre: 'un bol', cabe: '½ l' },
+        { emoji: '🥛', nombre: 'un vaso', cabe: '¼ l' },
+      ]
+      const r = pick(rng, recipientes)
+      if (spec.ask === 'amount') {
+        return { ...elegir(`¿Cuánta agua cabe en ${r.nombre}?`, recipientes.map((x) => x.cabe), r.cabe, r.emoji), fact: `liter-label:amount:${r.cabe}` }
+      }
+      const opciones = recipientes.map((x) => `${x.emoji} ${x.nombre}`)
+      return { ...elegir(`¿Qué recipiente tiene ${r.cabe}?`, opciones, `${r.emoji} ${r.nombre}`), fact: `liter-label:container:${r.cabe}` }
+    }
+
+    case 'liter-compare': {
+      if (spec.fractions) {
+        const valores = shuffle(rng, [['¼ l', 0.25], ['½ l', 0.5], ['1 l', 1]] as const).slice(0, 2)
+        const [[a, x], [b, y]] = valores
+        return elegir('¿Qué signo va en el recuadro?', ['>', '<'], x > y ? '>' : '<', `${a}  ❓  ${b}`)
+      }
+      const a = int(rng, 1, 99)
+      let b = int(rng, 1, 99)
+      while (b === a) b = int(rng, 1, 99)
+      return elegir('¿Qué signo va en el recuadro?', ['>', '<'], a > b ? '>' : '<', `${a} l  ❓  ${b} l`)
+    }
+
     case 'nearest-ten': {
       // Sin acabar en 0 (ya es decena) ni en 5 (a mitad de camino, no hay una más cercana)
       const sinMitad = (min: number) => {

@@ -208,6 +208,14 @@ export type BlockSpec =
   | { kind: 'cdu'; ask: 'read' | 'compose' | 'blocks' | 'count' | 'clue' }
   // El litro: qué recipiente tiene más o menos capacidad de tres (elegir)
   | { kind: 'capacity'; mode: 'more' | 'less' }
+  // Medio litro y cuarto de litro (pp. 60, 61 y 68; botella 1 l, bol ½ l, vaso ¼ l): `liter-parts` cuántas jarras de ½ l o vasos
+  // de ¼ l llenan un cubo de 1 a 4 l (escribir), `liter-sum` cuántos litros hay en botellas, boles y vasos (escribir; siempre litros enteros),
+  // `liter-label` cuánto cabe en un recipiente o qué recipiente tiene una cantidad (elegir) y `liter-compare` > o < entre litros
+  // (con `fractions`, entre 1 l, ½ l y ¼ l)
+  | { kind: 'liter-parts'; part: 'half' | 'quarter' }
+  | { kind: 'liter-sum' }
+  | { kind: 'liter-label'; ask: 'amount' | 'container' }
+  | { kind: 'liter-compare'; fractions?: boolean }
   // Decena más cercana a un número (elegir); con `ask`: entre qué dos decenas está, si la cifra de las unidades
   // es mayor o menor que 5, o la decena más cercana en un problema «más o menos» (por defecto: 'nearest')
   | { kind: 'nearest-ten'; ask?: 'nearest' | 'between' | 'rule' | 'approx' }
