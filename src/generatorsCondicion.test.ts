@@ -64,3 +64,47 @@ describe('Completar la resta para que lleve o no lleve', () => {
     }
   })
 })
+
+function number(e: Exercise) {
+  if (e.type !== 'number') throw new Error(`se esperaba escribir un número: ${e.question}`)
+  return e
+}
+
+describe('Completar la resta para que lleve o no lleve, escribiendo', () => {
+  it('minuend-digit: vale cualquier cifra que cumpla la condición y la respuesta es la menor', () => {
+    for (const carry of [false, true]) {
+      for (const e of muchos({ kind: 'borrow-condition', ask: 'minuend-digit', carry, typed: true }).map(number)) {
+        const m = /^(\d)❓ − (\d\d)$/.exec(e.visual!)
+        expect(m, e.visual).not.toBeNull()
+        const t = Number(m![1])
+        const sustraendo = Number(m![2])
+        expect(e.question, e.visual).toContain(carry ? 'llevando' : 'sin llevar')
+        // tabla de verdad: las cifras del 0 al 9 que cumplen
+        const buenas = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter((u) => lleva(t * 10 + u, sustraendo) === carry)
+        expect([...e.valid!].sort((a, b) => a - b), e.visual).toEqual(buenas)
+        expect(e.answer, e.visual).toBe(Math.min(...buenas))
+        expect(Math.floor(t) - 1, e.visual).toBeGreaterThanOrEqual(Math.floor(sustraendo / 10))
+        expect(buenas.length).toBeGreaterThanOrEqual(1)
+      }
+    }
+  })
+
+  it('subtrahend: vale cualquier número que cumpla la condición y se pueda restar, de una o dos cifras', () => {
+    for (const carry of [false, true]) {
+      const ejercicios = muchos({ kind: 'borrow-condition', ask: 'subtrahend', carry, typed: true }).map(number)
+      const hayDeUnaCifra = ejercicios.some((e) => e.valid!.some((n) => n < 10))
+      expect(hayDeUnaCifra).toBe(true)
+      for (const e of ejercicios) {
+        const m = /^(\d\d) − ❓$/.exec(e.visual!)
+        expect(m, e.visual).not.toBeNull()
+        const minuendo = Number(m![1])
+        const tope = (Math.floor(minuendo / 10) - 1) * 10 + 9
+        const buenas = Array.from({ length: tope }, (_, i) => i + 1).filter((n) => lleva(minuendo, n) === carry)
+        expect([...e.valid!].sort((a, b) => a - b), e.visual).toEqual(buenas)
+        expect(buenas, e.visual).toContain(e.answer)
+        expect(e.answer, e.visual).toBe(Math.min(...buenas))
+        expect(buenas.length, e.visual).toBeGreaterThanOrEqual(2)
+      }
+    }
+  })
+})

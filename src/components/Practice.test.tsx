@@ -589,3 +589,20 @@ describe('Practice: programar a Repi', () => {
     expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
   })
 })
+
+describe('Practice: ejercicios de escribir con varias respuestas válidas', () => {
+  const topic = topicFrom([{ type: 'number', question: '¿Qué cifra falta para que la resta sea sin llevar?', answer: 4, valid: [4, 5, 6, 7, 8, 9], visual: '4❓ − 14' }])
+
+  it('acepta cualquier número válido, enseña el que se escribió y no da pistas al fallar', async () => {
+    const user = userEvent.setup()
+    render(<Practice topic={topic} onHome={vi.fn()} onBack={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByRole('button', { name: 'Comprobar' }))
+    expect(screen.getByText('¡Casi! Inténtalo otra vez')).toBeInTheDocument()
+    expect(screen.getAllByRole('status').map((n) => n.textContent).join(' ')).not.toMatch(/[4-9]/)
+    await user.click(screen.getByRole('button', { name: '8' }))
+    await user.click(screen.getByRole('button', { name: 'Comprobar' }))
+    expect(screen.getByText('¡Muy bien!')).toBeInTheDocument()
+    expect(screen.getAllByRole('status').map((n) => n.textContent).join(' ')).toContain('8')
+  })
+})

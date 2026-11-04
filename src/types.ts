@@ -83,6 +83,8 @@ export type NumberExercise = {
   // Tabla de puntos con una casilla vacía (unidad 2): el número que falta es la respuesta
   scoreTable?: ScoreTableData
   answer: number
+  // Si hay varias respuestas posibles (completar una resta para que lleve o no), todas valen y `answer` es la menor
+  valid?: number[]
 }
 
 // Suma o resta en columna: el resultado se escribe cifra a cifra (unidades, decenas y, en las sumas,
@@ -189,8 +191,9 @@ export type BlockSpec =
   // que las del sustraendo) o, con `ask: 'type'`, una resta ya hecha (85 − 67 = 18) y se elige «Sin llevar» o «Llevando»
   | { kind: 'carry-spot'; operator?: '+' | '−'; ask?: 'pick' | 'type' }
   // Completar una resta para que lleve o no (unidad 3, pp. 55 y 70; elegir): `minuend-digit` completa la cifra de las unidades del
-  // minuendo («4❓ − 14») y `subtrahend` elige el número que se resta («57 − ❓»); de tres números solo uno cumple `carry`
-  | { kind: 'borrow-condition'; ask: 'minuend-digit' | 'subtrahend'; carry: boolean }
+  // minuendo («4❓ − 14») y `subtrahend` elige el número que se resta («57 − ❓»); de tres números solo uno cumple `carry`;
+  // con `typed` se escribe con el teclado y vale cualquier número que cumpla la condición (`NumberExercise.valid`)
+  | { kind: 'borrow-condition'; ask: 'minuend-digit' | 'subtrahend'; carry: boolean; typed?: boolean }
   // Pasos de un problema (elegir): a partir de un texto corto, ¿hay que sumar o restar? (`operation`) o ¿hay que calcular
   // el total o la diferencia? (`calculate`). Sin llevar. Con `faltan` (unidad 2) solo salen restas de «¿cuántos faltan?»:
   // hace falta un total, ya hay una parte y se pregunta cuántos faltan
