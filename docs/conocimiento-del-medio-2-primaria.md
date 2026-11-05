@@ -44,6 +44,18 @@ Resumen de los términos de la unidad 1 (hecho a partir de las páginas del libr
 
 Fuera de la web: «Mi cuestionario de salud» (datos personales), las medidas y notas sobre la propia persona o la familia, y el rincón de las emociones (no es un saber que se pueda comprobar tocando).
 
+## Unidad 2: términos clave para escribir los ejercicios
+
+Resumen de los términos de la unidad 2 (solo vocabulario; los ejercicios están en `src/primaria/medio/unidad2.ts`):
+
+- **Vertebrados e invertebrados:** vertebrado = esqueleto de huesos (vértebras); invertebrado = sin huesos; cinco grupos de vertebrados (mamíferos, aves, peces, reptiles y anfibios).
+- **Los mamíferos y las aves:** mamíferos vivíparos, con pelo, cuyas crías maman (el murciélago tiene alas y el delfín vive en el agua); aves ovíparas, con plumas y pico (el pingüino y el avestruz no vuelan).
+- **Peces, reptiles y anfibios:** peces con aletas, escamas y branquias; reptiles con escamas (la serpiente no tiene patas y la tortuga tiene caparazón); anfibios de piel desnuda y húmeda; ciclo de la rana (huevo, renacuajo, rana con patas, rana adulta).
+- **Los animales invertebrados:** insectos (seis patas, dos antenas, casi todos con alas), la araña no es un insecto (ocho patas), medusa, caracol y cangrejo; ciclo de la mariposa (huevo, oruga, capullo, mariposa).
+- **¿Dónde viven los animales?:** hábitat, acuáticos y terrestres, adaptaciones (branquias, pelo grueso, púas, orejas grandes, pezuñas, joroba) y qué comen (herbívoros, carnívoros y omnívoros, con una cadena sencilla hierba, conejo y lobo). El libro no explica herbívoros, carnívoros y omnívoros: la definición es propia y solo se usan animales inequívocos (no el escarabajo ni el ratón).
+
+Evitados a propósito por dudosos: el avestruz «de desierto», el insecto palo «en selvas» y la clave del taller, que deja sin grupo a las serpientes.
+
 ## Qué entra primero en la web
 
 Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el bloque 1:

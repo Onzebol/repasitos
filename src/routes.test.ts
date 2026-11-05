@@ -95,7 +95,7 @@ describe('routes: dirección ↔ pantalla', () => {
     expect(hasContent('primaria', materia('ingles'))).toBe(false)
   })
 
-  it('Lengua abre sus unidades: solo la 1 tiene temas y las demás vuelven al inicio', () => {
+  it('Lengua abre sus unidades: la 1 y la 2 tienen temas y las demás vuelven al inicio', () => {
     const unidades = screenFromHash('#/primaria/lengua')
     expect(unidades.name).toBe('units')
     if (unidades.name === 'units') expect(unidades.units).toHaveLength(9)
@@ -103,12 +103,13 @@ describe('routes: dirección ↔ pantalla', () => {
     expect(screenFromHash('#/primaria/lengua/u2')).toEqual({ name: 'home' })
   })
 
-  it('Conocimiento del medio abre sus unidades: solo la 1 tiene temas y las demás vuelven al inicio', () => {
+  it('Conocimiento del medio abre sus unidades: la 1 y la 2 tienen temas y las demás vuelven al inicio', () => {
     const unidades = screenFromHash('#/primaria/medio')
     expect(unidades.name).toBe('units')
     if (unidades.name === 'units') expect(unidades.units).toHaveLength(9)
     expect(screenFromHash('#/primaria/medio/u1').name).toBe('topics')
-    expect(screenFromHash('#/primaria/medio/u2')).toEqual({ name: 'home' })
+    expect(screenFromHash('#/primaria/medio/u2').name).toBe('topics')
+    expect(screenFromHash('#/primaria/medio/u3')).toEqual({ name: 'home' })
   })
 
   it('la dirección de un ejercicio abre ese tema', () => {
