@@ -142,4 +142,23 @@ export const temasUnidad3: Topic[] = [
       { spec: { kind: 'mental', mode: 'tens-sub' }, count: 1 },
     ],
   },
+  {
+    // Repaso de la unidad (pp. 70–73): series de 100 en 100, centenas, restas llevando, litros, tres sumandos y ordenar
+    id: 'repaso',
+    name: 'Repaso',
+    icon: '🏁',
+    tint: '#cfe8ff',
+    plan: [
+      { spec: { kind: 'series', step: 100, min: 100, max: 900 }, count: 1 },
+      { spec: { kind: 'series', step: 100, min: 100, max: 900, down: true }, count: 1 },
+      { spec: { kind: 'cdu', ask: 'read' }, count: 1 },
+      { spec: { kind: 'cdu', ask: 'compose' }, count: 1 },
+      { spec: { kind: 'cdu', ask: 'blocks' }, count: 1 },
+      { spec: { kind: 'carry-spot', operator: '−' }, count: 1 },
+      { spec: { kind: 'column', operator: '−', carry: true }, count: 1 },
+      { spec: { kind: 'column', operator: '+', carry: true, addends: 3 }, count: 1 },
+      { spec: { kind: 'liter-sum' }, count: 1 },
+      { spec: { kind: 'compare', mode: 'order', min: 100, max: 999 }, count: 1 },
+    ],
+  },
 ]

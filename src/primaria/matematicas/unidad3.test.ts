@@ -13,7 +13,7 @@ const sesion = (id: string, seed = 3) => buildSession(temasUnidad3.find((topic) 
 
 describe('Unidad 3 de Matemáticas: contenido', () => {
   it('tiene los temas de la unidad y está registrada en la unidad 3', () => {
-    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'centenas-decenas-unidades', 'el-litro', 'medio-y-cuarto-de-litro', 'instrumentos-y-unidades', 'mas-menos-que', 'desafios-y-logica', 'calculo-mental'])
+    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'centenas-decenas-unidades', 'el-litro', 'medio-y-cuarto-de-litro', 'instrumentos-y-unidades', 'mas-menos-que', 'desafios-y-logica', 'calculo-mental', 'repaso'])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u3')!.topics).toBe(temasUnidad3)
   })
 
@@ -111,6 +111,23 @@ describe('Unidad 3 de Matemáticas: contenido', () => {
     // decenas con decenas (30 + 40, 70 − 20) y decenas con unidades (30 + 3, 5 + 60)
     expect(operaciones.filter((q) => /^\d0 [+−] \d0 =$/.test(q)).length).toBeGreaterThanOrEqual(2)
     expect(operaciones.filter((q) => /^(\d0 \+ \d|\d \+ \d0) =$/.test(q)).length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('"Repaso" mezcla series de 100 en 100, centenas, una resta que lleva, litros, tres sumandos y ordenar centenas', () => {
+    const plan = temasUnidad3.find((topic) => topic.id === 'repaso')!.plan
+    expect(plan.reduce((total, bloque) => total + bloque.count, 0)).toBe(10)
+    for (let seed = 0; seed < 100; seed++) {
+      const session = sesion('repaso', seed)
+      expect(session).toHaveLength(10)
+      const series = session.filter((e) => e.question.startsWith('Completa la serie: '))
+      expect(series).toHaveLength(2)
+      for (const e of series) expect(e.type === 'number' && e.answer % 100, e.question).toBe(0)
+      expect(session.filter((e) => e.type === 'choice' && e.question === '¿Qué resta es llevando?')).toHaveLength(1)
+      const columnas = session.filter((e) => e.type === 'column')
+      expect(columnas).toHaveLength(2)
+      expect(columnas.filter((e) => e.operator === '+' && e.third !== undefined)).toHaveLength(1)
+      expect(columnas.filter((e) => e.operator === '−' && e.carry)).toHaveLength(1)
+    }
   })
 
   it('los iconos de los temas y las piezas 🟥🟦🟨 están en la fuente de emojis', () => {
