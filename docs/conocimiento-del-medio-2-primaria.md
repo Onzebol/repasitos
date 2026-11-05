@@ -56,6 +56,17 @@ Resumen de los términos de la unidad 2 (solo vocabulario; los ejercicios están
 
 Evitados a propósito por dudosos: el avestruz «de desierto», el insecto palo «en selvas» y la clave del taller, que deja sin grupo a las serpientes.
 
+## Unidad 3: términos clave para escribir los ejercicios
+
+Resumen de los términos de la unidad 3 (solo vocabulario; los ejercicios están en `src/primaria/medio/unidad3.ts`):
+
+- **¿Qué tienen las plantas en común?:** son seres vivos (nacen, crecen, se reproducen y mueren), viven fijas al suelo y necesitan agua, aire, luz del sol y sustancias de la tierra; hojas (fabrican el alimento: fotosíntesis), tallo, raíces, flores y frutos con sus semillas.
+- **¿Cómo clasificamos las plantas?:** por el tallo (árboles, arbustos y hierbas), por las hojas (perenne o caduca) y por las flores (con flor, o sin flor como los helechos y los musgos); el roble a lo largo de las cuatro estaciones.
+- **Las plantas se reproducen:** semilla, brote, planta con flores y fruto con semillas; polen que llevan el viento y los insectos; esporas en helechos y musgos.
+- **¿Por qué son importantes las plantas?:** alimento, materiales (madera, algodón, lino), refugio y oxígeno; plantas silvestres y cultivadas; tareas del agricultor (sembrar, regar y cuidar, recoger la cosecha).
+
+Evitados a propósito por ambiguos: la «parte comestible» de la coliflor, el espárrago y la patata, y clasificar cereales, pan y cartón. El «Repaso del primer trimestre» irá como quinto tema (#83).
+
 ## Qué entra primero en la web
 
 Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el bloque 1:
