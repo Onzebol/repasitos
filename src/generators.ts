@@ -1170,6 +1170,27 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       return elegir(`¿Qué número se puede restar para que la resta sea ${condicion}?`, [bien, ...otros], bien, `${t * 10 + m} − ❓`)
     }
 
+    case 'regroup': {
+      const t = int(rng, 2, 9)
+      const u = int(rng, 0, 8)
+      const n = t * 10 + u
+      const intro = `Desagrupamos una decena de ${n}. ${n} = `
+      return spec.ask === 'units'
+        ? numero(`${intro}${decenas(t - 1)} y ❓ unidades`, u + 10)
+        : numero(`${intro}❓ decenas y ${u + 10} unidades`, t - 1)
+    }
+
+    case 'borrow-step': {
+      // Las unidades de arriba son menores que las de abajo y las decenas alcanzan después de desagrupar
+      const d = int(rng, 1, 8)
+      const t = int(rng, d + 1, 9)
+      const menor = int(rng, 0, 8)
+      const mayor = int(rng, menor + 1, 9)
+      const bien = `Desagrupamos una decena: ${menor} pasa a ${menor + 10} unidades`
+      const opciones = [bien, `Restamos al revés: ${mayor} − ${menor}`, `Sumamos ${mayor} a ${menor}`]
+      return elegir(`En ${t * 10 + menor} − ${d * 10 + mayor}, como ${mayor} > ${menor}, ¿qué hacemos primero?`, shuffle(rng, opciones), bien)
+    }
+
     case 'count-table':
       return contarCirculos(spec.ask, rng)
 

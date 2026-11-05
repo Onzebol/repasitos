@@ -13,7 +13,7 @@ const sesion = (id: string, seed = 3) => buildSession(temasUnidad3.find((topic) 
 
 describe('Unidad 3 de Matemáticas: contenido', () => {
   it('tiene los temas de la unidad y está registrada en la unidad 3', () => {
-    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'centenas-decenas-unidades', 'el-litro', 'medio-y-cuarto-de-litro', 'instrumentos-y-unidades', 'mas-menos-que', 'contar-y-registrar', 'desafios-y-logica', 'calculo-mental', 'repaso'])
+    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'desagrupar', 'centenas-decenas-unidades', 'el-litro', 'medio-y-cuarto-de-litro', 'instrumentos-y-unidades', 'mas-menos-que', 'contar-y-registrar', 'desafios-y-logica', 'calculo-mental', 'repaso'])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u3')!.topics).toBe(temasUnidad3)
   })
 
@@ -33,6 +33,22 @@ describe('Unidad 3 de Matemáticas: contenido', () => {
     expect(columnas.filter((e) => e.bottom < 10)).toHaveLength(1)
     expect(session.filter((e) => e.type === 'choice' && e.question === '¿Qué resta es llevando?')).toHaveLength(1)
     expect(session.filter((e) => e.type === 'choice' && e.question === 'Esta resta, ¿es sin llevar o llevando?')).toHaveLength(1)
+  })
+
+  it('"Desagrupar para restar" mezcla desagrupar una decena (unidades y decenas), el primer paso y restas en columna llevando', () => {
+    for (let seed = 0; seed < 100; seed++) {
+      const session = sesion('desagrupar', seed)
+      expect(session).toHaveLength(10)
+      expect(session.filter((e) => e.question.startsWith('Desagrupamos una decena de ') && e.question.includes('❓ unidades'))).toHaveLength(2)
+      expect(session.filter((e) => e.question.startsWith('Desagrupamos una decena de ') && e.question.includes('❓ decenas'))).toHaveLength(2)
+      expect(session.filter((e) => e.type === 'choice' && /¿qué hacemos primero\?$/.test(e.question))).toHaveLength(2)
+      const columnas = session.filter((e) => e.type === 'column')
+      expect(columnas).toHaveLength(4)
+      for (const e of columnas) {
+        expect(e.operator).toBe('−')
+        expect(e.carry).toBe(true)
+      }
+    }
   })
 
   it('"Centenas, decenas y unidades" incluye una serie de 100 en 100 hacia arriba y otra hacia abajo, y sigue en 10', () => {

@@ -201,6 +201,12 @@ export type BlockSpec =
   // minuendo («4❓ − 14») y `subtrahend` elige el número que se resta («57 − ❓»); de tres números solo uno cumple `carry`;
   // con `typed` se escribe con el teclado y vale cualquier número que cumpla la condición (`NumberExercise.valid`)
   | { kind: 'borrow-condition'; ask: 'minuend-digit' | 'subtrahend'; carry: boolean; typed?: boolean }
+  // Desagrupar una decena para restar llevando (unidad 3, p. 54; escribir): «Desagrupamos una decena de 53. 53 = 4 decenas y ❓
+  // unidades» (`units`, 13) o «53 = ❓ decenas y 13 unidades» (`tens`, 4). Números de 20 a 98 con unidades de 0 a 8
+  | { kind: 'regroup'; ask: 'units' | 'tens' }
+  // El primer paso de una resta llevando (unidad 3, p. 54; elegir): «En 52 − 37, como 7 > 2, ¿qué hacemos primero?». Solo una de
+  // las tres opciones desagrupa una decena
+  | { kind: 'borrow-step' }
   // Contar con dos criterios a la vez (unidad 3, p. 66; elegir): un móvil de círculos rojos, azules y verdes, grandes y pequeños
   // (de 1 a 5 de cada clase) y «¿Cuántos círculos rojos grandes hay?» (`cell`), «…grandes hay?» (`size`) o «…azules hay?» (`color`)
   | { kind: 'count-table'; ask: 'cell' | 'size' | 'color' }
