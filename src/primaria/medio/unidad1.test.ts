@@ -44,11 +44,11 @@ function ejercicios(t: Topic): ChoiceExercise[] {
 }
 
 describe('Unidad 1 de Conocimiento del medio: estructura', () => {
-  it('es la primera de las 9 unidades del índice y, salvo la 3, las demás aún no tienen temas', () => {
+  it('es la primera de las 9 unidades del índice y, salvo la 2 y la 3, las demás aún no tienen temas', () => {
     expect(unidadesMedio).toHaveLength(9)
     expect(unidadesMedio.map((unidad) => unidad.id)).toEqual(['u1', 'u2', 'u3', 'u4', 'u5', 'u6', 'u7', 'u8', 'u9'])
     expect(unidadesMedio[0].topics).toBe(temasUnidad1)
-    for (const unidad of unidadesMedio.slice(1)) if (unidad.id !== 'u3') expect(unidad.topics).toEqual([])
+    for (const unidad of unidadesMedio.slice(3)) expect(unidad.topics).toEqual([])
   })
 
   it('cada unidad lleva el título del libro como nota', () => {
