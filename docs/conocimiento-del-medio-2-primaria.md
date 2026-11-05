@@ -65,7 +65,7 @@ Resumen de los términos de la unidad 3 (solo vocabulario; los ejercicios están
 - **Las plantas se reproducen:** semilla, brote, planta con flores y fruto con semillas; polen que llevan el viento y los insectos; esporas en helechos y musgos.
 - **¿Por qué son importantes las plantas?:** alimento, materiales (madera, algodón, lino), refugio y oxígeno; plantas silvestres y cultivadas; tareas del agricultor (sembrar, regar y cuidar, recoger la cosecha).
 
-Evitados a propósito por ambiguos: la «parte comestible» de la coliflor, el espárrago y la patata, y clasificar cereales, pan y cartón. El «Repaso del primer trimestre» irá como quinto tema (#83).
+Evitados a propósito por ambiguos: la «parte comestible» de la coliflor, el espárrago y la patata, y clasificar cereales, pan y cartón. El «Repaso del primer trimestre» es el quinto tema de la unidad 3: toma bloques de las unidades 1, 2 y 3 (funciones vitales, hueso, articulación o músculo, camino de la comida, grupos de vertebrados, vertebrado o invertebrado, herbívoro, carnívoro u omnívoro, insectos y árbol, arbusto o hierba) y añade cuatro hechos sueltos. «Juegos y hábitos» (el reto de la p. 60) queda fuera por ahora.
 
 ## Qué entra primero en la web
 

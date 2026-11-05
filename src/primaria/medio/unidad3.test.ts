@@ -49,15 +49,16 @@ describe('Unidad 3 de Conocimiento del medio: estructura', () => {
     expect(unidadesMedio[2].topics).toBe(temasUnidad3)
   })
 
-  it('tiene los cuatro temas de la unidad, en el orden del libro, con icono y color propios', () => {
-    expect(temasUnidad3.map((t) => t.id)).toEqual(['comun', 'clasificar', 'reproduccion', 'importancia'])
+  it('tiene los cuatro temas de la unidad y el repaso del trimestre, en el orden del libro, con icono y color propios', () => {
+    expect(temasUnidad3.map((t) => t.id)).toEqual(['comun', 'clasificar', 'reproduccion', 'importancia', 'repaso'])
     expect(temasUnidad3.map((t) => t.name)).toEqual([
       '¿Qué tienen las plantas en común?',
       '¿Cómo clasificamos las plantas?',
       'Las plantas se reproducen',
       '¿Por qué son importantes las plantas?',
+      'Repaso del primer trimestre',
     ])
-    expect(new Set(temasUnidad3.map((t) => t.icon)).size).toBe(4)
+    expect(new Set(temasUnidad3.map((t) => t.icon)).size).toBe(5)
     for (const t of temasUnidad3) expect(t.tint).toMatch(/^#/)
   })
 
@@ -67,6 +68,7 @@ describe('Unidad 3 de Conocimiento del medio: estructura', () => {
     expect(cuentas('clasificar')).toEqual([3, 2, 1, 1, 3])
     expect(cuentas('reproduccion')).toEqual([3, 3, 4])
     expect(cuentas('importancia')).toEqual([2, 2, 2, 4])
+    expect(cuentas('repaso')).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 2])
   })
 
   it('cada bloque tiene al menos el doble de hechos distintos que los que toma una sesión, para que una sesión no repita la anterior', () => {

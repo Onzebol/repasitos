@@ -1,4 +1,6 @@
 import type { FactItem, Group, Member, PairRow, Topic } from '../../types'
+import { temasUnidad1 } from './unidad1'
+import { temasUnidad2 } from './unidad2'
 
 // Unidad 3: «Identificamos plantas» (ver docs/conocimiento-del-medio-2-primaria.md). Igual que las unidades 1 y 2: ejercicios
 // escritos desde cero que se generan al azar a partir de tablas (src/generators.ts: classify, pick-member, sequence, pairs y
@@ -302,7 +304,31 @@ const importancia: FactItem[] = [
   },
 ]
 
-export const temasUnidad3: Topic[] = [
+// ── Repaso del primer trimestre ────────────────────────────────────────────────────────────────────────────────────────
+// Un poco de cada unidad (¡Cuánto sabes ya!). No copia tablas: toma bloques de las unidades 1, 2 y 3, que ya tienen su
+// tabla de verdad independiente en los tests, y añade unos pocos hechos sueltos que mezclan las tres.
+const repasoHechos: FactItem[] = [
+  { question: '¿Cuál de estos insectos no tiene alas?', answer: 'la pulga', wrong: ['la abeja', 'la mariposa', 'el mosquito'] },
+  {
+    question: '¿Qué diferencia a un árbol de una hierba?',
+    answer: 'el árbol tiene el tronco grueso y alto',
+    wrong: ['la hierba tiene el tronco grueso', 'el árbol no tiene tallo', 'la hierba es más alta'],
+  },
+  {
+    question: '¿Cómo se llaman los lugares donde viven los animales?',
+    answer: 'hábitats',
+    wrong: ['colegios', 'nubes', 'caminos'],
+  },
+  {
+    question: '¿Qué tienen en común las plantas y los animales?',
+    answer: 'son seres vivos: nacen, crecen y se reproducen',
+    wrong: ['siempre vuelan', 'viven fijos al suelo', 'siempre tienen patas'],
+  },
+]
+
+const bloqueDe = (temas: Topic[], tema: string, i: number) => temas.find((t) => t.id === tema)!.plan[i].spec
+
+const temasDeLaUnidad: Topic[] = [
   {
     id: 'comun',
     name: '¿Qué tienen las plantas en común?',
@@ -375,3 +401,23 @@ export const temasUnidad3: Topic[] = [
     ],
   },
 ]
+
+const repaso: Topic = {
+  id: 'repaso',
+  name: 'Repaso del primer trimestre',
+  icon: '🏁',
+  tint: '#cfe8ff',
+  plan: [
+    { spec: bloqueDe(temasUnidad1, 'funciones', 2), count: 1 },
+    { spec: bloqueDe(temasUnidad1, 'movimiento', 1), count: 1 },
+    { spec: bloqueDe(temasUnidad1, 'alimentacion', 0), count: 1 },
+    { spec: bloqueDe(temasUnidad2, 'vertebrados', 1), count: 1 },
+    { spec: bloqueDe(temasUnidad2, 'vertebrados', 0), count: 1 },
+    { spec: bloqueDe(temasUnidad2, 'habitat', 2), count: 1 },
+    { spec: bloqueDe(temasUnidad2, 'invertebrados', 0), count: 1 },
+    { spec: bloqueDe(temasDeLaUnidad, 'clasificar', 0), count: 1 },
+    { spec: { kind: 'facts', items: repasoHechos }, count: 2 },
+  ],
+}
+
+export const temasUnidad3: Topic[] = [...temasDeLaUnidad, repaso]
