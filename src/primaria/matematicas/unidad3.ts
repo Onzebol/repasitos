@@ -60,6 +60,20 @@ export const temasUnidad3: Topic[] = [
     ],
   },
   {
+    // Por qué se lleva al restar (p. 54): desagrupar una decena del minuendo en 10 unidades
+    id: 'desagrupar',
+    name: 'Desagrupar para restar',
+    icon: '📦',
+    tint: '#e3d4ff',
+    plan: [
+      { spec: { kind: 'regroup', ask: 'units' }, count: 2 },
+      { spec: { kind: 'regroup', ask: 'tens' }, count: 2 },
+      { spec: { kind: 'borrow-step' }, count: 2 },
+      { spec: { kind: 'column', operator: '−', carry: true }, count: 3 },
+      { spec: { kind: 'column', operator: '−', carry: true, oneDigit: true }, count: 1 },
+    ],
+  },
+  {
     id: 'centenas-decenas-unidades',
     name: 'Centenas, decenas y unidades',
     icon: '💯',

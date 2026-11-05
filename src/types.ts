@@ -194,6 +194,12 @@ export type BlockSpec =
   // minuendo («4❓ − 14») y `subtrahend` elige el número que se resta («57 − ❓»); de tres números solo uno cumple `carry`;
   // con `typed` se escribe con el teclado y vale cualquier número que cumpla la condición (`NumberExercise.valid`)
   | { kind: 'borrow-condition'; ask: 'minuend-digit' | 'subtrahend'; carry: boolean; typed?: boolean }
+  // Desagrupar una decena para restar llevando (unidad 3, p. 54; escribir): «Desagrupamos una decena de 53. 53 = 4 decenas y ❓
+  // unidades» (`units`, 13) o «53 = ❓ decenas y 13 unidades» (`tens`, 4). Números de 20 a 98 con unidades de 0 a 8
+  | { kind: 'regroup'; ask: 'units' | 'tens' }
+  // El primer paso de una resta llevando (unidad 3, p. 54; elegir): «En 52 − 37, como 7 > 2, ¿qué hacemos primero?». Solo una de
+  // las tres opciones desagrupa una decena
+  | { kind: 'borrow-step' }
   // Pasos de un problema (elegir): a partir de un texto corto, ¿hay que sumar o restar? (`operation`) o ¿hay que calcular
   // el total o la diferencia? (`calculate`). Sin llevar. Con `faltan` (unidad 2) solo salen restas de «¿cuántos faltan?»:
   // hace falta un total, ya hay una parte y se pregunta cuántos faltan
