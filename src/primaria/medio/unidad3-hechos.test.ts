@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { BlockSpec, FactItem, Member, PairRow } from '../../types'
+import { temasUnidad1 } from './unidad1'
+import { temasUnidad2 } from './unidad2'
 import { temasUnidad3 } from './unidad3'
 
 // Tablas de verdad escritas aquí por separado: comparan las tablas del contenido con lo que se sabe de las plantas, para que
@@ -224,6 +226,32 @@ describe('Hechos de «¿Por qué son importantes las plantas?»', () => {
       '¿Qué nos dan las plantas?': 'alimento, refugio, materiales y oxígeno',
       '¿Qué ayudan a limpiar las plantas?': 'el aire',
       '¿Qué hace falta para que una planta cultivada crezca sana?': 'regarla y cuidarla',
+    })
+  })
+})
+
+describe('Hechos de «Repaso del primer trimestre»', () => {
+  // El repaso no copia tablas: usa las de las unidades 1 a 3, que ya tienen su tabla de verdad independiente
+  const origen = (temas: typeof temasUnidad1, tema: string, i: number) => temas.find((t) => t.id === tema)!.plan[i].spec
+
+  it('toma sus tablas de las unidades 1, 2 y 3, sin duplicarlas', () => {
+    const spec = (i: number) => temasUnidad3.find((t) => t.id === 'repaso')!.plan[i].spec
+    expect(spec(0)).toBe(origen(temasUnidad1, 'funciones', 2))
+    expect(spec(1)).toBe(origen(temasUnidad1, 'movimiento', 1))
+    expect(spec(2)).toBe(origen(temasUnidad1, 'alimentacion', 0))
+    expect(spec(3)).toBe(origen(temasUnidad2, 'vertebrados', 1))
+    expect(spec(4)).toBe(origen(temasUnidad2, 'vertebrados', 0))
+    expect(spec(5)).toBe(origen(temasUnidad2, 'habitat', 2))
+    expect(spec(6)).toBe(origen(temasUnidad2, 'invertebrados', 0))
+    expect(spec(7)).toBe(origen(temasUnidad3, 'clasificar', 0))
+  })
+
+  it('los hechos sueltos son correctos', () => {
+    compruebaHechos('repaso', {
+      '¿Cuál de estos insectos no tiene alas?': 'la pulga',
+      '¿Qué diferencia a un árbol de una hierba?': 'el árbol tiene el tronco grueso y alto',
+      '¿Cómo se llaman los lugares donde viven los animales?': 'hábitats',
+      '¿Qué tienen en común las plantas y los animales?': 'son seres vivos: nacen, crecen y se reproducen',
     })
   })
 })
