@@ -104,13 +104,14 @@ describe('App: navegación', () => {
     expect(screen.getByLabelText('Ejercicio 1 de 10')).toBeInTheDocument()
   })
 
-  it('Conocimiento del medio abre sus 9 unidades: la 1 con su tema y las demás «Muy pronto»', async () => {
+  it('Conocimiento del medio abre sus 9 unidades: la 1 y la 3 con sus temas y las demás «Muy pronto»', async () => {
     const user = abrir()
     await user.click(screen.getByRole('button', { name: /Primaria/ }))
     await user.click(screen.getByRole('button', { name: 'Conocimiento del medio' }))
     expect(window.location.hash).toBe('#/primaria/medio')
     expect(screen.getByRole('button', { name: /Unidad 1/ })).toBeEnabled()
-    expect(screen.getAllByText('Muy pronto')).toHaveLength(8)
+    expect(screen.getByRole('button', { name: /Unidad 3/ })).toBeEnabled()
+    expect(screen.getAllByText('Muy pronto')).toHaveLength(7)
     await user.click(screen.getByRole('button', { name: /Unidad 1/ }))
     expect(window.location.hash).toBe('#/primaria/medio/u1')
     await user.click(screen.getByRole('button', { name: /¿Cómo nos alimentamos\?/ }))
