@@ -153,6 +153,44 @@ const FIGURAS = [
   { emoji: '🟡', nombre: 'círculo amarillo' },
 ]
 
+// Contar con dos criterios: el móvil tiene de 1 a 5 círculos de cada color y tamaño, mezclados
+function contarCirculos(ask: 'cell' | 'size' | 'color', rng: Rng): ChoiceExercise {
+  const colores = ['rojo', 'azul', 'verde'] as const
+  const plural = { rojo: 'rojos', azul: 'azules', verde: 'verdes' }
+  const casillas = colores.flatMap((color) => [true, false].map((big) => ({ color, big, n: int(rng, 1, 5) })))
+  const items = shuffle(rng, casillas.flatMap(({ color, big, n }) => Array.from({ length: n }, () => ({ color, big }))))
+  const color = pick(rng, [...colores])
+  const big = pick(rng, [true, false])
+  const suma = (filtro: (c: (typeof casillas)[number]) => boolean) => casillas.filter(filtro).reduce((total, c) => total + c.n, 0)
+  const tamano = big ? 'grandes' : 'pequeños'
+  let respuesta: number
+  let criterio: string
+  let trampas: number[]
+  if (ask === 'cell') {
+    respuesta = suma((c) => c.color === color && c.big === big)
+    criterio = `${plural[color]} ${tamano}`
+    // Errores típicos: contar todos los del color o todos los del tamaño, en vez de los dos criterios a la vez
+    trampas = [suma((c) => c.color === color), suma((c) => c.big === big)]
+  } else if (ask === 'size') {
+    respuesta = suma((c) => c.big === big)
+    criterio = tamano
+    trampas = [suma((c) => c.big === big && c.color === color)]
+  } else {
+    respuesta = suma((c) => c.color === color)
+    criterio = plural[color]
+    trampas = [suma((c) => c.color === color && c.big === big)]
+  }
+  const otros = new Set<number>()
+  for (const t of shuffle(rng, trampas)) {
+    if (t !== respuesta && otros.size < 1) otros.add(t)
+  }
+  for (const d of shuffle(rng, [-2, -1, 1, 2, 3])) {
+    const n = respuesta + d
+    if (n >= 0 && n !== respuesta && otros.size < 2) otros.add(n)
+  }
+  return { ...elegir(`¿Cuántos círculos ${criterio} hay?`, shuffle(rng, [respuesta, ...otros]), respuesta), countMobile: { items } }
+}
+
 const decenas = (n: number) => `${n} ${n === 1 ? 'decena' : 'decenas'}`
 const unidades = (n: number) => `${n} ${n === 1 ? 'unidad' : 'unidades'}`
 
@@ -1131,6 +1169,9 @@ export function generate(spec: BlockSpec, rng: Rng): Exercise {
       }
       return elegir(`¿Qué número se puede restar para que la resta sea ${condicion}?`, [bien, ...otros], bien, `${t * 10 + m} − ❓`)
     }
+
+    case 'count-table':
+      return contarCirculos(spec.ask, rng)
 
     case 'compare-problem':
       return problemaComparar(spec.ask, spec.carry ?? false, rng)

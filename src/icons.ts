@@ -25,6 +25,9 @@ export const iconosInterfaz = {
   repeat: { glyph: '↻', uso: 'Repetir con ejercicios nuevos', donde: 'Pantalla final de cada tema' },
   update: { glyph: '🔄', uso: 'Instalar la versión nueva de la aplicación', donde: 'Botón «Actualizar» flotante' },
   gap: { glyph: '❓', uso: 'Marcar el número que falta', donde: 'Tabla del 0 al 99 · Números hasta el 99' },
+  'circle-rojo': { glyph: '🔴', uso: 'Círculo rojo que se cuenta', donde: 'Contar y registrar' },
+  'circle-azul': { glyph: '🔵', uso: 'Círculo azul que se cuenta', donde: 'Contar y registrar' },
+  'circle-verde': { glyph: '🟢', uso: 'Círculo verde que se cuenta', donde: 'Contar y registrar' },
   infantil: { glyph: '🧩', uso: 'Perfil Infantil', donde: 'Pantalla de inicio' },
   primaria: { glyph: '📚', uso: 'Perfil Primaria', donde: 'Pantalla de inicio' },
 } as const satisfies Record<string, UiIcon>
