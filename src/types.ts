@@ -23,6 +23,11 @@ export type CodeTableData = {
   legend: { emoji: string; name: string; number: number }[]
 }
 
+// Móvil de círculos de colores y tamaños (CountMobile, unidad 3, p. 66): cada pieza es un círculo rojo, azul o verde, grande o pequeño
+export type CountMobileData = {
+  items: { color: 'rojo' | 'azul' | 'verde'; big: boolean }[]
+}
+
 // Tabla de puntos (ScoreTable, unidad 2): tres jugadores —animales— con los puntos de dos partidas y el total. `null` es
 // una casilla que falta (se dibuja como ❓)
 export type ScoreTableData = {
@@ -50,6 +55,8 @@ export type ChoiceExercise = {
   table?: TableMarks
   // Tabla de actividades con números (unidad 2): se dibuja entre la pregunta y las opciones, con su leyenda
   codeTable?: CodeTableData
+  // Móvil de círculos de colores y tamaños (unidad 3): se dibuja entre la pregunta y las opciones y se cuenta con dos criterios
+  countMobile?: CountMobileData
   // Tabla de puntos de tres jugadores (unidad 2): se dibuja entre la pregunta y las opciones
   scoreTable?: ScoreTableData
   // Itinerarios con flechas: mapa dibujado entre la pregunta y las opciones. `steps` son las instrucciones («3> 1^ 1>», ver
@@ -200,6 +207,9 @@ export type BlockSpec =
   // El primer paso de una resta llevando (unidad 3, p. 54; elegir): «En 52 − 37, como 7 > 2, ¿qué hacemos primero?». Solo una de
   // las tres opciones desagrupa una decena
   | { kind: 'borrow-step' }
+  // Contar con dos criterios a la vez (unidad 3, p. 66; elegir): un móvil de círculos rojos, azules y verdes, grandes y pequeños
+  // (de 1 a 5 de cada clase) y «¿Cuántos círculos rojos grandes hay?» (`cell`), «…grandes hay?» (`size`) o «…azules hay?» (`color`)
+  | { kind: 'count-table'; ask: 'cell' | 'size' | 'color' }
   // Pasos de un problema (elegir): a partir de un texto corto, ¿hay que sumar o restar? (`operation`) o ¿hay que calcular
   // el total o la diferencia? (`calculate`). Sin llevar. Con `faltan` (unidad 2) solo salen restas de «¿cuántos faltan?»:
   // hace falta un total, ya hay una parte y se pregunta cuántos faltan

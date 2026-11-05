@@ -130,6 +130,18 @@ export const temasUnidad3: Topic[] = [
     ],
   },
   {
+    // Taller de gráficos del libro (p. 66): contar con dos criterios a la vez, color y tamaño, para registrar en una tabla
+    id: 'contar-y-registrar',
+    name: 'Contar y registrar',
+    icon: '🐟',
+    tint: '#c8ecf5',
+    plan: [
+      { spec: { kind: 'count-table', ask: 'cell' }, count: 4 },
+      { spec: { kind: 'count-table', ask: 'size' }, count: 3 },
+      { spec: { kind: 'count-table', ask: 'color' }, count: 3 },
+    ],
+  },
+  {
     // El rincón de la lógica del libro (p. 69): cantidades encadenadas con «más que» y «menos que»
     id: 'desafios-y-logica',
     name: 'Desafíos y lógica',

@@ -13,7 +13,7 @@ const sesion = (id: string, seed = 3) => buildSession(temasUnidad3.find((topic) 
 
 describe('Unidad 3 de Matemáticas: contenido', () => {
   it('tiene los temas de la unidad y está registrada en la unidad 3', () => {
-    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'desagrupar', 'centenas-decenas-unidades', 'el-litro', 'medio-y-cuarto-de-litro', 'instrumentos-y-unidades', 'mas-menos-que', 'desafios-y-logica', 'calculo-mental', 'repaso'])
+    expect(temasUnidad3.map((topic) => topic.id)).toEqual(['restas-llevando', 'desagrupar', 'centenas-decenas-unidades', 'el-litro', 'medio-y-cuarto-de-litro', 'instrumentos-y-unidades', 'mas-menos-que', 'contar-y-registrar', 'desafios-y-logica', 'calculo-mental', 'repaso'])
     expect(unidadesMatematicas.find((unit) => unit.id === 'u3')!.topics).toBe(temasUnidad3)
   })
 
@@ -85,6 +85,17 @@ describe('Unidad 3 de Matemáticas: contenido', () => {
     expect(elegir).toHaveLength(3)
     for (const e of elegir) expect(e.type === 'choice' && e.text, e.question).toMatch(/(más|menos)\. ¿/)
     expect(session.filter((e) => e.type === 'number')).toHaveLength(7)
+  })
+
+  it('"Contar y registrar" cuenta círculos de un móvil con dos criterios: 4 de una casilla, 3 de un tamaño y 3 de un color, con el móvil a la vista', () => {
+    for (let seed = 0; seed < 100; seed++) {
+      const session = sesion('contar-y-registrar', seed)
+      expect(session).toHaveLength(10)
+      for (const e of session) expect(e.type === 'choice' && e.countMobile !== undefined, e.question).toBe(true)
+      const criterios = session.map((e) => /^¿Cuántos círculos (.+) hay\?$/.exec(e.question)![1].split(' ').length)
+      expect(criterios.filter((n) => n === 2)).toHaveLength(4)
+      expect(criterios.filter((n) => n === 1)).toHaveLength(6)
+    }
   })
 
   it('"Desafíos y lógica" encadena «más que» y «menos que»: 5 de cuántos rojos y 5 de cuántos azules, con el texto a la vista', () => {
