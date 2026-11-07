@@ -67,6 +67,25 @@ Fuera de la web: hablar y escuchar, el juego del eco, valores, preguntas persona
 
 Siete temas: palabras de la granja, antónimos, la r y la rr, unir oraciones (con separar palabras), la lengua oral y la escrita, símbolos y cómic, y comprensión lectora (seis textos propios, tres cuentos y tres informativos, con cuatro preguntas cada uno).
 
+## Unidad 3: términos clave para escribir los ejercicios
+
+Resumen de la unidad 3 (pp. 54–79, hecho a partir de las páginas del libro; solo vocabulario y reglas, sin copiar textos):
+
+- **Vocabulario:** no hay un apartado de palabras de la pintura como tal; salen en las lecturas y en definiciones (pincel, cuadro, lienzo, marco, retrato, paisaje) y en la nube de palabras (museo, concierto, escenario, mural, danza).
+- **Aumentativos y diminutivos:** sin recuadro de regla, solo ejemplos: pequeño = diminutivo (-ito/-ita, -illo/-illa: tacita, barquita, cucharilla) y grande = aumentativo (-ón, -azo/-aza: tazón, barcaza, cucharón).
+- **ca, co, cu, que, qui:** se escribe c delante de a, o, u (música, banco, cuadro) y qu delante de e, i (banqueta, flequillo).
+- **Completar oraciones:** elegir el final que tiene sentido y no olvidar el punto.
+- **Sustantivos:** nombran personas, animales o cosas. Los comunes nombran a cualquiera (niña, pato, gorro); los propios dicen cómo se llaman personas, animales o lugares concretos y llevan mayúscula. Palabras que son las dos cosas: Rosa/rosa, Paloma/paloma.
+- **Describir un objeto:** su tamaño, su color, sus partes y los detalles que lo hacen especial (modelo: una bici, con manillar, sillín, timbre, faro…).
+- **La biblioteca del colegio:** libros para leer y de consulta, préstamo con el carné, tipos de libro (cuento, teatro, cómic, poesía) y normas.
+- «Nuestro reto» (hábitos saludables, grabar un audio) cierra el primer bloque; no hay repaso del trimestre en el libro.
+
+Fuera de la web: conversaciones, dibujar, valores, taller de creatividad, dramatizar el diálogo, lectura en cadena, preguntas personales, escribir la descripción propia, «Nuestro reto», la parte oral de la biblioteca y «Valora tu aprendizaje».
+
+## Unidad 3 en la web
+
+Ocho temas: palabras del arte, aumentativos y diminutivos, ca, co, cu, que, qui, completar oraciones, sustantivos comunes y propios, describir objetos, la biblioteca del colegio y comprensión lectora (seis textos propios: dos cuentos, dos diálogos y dos poemas, con cuatro preguntas cada uno).
+
 ## Qué entra primero en la web
 
 Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el bloque 1:

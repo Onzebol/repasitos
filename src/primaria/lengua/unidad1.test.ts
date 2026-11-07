@@ -41,11 +41,11 @@ function ejercicios(t: Topic): ChoiceExercise[] {
 }
 
 describe('Unidad 1 de Lengua: estructura', () => {
-  it('es la primera de las 9 unidades del índice y de la 3 en adelante aún no tienen temas', () => {
+  it('es la primera de las 9 unidades del índice y de la 4 en adelante aún no tienen temas', () => {
     expect(unidadesLengua).toHaveLength(9)
     expect(unidadesLengua.map((unidad) => unidad.id)).toEqual(['u1', 'u2', 'u3', 'u4', 'u5', 'u6', 'u7', 'u8', 'u9'])
     expect(unidadesLengua[0].topics).toBe(temasUnidad1)
-    for (const unidad of unidadesLengua.slice(2)) expect(unidad.topics).toEqual([])
+    for (const unidad of unidadesLengua.slice(3)) expect(unidad.topics).toEqual([])
   })
 
   it('cada unidad lleva el título del libro como nota y un icono que dibuja la fuente de la web', () => {

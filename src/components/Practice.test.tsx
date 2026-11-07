@@ -399,6 +399,11 @@ describe('Practice: ejercicios con un texto para leer', () => {
   it('la tarjeta de lectura tiene su propio estilo', () => {
     expect(css).toMatch(/\.reading-text\s*\{/)
   })
+
+  it('la tarjeta de lectura respeta los saltos de línea, para los diálogos y los versos', () => {
+    const regla = css.match(/\.reading-text\s*\{([^}]*)\}/)?.[1] ?? ''
+    expect(regla).toMatch(/white-space:\s*pre-line/)
+  })
 })
 
 describe('Practice: ejercicios sobre la tabla del 0 al 99', () => {

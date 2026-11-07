@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import emojiCss from '../../assets/emoji-font.css?raw'
 import { emojisDeLaFuente } from '../../emojiFont'
 import { mulberry32 } from '../../random'
@@ -7,6 +7,9 @@ import { describeUnit } from '../../test/unitChecks'
 import type { BlockSpec, ChoiceExercise, Topic } from '../../types'
 import { temasUnidad2 } from './unidad2'
 import { unidadesLengua } from './unidades'
+
+// Cada comprobación genera 150 sesiones de cada tema: con toda la batería a la vez puede pasar de los 5 s por defecto
+vi.setConfig({ testTimeout: 30_000 })
 
 describeUnit('Unidad 2 de Lengua', temasUnidad2)
 
