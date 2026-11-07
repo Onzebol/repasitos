@@ -95,13 +95,14 @@ describe('routes: dirección ↔ pantalla', () => {
     expect(hasContent('primaria', materia('ingles'))).toBe(false)
   })
 
-  it('Lengua abre sus unidades: la 1 y la 2 tienen temas y las demás vuelven al inicio', () => {
+  it('Lengua abre sus unidades: la 1, la 2 y la 3 tienen temas y las demás vuelven al inicio', () => {
     const unidades = screenFromHash('#/primaria/lengua')
     expect(unidades.name).toBe('units')
     if (unidades.name === 'units') expect(unidades.units).toHaveLength(9)
     expect(screenFromHash('#/primaria/lengua/u1').name).toBe('topics')
     expect(screenFromHash('#/primaria/lengua/u2').name).toBe('topics')
-    expect(screenFromHash('#/primaria/lengua/u3')).toEqual({ name: 'home' })
+    expect(screenFromHash('#/primaria/lengua/u3').name).toBe('topics')
+    expect(screenFromHash('#/primaria/lengua/u4')).toEqual({ name: 'home' })
   })
 
   it('Conocimiento del medio abre sus unidades: la 1, la 2 y la 3 tienen temas y las demás vuelven al inicio', () => {
