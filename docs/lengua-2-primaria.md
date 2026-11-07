@@ -86,6 +86,8 @@ Fuera de la web: conversaciones, dibujar, valores, taller de creatividad, dramat
 
 Ocho temas: palabras del arte, aumentativos y diminutivos, ca, co, cu, que, qui, completar oraciones, sustantivos comunes y propios, describir objetos, la biblioteca del colegio y comprensión lectora (seis textos propios: dos cuentos, dos diálogos y dos poemas, con cuatro preguntas cada uno).
 
+Al final de la unidad 3 está el tema «Repaso del primer trimestre» (el libro no lo trae): un ejercicio de cada uno de nueve bloques de las unidades 1 a 3 (mayúscula, sinónimos, abecedario, r y rr, antónimos, lengua oral y escrita, c y qu, diminutivos y nombres propios) y uno de cuatro hechos propios que mezclan las tres.
+
 ## Qué entra primero en la web
 
 Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el bloque 1:

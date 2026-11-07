@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { BlockSpec, FactItem, PairRow } from '../../types'
+import { temasUnidad1 } from './unidad1'
+import { temasUnidad2 } from './unidad2'
 import { temasUnidad3 } from './unidad3'
 
 // Tablas de verdad escritas aquí por separado: comparan las tablas del contenido con lo que se sabe, para que un cambio en
@@ -371,5 +373,49 @@ describe('Comprensión lectora', () => {
     const poemas = textos.filter((t) => !t.startsWith('—') && t.split('\n').length >= 4)
     expect(poemas.length).toBeGreaterThanOrEqual(2)
     for (const t of textos) expect(t, t).not.toContain(' / ')
+  })
+})
+
+describe('Repaso del primer trimestre', () => {
+  // El repaso no copia tablas: usa bloques de las unidades 1 a 3, que ya tienen su tabla de verdad independiente
+  const origen = (temas: typeof temasUnidad1, tema: string, i: number) => temas.find((t) => t.id === tema)!.plan[i].spec
+  const repaso = temasUnidad3.find((t) => t.id === 'repaso')!
+  // los hechos propios del repaso son su último bloque (los demás son de las unidades)
+  const propios = () => bloques('repaso', 'facts').at(-1)!.items
+
+  it('toma un ejercicio de tres bloques de cada unidad, sin duplicar sus tablas, y uno de hechos propios', () => {
+    const esperados = [
+      origen(temasUnidad1, 'mayuscula', 2),
+      origen(temasUnidad1, 'sinonimos', 0),
+      origen(temasUnidad1, 'abecedario', 0),
+      origen(temasUnidad2, 'erre', 0),
+      origen(temasUnidad2, 'antonimos', 0),
+      origen(temasUnidad2, 'oral-escrita', 0),
+      origen(temasUnidad3, 'c-qu', 1),
+      origen(temasUnidad3, 'aumentativos', 0),
+      origen(temasUnidad3, 'sustantivos', 1),
+    ]
+    expect(repaso.plan).toHaveLength(esperados.length + 1)
+    esperados.forEach((spec, i) => expect(repaso.plan[i].spec, `bloque ${i}`).toBe(spec))
+    expect(repaso.plan[esperados.length].spec.kind).toBe('facts')
+    expect(repaso.plan.map((b) => b.count)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+  })
+
+  it('los hechos sueltos son correctos y tienen tres respuestas equivocadas', () => {
+    const hechos = propios()
+    compruebaMalas(hechos)
+    expect(Object.fromEntries(hechos.map((f) => [f.question, f.answer]))).toEqual({
+      '¿Qué tienen en común «perrito» y «perrazo»?': 'vienen de la palabra «perro»',
+      '¿Qué nombre se escribe siempre con mayúscula?': 'el nombre de un río, como Ebro',
+      '¿Qué es lo contrario de un diminutivo?': 'un aumentativo',
+      '¿Qué oración tiene bien escritas la mayúscula, la rr y la qu?': 'Mi perro Toby come queso.',
+    })
+  })
+
+  it('sus preguntas no son las mismas que las de los temas de las unidades, para no repetir un hecho', () => {
+    const deLasUnidades = [...temasUnidad1, ...temasUnidad2, ...temasUnidad3.filter((t) => t.id !== 'repaso')]
+      .flatMap((t) => t.plan)
+      .flatMap((b) => (b.spec.kind === 'facts' ? b.spec.items.map((f) => f.question) : []))
+    for (const f of propios()) expect(deLasUnidades, f.question).not.toContain(f.question)
   })
 })
