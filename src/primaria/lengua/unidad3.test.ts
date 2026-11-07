@@ -23,6 +23,10 @@ function hechosDe(spec: BlockSpec): number {
       return spec.items.filter((m) => !m.plural).length
     case 'pairs':
       return spec.rows.length
+    case 'sequence': {
+      const n = spec.steps.length
+      return (spec.first ? 1 : 0) + (spec.last ? 1 : 0) + (spec.after ? n - 1 : 0) + (spec.before ? n - 1 : 0)
+    }
     default:
       throw new Error(`bloque inesperado: ${spec.kind}`)
   }
@@ -46,7 +50,7 @@ describe('Unidad 3 de Lengua: estructura', () => {
   })
 
   it('tiene los temas previstos, cada uno con icono y color propios', () => {
-    expect(temasUnidad3.map((t) => t.id)).toEqual(['arte', 'aumentativos', 'c-qu', 'completar', 'sustantivos', 'describir', 'biblioteca', 'lectura'])
+    expect(temasUnidad3.map((t) => t.id)).toEqual(['arte', 'aumentativos', 'c-qu', 'completar', 'sustantivos', 'describir', 'biblioteca', 'lectura', 'repaso'])
     expect(temasUnidad3.map((t) => t.name)).toEqual([
       'Palabras del arte',
       'Aumentativos y diminutivos',
@@ -56,6 +60,7 @@ describe('Unidad 3 de Lengua: estructura', () => {
       'Describir objetos',
       'La biblioteca del colegio',
       'Comprensión lectora',
+      'Repaso del primer trimestre',
     ])
     const fuente = new Set(emojisDeLaFuente(emojiCss))
     for (const t of temasUnidad3) expect(fuente.has(t.icon.replace(/️/g, '')), `${t.icon} no está en la fuente`).toBe(true)

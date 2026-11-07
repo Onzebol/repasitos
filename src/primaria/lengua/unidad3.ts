@@ -1,4 +1,6 @@
 import type { FactItem, Group, Member, PairRow, Topic } from '../../types'
+import { temasUnidad1 } from './unidad1'
+import { temasUnidad2 } from './unidad2'
 
 // Unidad 3: «¿Te sientes artista?» (ver docs/lengua-2-primaria.md). Mismas reglas que las unidades 1 y 2: ejercicios
 // escritos desde cero con el vocabulario y las reglas de la unidad, preguntas generadas desde tablas y respuestas
@@ -485,7 +487,7 @@ const LECTURAS: FactItem[] = [
   leer(ORQUESTA, '¿Qué dice el piano?', '¡aquí!', ['¡tirurí!', '¡pom, pom, pom!', '¡adiós!']),
 ]
 
-export const temasUnidad3: Topic[] = [
+const temasDeLaUnidad: Topic[] = [
   {
     id: 'arte',
     name: 'Palabras del arte',
@@ -572,3 +574,49 @@ export const temasUnidad3: Topic[] = [
     plan: [{ spec: { kind: 'facts', items: LECTURAS }, count: 10 }],
   },
 ]
+
+// ── Repaso del primer trimestre ────────────────────────────────────────────────────────────────────────────────────────
+// Un poco de cada unidad, como en Conocimiento del medio. El libro no trae un repaso del trimestre: el tema es de la web.
+// No copia tablas: toma bloques de las unidades 1, 2 y 3, que ya tienen su tabla de verdad independiente en los tests, y
+// añade unos pocos hechos que mezclan las tres (sin comprensión lectora, que tiene su tema en cada unidad).
+const REPASO: FactItem[] = [
+  {
+    question: '¿Qué tienen en común «perrito» y «perrazo»?',
+    answer: 'vienen de la palabra «perro»',
+    wrong: ['significan lo mismo', 'son nombres propios', 'riman con «gato»'],
+  },
+  {
+    question: '¿Qué nombre se escribe siempre con mayúscula?',
+    answer: 'el nombre de un río, como Ebro',
+    wrong: ['el nombre de un animal, como perro', 'el nombre de una fruta, como pera', 'el nombre de un color, como rojo'],
+  },
+  { question: '¿Qué es lo contrario de un diminutivo?', answer: 'un aumentativo', wrong: ['un sinónimo', 'un sustantivo', 'un nombre propio'] },
+  {
+    question: '¿Qué oración tiene bien escritas la mayúscula, la rr y la qu?',
+    answer: 'Mi perro Toby come queso.',
+    wrong: ['Mi pero Toby come queso.', 'Mi perro toby come queso.', 'Mi perro Toby come ceso.'],
+  },
+]
+
+const bloqueDe = (temas: Topic[], tema: string, i: number) => temas.find((t) => t.id === tema)!.plan[i].spec
+
+const repaso: Topic = {
+  id: 'repaso',
+  name: 'Repaso del primer trimestre',
+  icon: '🏁',
+  tint: '#cfe8ff',
+  plan: [
+    { spec: bloqueDe(temasUnidad1, 'mayuscula', 2), count: 1 }, // frases con la mayúscula bien puesta
+    { spec: bloqueDe(temasUnidad1, 'sinonimos', 0), count: 1 }, // sinónimos
+    { spec: bloqueDe(temasUnidad1, 'abecedario', 0), count: 1 }, // orden del abecedario
+    { spec: bloqueDe(temasUnidad2, 'erre', 0), count: 1 }, // r suave, r fuerte, rr
+    { spec: bloqueDe(temasUnidad2, 'antonimos', 0), count: 1 }, // antónimos (adjetivos)
+    { spec: bloqueDe(temasUnidad2, 'oral-escrita', 0), count: 1 }, // lengua oral o escrita
+    { spec: bloqueDe(temasDeLaUnidad, 'c-qu', 1), count: 1 }, // cómo se escribe con c o con qu
+    { spec: bloqueDe(temasDeLaUnidad, 'aumentativos', 0), count: 1 }, // diminutivos
+    { spec: bloqueDe(temasDeLaUnidad, 'sustantivos', 1), count: 1 }, // nombre propio ↔ nombre común
+    { spec: { kind: 'facts', items: REPASO }, count: 1 },
+  ],
+}
+
+export const temasUnidad3: Topic[] = [...temasDeLaUnidad, repaso]
