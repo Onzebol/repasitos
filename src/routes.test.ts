@@ -100,7 +100,8 @@ describe('routes: dirección ↔ pantalla', () => {
     expect(unidades.name).toBe('units')
     if (unidades.name === 'units') expect(unidades.units).toHaveLength(9)
     expect(screenFromHash('#/primaria/lengua/u1').name).toBe('topics')
-    expect(screenFromHash('#/primaria/lengua/u2')).toEqual({ name: 'home' })
+    expect(screenFromHash('#/primaria/lengua/u2').name).toBe('topics')
+    expect(screenFromHash('#/primaria/lengua/u3')).toEqual({ name: 'home' })
   })
 
   it('Conocimiento del medio abre sus unidades: la 1, la 2 y la 3 tienen temas y las demás vuelven al inicio', () => {

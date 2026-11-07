@@ -49,6 +49,24 @@ Fuera de la web: las tres lecturas (un cuento, un diálogo y un poema) tienen de
 
 Siete temas: sinónimos y palabras del colegio, la mayúscula, describir personas, lenguas de España, abecedario y sílabas, palabras que riman y comprensión lectora (seis textos propios con cuatro preguntas cada uno).
 
+## Unidad 2: términos clave para escribir los ejercicios
+
+Resumen de la unidad 2 (pp. 34–53, hecho a partir de las páginas del libro; solo vocabulario y reglas, sin copiar textos):
+
+- **Vocabulario:** dónde vive cada animal de la granja (caballo → cuadra, vaca → establo, cerdo → pocilga, gallina → corral); animales domésticos y salvajes, la fauna, la veterinaria.
+- **Antónimos:** palabras de significado contrario. El libro no trae recuadro de teoría: los practica con adjetivos (grande/pequeño, lleno/vacío), con verbos (abrir/cerrar, ganar/perder) y con el prefijo *in-* (feliz/infeliz).
+- **Palabras con r:** el sonido R suave se escribe con una sola r (toro, mariposa); el fuerte, con r (reno) o con rr (perro), y solo se escribe rr entre vocales. El libro no explica la r fuerte tras n, l o s. Parejas que cambian de significado: coro/corro, pera/perra, coral/corral, caro/carro.
+- **Unir oraciones:** dos oraciones que cuentan cosas del mismo sujeto se unen con «y»; también separar las palabras de una oración escrita toda junta.
+- **La lengua oral y la lengua escrita:** el lenguaje es el principal medio de comunicación entre las personas; hablar es lengua oral (una conversación) y escribir, lengua escrita (un chat). Otras formas: lengua de signos, braille y pictogramas.
+- **Texto informativo y símbolos:** los símbolos informativos son dibujos sencillos que dan información, en calles, edificios, planos, aparatos y ropa; un plano lleva una leyenda.
+- **Cómic:** viñetas, una cartela arriba que ayuda a entender la historia, bocadillo con pico (habla) y con forma de nube (piensa).
+
+Fuera de la web: hablar y escuchar, el juego del eco, valores, preguntas personales, dictados, rotular carteles, oratoria, dibujar símbolos, escribir los bocadillos, «Valora tu aprendizaje» y «Ahora elige tú».
+
+## Unidad 2 en la web
+
+Siete temas: palabras de la granja, antónimos, la r y la rr, unir oraciones (con separar palabras), la lengua oral y la escrita, símbolos y cómic, y comprensión lectora (seis textos propios, tres cuentos y tres informativos, con cuatro preguntas cada uno).
+
 ## Qué entra primero en la web
 
 Lo más fácil de convertir en ejercicios tocando la pantalla, empezando por el bloque 1:
